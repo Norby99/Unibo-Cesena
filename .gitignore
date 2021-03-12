@@ -1,0 +1,6 @@
+.vscode
+.vs
+*.exe
+*.temp
+*.o
+*.dat
