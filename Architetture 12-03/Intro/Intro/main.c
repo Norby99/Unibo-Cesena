@@ -2,7 +2,9 @@
 
 void main() {
 
-	printf("Prima riga");
-	printf("Hello World\n");
-	printf("Seconda riga");
+	int a = 0;
+	int b = 3;
+	int c = 5;
+
+	printf("Hello World");
 }
