@@ -1,2 +1,2 @@
-# Architetture
-Qui mettero i lavoretti fatti a lezione di **architetture**
+# Architetture + Algoritmi
+Qui mettero i lavoretti fatti a lezione di **architetture** e **algoritmi**
