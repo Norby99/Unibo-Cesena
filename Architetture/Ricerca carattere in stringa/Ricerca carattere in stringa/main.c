@@ -3,7 +3,7 @@
 void main(){
 	char Stringa[] = "Questa è una stringa";
 	int Lunghezza = sizeof(Stringa) - 1;
-	char Carattere = 'z';
+	char Carattere = 'a';
 	int Posizione;
 	
 	__asm {
@@ -13,19 +13,22 @@ void main(){
 
 Ciclo:
 		CMP EDX, EBX
-		JGE NonTrovato // >
+		JGE NonTrovato // >=
 		MOV CL, Stringa[EDX]
 		CMP CL, CH
 		JE Fine // ==
 		INC EDX
 		JMP Ciclo // ripeti finche'
 
-NonTrovato:
+NonTrovato :
 		MOV Posizione, -1
+		JMP True
 Fine:
 		MOV Posizione, EDX
 
-		
+True:
+
+
 	}
 
 	printf("Posizione = %d\n", Posizione);

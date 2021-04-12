@@ -1,20 +1,20 @@
 #include <stdio.h>
 
 void main() {
-	unsigned int Num = 10;
+	unsigned int Num = 16;
 	unsigned int Radice;
 
 	__asm {
 		XOR EAX, EAX	//Radice
 		MOV EBX, 1	//S
 		MOV ECX, Num
-		Ciclo:
+Ciclo:
 		SUB ECX, EBX
 		JL Fine
 		INC EAX
 		ADD EBX, 2
 		JMP Ciclo
-		Fine: 
+Fine: 
 		MOV Radice, EAX
 
 	}

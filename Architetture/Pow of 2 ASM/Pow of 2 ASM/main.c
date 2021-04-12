@@ -2,7 +2,7 @@
 
 void main() {
 
-	unsigned int Num = 64;
+	unsigned int Num = 17;
 	unsigned int Ris;
 
 	__asm{
@@ -13,8 +13,8 @@ void main() {
 		JECXz Fine // Solo se ECX == 0
 
 Ciclo:
-		TEST ECX, 1
-		JNZ TrovatoBitUno
+		TEST ECX, 1	// fa la AND
+		JNZ TrovatoBitUno	// Solo se != 0
 
 		SHR ECX, 1
 		JMP Ciclo
@@ -30,8 +30,6 @@ PotenzaDue:
 
 Fine:
 		MOV Ris, EAX
-
-
 
 
 	}
