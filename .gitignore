@@ -6,3 +6,5 @@
 *.dat
 *.ps
 *.pdf
+*.in
+*.out
