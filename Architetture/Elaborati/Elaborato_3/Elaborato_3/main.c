@@ -1,12 +1,5 @@
 #include <stdio.h>
 
-/*
-* Domande:
-	1) Perche' 255 e' FF?
-	2) Va bene se printo all'indietro
-
-*/
-
 void main()
 {
 	// Variabili
