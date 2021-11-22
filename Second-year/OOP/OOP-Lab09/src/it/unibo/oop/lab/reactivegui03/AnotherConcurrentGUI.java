@@ -174,7 +174,7 @@ public final class AnotherConcurrentGUI extends JFrame {
             this.endTime = true;
         }
         
-        public volatile boolean isTimeOver() {
+        public boolean isTimeOver() {
             return !this.endTime;
         }
     }
