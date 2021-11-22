@@ -57,7 +57,8 @@ public final class ConcurrentGUI extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 // Agent should be final
-                agent.stopCounting();
+                //agent.stopCounting();
+                agent.manageCounting();
             }
         });
     }
@@ -82,34 +83,36 @@ public final class ConcurrentGUI extends JFrame {
 
         @Override
         public void run() {
-            while (!this.stop) {
-                try {
-                    /*
-                     * All the operations on the GUI must be performed by the
-                     * Event-Dispatch Thread (EDT)!
-                     */
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            // This will happen in the EDT: since i'm reading counter it needs to be volatile.
-                            ConcurrentGUI.this.display.setText(Integer.toString(Agent.this.counter));
-                        }
-                    });
-                    /*
-                     * SpotBugs shows a warning because the increment of a volatile variable is not atomic,
-                     * so the concurrent access is potentially not safe. In the specific case of this exercise,
-                     * we do synchronization with invokeAndWait, so it can be ignored.
-                     *
-                     * EXERCISE: Can you think of a solution that doesn't require counter to be volatile?
-                     */
-                    this.counter++;
-                    Thread.sleep(100);
-                } catch (InvocationTargetException | InterruptedException ex) {
-                    /*
-                     * This is just a stack trace print, in a real program there
-                     * should be some logging and decent error reporting
-                     */
-                    ex.printStackTrace();
+            while (true) {
+                if(!this.stop) {
+                    try {
+                        /*
+                         * All the operations on the GUI must be performed by the
+                         * Event-Dispatch Thread (EDT)!
+                         */
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            @Override
+                            public void run() {
+                                // This will happen in the EDT: since i'm reading counter it needs to be volatile.
+                                ConcurrentGUI.this.display.setText(Integer.toString(Agent.this.counter));
+                            }
+                        });
+                        /*
+                         * SpotBugs shows a warning because the increment of a volatile variable is not atomic,
+                         * so the concurrent access is potentially not safe. In the specific case of this exercise,
+                         * we do synchronization with invokeAndWait, so it can be ignored.
+                         *
+                         * EXERCISE: Can you think of a solution that doesn't require counter to be volatile?
+                         */
+                        this.counter++;
+                        Thread.sleep(100);
+                    } catch (InvocationTargetException | InterruptedException ex) {
+                        /*
+                         * This is just a stack trace print, in a real program there
+                         * should be some logging and decent error reporting
+                         */
+                        ex.printStackTrace();
+                    }
                 }
             }
         }
@@ -119,6 +122,22 @@ public final class ConcurrentGUI extends JFrame {
          */
         public void stopCounting() {
             this.stop = true;
+        }
+        
+        public void startCounting() {
+            this.stop = false;
+        }
+        
+        public boolean getCountingStatus() {
+            return !this.stop;
+        }
+        
+        public void manageCounting() {
+            if(this.getCountingStatus()){
+                this.stopCounting();
+            }else {
+                this.startCounting();
+            }
         }
     }
 }
