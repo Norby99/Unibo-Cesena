@@ -78,32 +78,34 @@ public final class ConcurrentGUI extends JFrame {
          * 
          */
         private volatile boolean stop;
-        private volatile int counter;
+        private int counter;
 
         @Override
         public void run() {
             while (true) {
-                if(!this.stop) {
                     try {
-                        /*
-                         * All the operations on the GUI must be performed by the
-                         * Event-Dispatch Thread (EDT)!
-                         */
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                // This will happen in the EDT: since i'm reading counter it needs to be volatile.
-                                ConcurrentGUI.this.display.setText(Integer.toString(Agent.this.counter));
-                            }
-                        });
-                        /*
-                         * SpotBugs shows a warning because the increment of a volatile variable is not atomic,
-                         * so the concurrent access is potentially not safe. In the specific case of this exercise,
-                         * we do synchronization with invokeAndWait, so it can be ignored.
-                         *
-                         * EXERCISE: Can you think of a solution that doesn't require counter to be volatile?
-                         */
-                        this.counter++;
+                        if (this.getCountingStatus()) {
+                            /*
+                             * All the operations on the GUI must be performed by the
+                             * Event-Dispatch Thread (EDT)!
+                             */
+                            final var curr = Integer.toString(this.counter);
+                            SwingUtilities.invokeAndWait(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // This will happen in the EDT: since i'm reading counter it needs to be volatile.
+                                    ConcurrentGUI.this.display.setText(curr);
+                                }
+                            });
+                            /*
+                             * SpotBugs shows a warning because the increment of a volatile variable is not atomic,
+                             * so the concurrent access is potentially not safe. In the specific case of this exercise,
+                             * we do synchronization with invokeAndWait, so it can be ignored.
+                             *
+                             * EXERCISE: Can you think of a solution that doesn't require counter to be volatile?
+                             */
+                            this.counter++;
+                        }
                         Thread.sleep(100);
                     } catch (InvocationTargetException | InterruptedException ex) {
                         /*
@@ -112,7 +114,6 @@ public final class ConcurrentGUI extends JFrame {
                          */
                         ex.printStackTrace();
                     }
-                }
             }
         }
 
