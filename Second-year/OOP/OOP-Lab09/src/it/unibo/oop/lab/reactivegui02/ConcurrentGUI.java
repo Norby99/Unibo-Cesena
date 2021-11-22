@@ -41,29 +41,34 @@ public final class ConcurrentGUI extends JFrame {
         panel.add(buttonCanvas);
         this.getContentPane().add(panel);
         this.setVisible(true);
-        /*
-         * Create the counter agent and start it. This is actually not so good:
-         * thread management should be left to
-         * java.util.concurrent.ExecutorService
-         */
+
         final Agent agent = new Agent();
         new Thread(agent).start();
-        /*
-         * Register a listener that stops it
-         */
+
         stop.addActionListener(new ActionListener() {
-            /**
-             * event handler associated to action event on button stop.
-             * 
-             * @param e
-             *            the action event that will be handled by this listener
-             */
+
             @Override
             public void actionPerformed(final ActionEvent e) {
-                // Agent should be final
                 agent.manageCounting();
             }
         });
+        
+        btUp.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                agent.setUp();
+            }
+        });
+        
+        btDown.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                agent.setDown();
+            }
+        });
+        
     }
 
     /*
@@ -73,30 +78,31 @@ public final class ConcurrentGUI extends JFrame {
     private class Agent implements Runnable {
 
         private volatile boolean stop;
-        private volatile int counter;
-        private boolean directionUp; // true if counter is incrementing, false if it is decrementing
+        private int counter;
+        private boolean directionUp = true; // true if counter is incrementing, false if it is decrementing
 
         @Override
         public void run() {
-            while (true) {
-                if(isCounting()) {
-                    try {
+            while (true) {    
+                try {
+                    if (isCounting()) {
                         /*
                          * All the operations on the GUI must be performed by the
                          * Event-Dispatch Thread (EDT)!
                          */
+                        final var curr = Integer.toString(this.counter);
                         SwingUtilities.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
                                 // This will happen in the EDT: since i'm reading counter it needs to be volatile.
-                                ConcurrentGUI.this.display.setText(Integer.toString(Agent.this.counter));
+                                ConcurrentGUI.this.display.setText(curr);
                             }
                         });
-                        this.counter++;
-                        Thread.sleep(100);
-                    } catch (InvocationTargetException | InterruptedException ex) {
-                        ex.printStackTrace();
+                        this.counter += intValOfDirection();
                     }
+                    Thread.sleep(100);
+                } catch (InvocationTargetException | InterruptedException ex) {
+                    ex.printStackTrace();
                 }
             }
         }
@@ -118,10 +124,26 @@ public final class ConcurrentGUI extends JFrame {
             return !this.stop;
         }
         
+        private int intValOfDirection() {
+            if (this.directionUp) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+        
+        public void setUp() {
+            this.directionUp = true;
+        }
+        
+        public void setDown() {
+            this.directionUp = false;
+        }
+        
         public void manageCounting() {
-            if(this.isCounting()){
+            if (this.isCounting()) {
                 this.stopCounting();
-            }else {
+            } else {
                 this.startCounting();
             }
         }
