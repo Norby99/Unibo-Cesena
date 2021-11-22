@@ -57,7 +57,6 @@ public final class ConcurrentGUI extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 // Agent should be final
-                //agent.stopCounting();
                 agent.manageCounting();
             }
         });
@@ -122,10 +121,12 @@ public final class ConcurrentGUI extends JFrame {
          */
         public void stopCounting() {
             this.stop = true;
+            ConcurrentGUI.this.stop.setText("start");
         }
         
         public void startCounting() {
             this.stop = false;
+            ConcurrentGUI.this.stop.setText("stop");
         }
         
         public boolean getCountingStatus() {
