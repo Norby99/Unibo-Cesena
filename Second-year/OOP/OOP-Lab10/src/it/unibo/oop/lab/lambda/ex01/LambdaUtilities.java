@@ -58,10 +58,9 @@ public final class LambdaUtilities {
      *         otherwise.
      */
     public static <T> List<Optional<T>> optFilter(final List<T> list, final Predicate<T> pre) {
-        /*
-         * Suggestion: consider Optional.filter
-         */
-        return null;
+    	List<Optional<T>> MyList = new ArrayList<>();
+    	list.forEach(i -> MyList.add(Optional.ofNullable(i).filter(pre)));
+        return MyList;
     }
 
     /**
@@ -77,9 +76,7 @@ public final class LambdaUtilities {
      *         based on the mapping done by the function
      */
     public static <R, T> Map<R, Set<T>> group(final List<T> list, final Function<T, R> op) {
-        /*
-         * Suggestion: consider Map.merge
-         */
+        
         return null;
     }
 
