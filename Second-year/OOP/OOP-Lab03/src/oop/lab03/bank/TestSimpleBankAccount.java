@@ -30,6 +30,5 @@ public final class TestSimpleBankAccount {
     	System.out.println("Mario Rossi balance = " + marioRossiAccount.getBalance() + "\n");
     	System.out.println("Luigi Bianchi balance = " + luigiBianchiAccount.getBalance() + "\n");
     	
-    	
     }
 }
