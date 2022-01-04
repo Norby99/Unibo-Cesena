@@ -2,15 +2,19 @@ package oop.lab03.encapsulation;
 
 public class Calculator {
 
-    int nOpDone;
-    double lastRes;
+    private int nOpDone;
+    protected double lastRes;
 
     Calculator() {
         nOpDone = 0;
         lastRes = 0;
     }
 
-    double add(final double n1, final double n2) {
+    public int getnOpDone() {
+		return nOpDone;
+	}
+
+	double add(final double n1, final double n2) {
         lastRes = n1 + n2;
         nOpDone++;
         return lastRes;
