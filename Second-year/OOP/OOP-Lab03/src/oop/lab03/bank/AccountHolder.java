@@ -25,7 +25,10 @@ public class AccountHolder {
     }
 
     public String toString() {
-        // TODO: complete here
-        return "";
+    	String val;
+    	val = "Name : " + this.name + "\n";
+    	val += "Surname : " + this.surname + "\n";
+    	val += "id : " + this.userID + "\n";
+        return val;
     }
 }
