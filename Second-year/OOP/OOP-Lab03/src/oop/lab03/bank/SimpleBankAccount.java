@@ -36,6 +36,10 @@ public class SimpleBankAccount {
          * conto Nota: il deposito va a buon fine solo se l'id utente
          * corrisponde
          */
+    	this.nTransactions++;
+    	if (this.userID == usrID) {
+    		this.balance += amount;
+    	}
     }
 
     public int getUserID() {
@@ -56,6 +60,10 @@ public class SimpleBankAccount {
          * conto. Note: - Il conto puo' andare in rosso (ammontare negativo) -
          * Il prelievo va a buon fine solo se l'id utente corrisponde
          */
+		this.nTransactions++;
+		if (this.userID == usrID) {
+    		this.balance -= amount;
+    	}
     }
 
     public void depositFromATM(final int usrID, final double amount) {
@@ -65,6 +73,11 @@ public class SimpleBankAccount {
          * all'uso dell'ATM (bancomat) Nota: il deposito va a buon fine solo se
          * l'id utente corrisponde
          */
+    	this.nTransactions++;
+    	if (this.userID == usrID) {
+    		this.balance += amount - ATM_TRANSACTION_FEE;
+    	}
+    	
     }
 
     public void withdrawFromATM(final int usrID, final double amount) {
@@ -75,6 +88,10 @@ public class SimpleBankAccount {
          * negativo) - Il prelievo va a buon fine solo se l'id utente
          * corrisponde
          */
+    	this.nTransactions++;
+    	if (this.userID == usrID) {
+    		this.balance -= amount - ATM_TRANSACTION_FEE;
+    	}
     }
 
     /* Utility method per controllare lo user */
