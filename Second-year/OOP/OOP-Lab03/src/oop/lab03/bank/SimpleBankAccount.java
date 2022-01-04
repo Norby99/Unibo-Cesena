@@ -10,11 +10,18 @@ public class SimpleBankAccount {
      * - int nTransactions: numero delle operazioni effettuate
      * - static double ATM_TRANSACTION_FEE = 1: costo delle operazioni via ATM
      */
+	private double balance;
+	private int nTransactions;
+	static double ATM_TRANSACTION_FEE = 1;
 
     /*
      * Creare un costruttore pubblico che prenda in ingresso un intero (ossia l'id
      * dell'utente) ed un double (ossia, l'ammontare iniziale del conto corrente).
      */
+	public SimpleBankAccount(int userId, double initialBalance) {
+		this.userID = userId;
+		this.balance = initialBalance;
+	}
 
     /*
      * Si aggiungano selettori per: 
@@ -31,7 +38,19 @@ public class SimpleBankAccount {
          */
     }
 
-    public void withdraw(final int usrID, final double amount) {
+    public int getUserID() {
+		return userID;
+	}
+
+	public double getBalance() {
+		return balance;
+	}
+
+	public int getnTransactions() {
+		return nTransactions;
+	}
+
+	public void withdraw(final int usrID, final double amount) {
         /*
          * Incrementa il numero di transazioni e rimuove amount al totale del
          * conto. Note: - Il conto puo' andare in rosso (ammontare negativo) -
