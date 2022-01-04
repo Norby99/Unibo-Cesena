@@ -37,7 +37,7 @@ public class SimpleBankAccount {
          * corrisponde
          */
     	this.nTransactions++;
-    	if (this.userID == usrID) {
+    	if (checkUser(usrID)) {
     		this.balance += amount;
     	}
     }
@@ -61,7 +61,7 @@ public class SimpleBankAccount {
          * Il prelievo va a buon fine solo se l'id utente corrisponde
          */
 		this.nTransactions++;
-		if (this.userID == usrID) {
+		if (checkUser(usrID)) {
     		this.balance -= amount;
     	}
     }
@@ -74,7 +74,7 @@ public class SimpleBankAccount {
          * l'id utente corrisponde
          */
     	this.nTransactions++;
-    	if (this.userID == usrID) {
+    	if (checkUser(usrID)) {
     		this.balance += amount - ATM_TRANSACTION_FEE;
     	}
     	
@@ -89,7 +89,7 @@ public class SimpleBankAccount {
          * corrisponde
          */
     	this.nTransactions++;
-    	if (this.userID == usrID) {
+    	if (checkUser(usrID)) {
     		this.balance -= amount - ATM_TRANSACTION_FEE;
     	}
     }
