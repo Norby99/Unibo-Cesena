@@ -13,5 +13,23 @@ public final class TestSimpleBankAccount {
          * la correttezza del risultato 6) Provare a prelevare fornendo un idUsr
          * sbagliato 7) Controllare nuovamente l'ammontare
          */
+    	AccountHolder marioRossi = new AccountHolder("Mario", "Rossi", 1);
+    	AccountHolder luigiBianchi = new AccountHolder("Luigi", "Bianchi", 2);
+    	
+    	SimpleBankAccount marioRossiAccount = new SimpleBankAccount(marioRossi.getUserID(), 1000);
+    	SimpleBankAccount luigiBianchiAccount = new SimpleBankAccount(luigiBianchi.getUserID(), 51000);
+    	
+    	marioRossiAccount.deposit(marioRossi.getUserID(), 20);
+    	luigiBianchiAccount.depositFromATM(luigiBianchi.getUserID(), 20);
+    	
+    	System.out.println("Mario Rossi balance = " + marioRossiAccount.getBalance() + "\n");
+    	System.out.println("Luigi Bianchi balance = " + luigiBianchiAccount.getBalance() + "\n");
+    	
+    	luigiBianchiAccount.deposit(8, 8980);
+    	
+    	System.out.println("Mario Rossi balance = " + marioRossiAccount.getBalance() + "\n");
+    	System.out.println("Luigi Bianchi balance = " + luigiBianchiAccount.getBalance() + "\n");
+    	
+    	
     }
 }
