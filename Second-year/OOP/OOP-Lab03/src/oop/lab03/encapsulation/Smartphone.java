@@ -9,16 +9,72 @@ public class Smartphone {
     private static final int DEF_RAM_SIZE = 1024;
     private static final int DEF_N_CPU = 2;
 
-    public int nCPU;
-    public int ram;
-    public int sdSize;
-    public String brand;
-    public String model;
-    public boolean hasGPS;
-    public boolean has3G;
-    public boolean hasNFC;
+    private final int nCPU;
+    private final int ram;
+    private final int sdSize;
+    private final String brand;
+    private final String model;
+    private final boolean hasGPS;
+    private final boolean has3G;
+    private final boolean hasNFC;
 
-    public Smartphone(final int nCPU, final int ram, final int sdSize, final String brand, final String model, final boolean hasGPS, final boolean has3G, final boolean hasNFC) {
+    public static boolean isDefHasGps() {
+		return DEF_HAS_GPS;
+	}
+
+	public static boolean isDefHas3g() {
+		return DEF_HAS_3G;
+	}
+
+	public static boolean isDefHasNfc() {
+		return DEF_HAS_NFC;
+	}
+
+	public static int getDefSdSize() {
+		return DEF_SD_SIZE;
+	}
+
+	public static int getDefRamSize() {
+		return DEF_RAM_SIZE;
+	}
+
+	public static int getDefNCpu() {
+		return DEF_N_CPU;
+	}
+
+	public int getnCPU() {
+		return nCPU;
+	}
+
+	public int getRam() {
+		return ram;
+	}
+
+	public int getSdSize() {
+		return sdSize;
+	}
+
+	public String getBrand() {
+		return brand;
+	}
+
+	public String getModel() {
+		return model;
+	}
+
+	public boolean isHasGPS() {
+		return hasGPS;
+	}
+
+	public boolean isHas3G() {
+		return has3G;
+	}
+
+	public boolean isHasNFC() {
+		return hasNFC;
+	}
+
+	public Smartphone(final int nCPU, final int ram, final int sdSize, final String brand, final String model, final boolean hasGPS, final boolean has3G, final boolean hasNFC) {
         this.nCPU = nCPU;
         this.ram = ram;
         this.sdSize = sdSize;
