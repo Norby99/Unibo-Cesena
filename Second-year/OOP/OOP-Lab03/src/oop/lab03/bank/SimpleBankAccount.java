@@ -1,6 +1,7 @@
 package oop.lab03.bank;
+import oop.lab03.bank.interfaces.BankAccount;
 
-public class SimpleBankAccount {
+public class SimpleBankAccount implements BankAccount {
 
 	private int userID;
     /*
@@ -98,4 +99,15 @@ public class SimpleBankAccount {
     private boolean checkUser(final int id) {
         return this.userID == id;
     }
+
+	@Override
+	public void chargeManagementFees(int usrID) {
+		// this class has no charge fees
+		
+	}
+
+	@Override
+	public int getTransactionsCount() {
+		return this.getnTransactions();
+	}
 }
