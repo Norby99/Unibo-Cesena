@@ -11,7 +11,7 @@ public class MyController implements Controller {
 
     @Override
     public void setNextText(String text) {
-        this.nextText = Objects.requireNonNull(this.nextText, "Null value is not accepted");
+        this.nextText = Objects.requireNonNull(text, "Null value is not accepted");
     }
 
     @Override
@@ -26,7 +26,7 @@ public class MyController implements Controller {
 
     @Override
     public void printCurrentString() {
-        if (this.nextText == null || this.nextText == "") {
+        if (this.nextText == null) {
             throw new IllegalStateException("nextText is not set");
         }
         
