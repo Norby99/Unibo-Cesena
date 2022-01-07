@@ -1,5 +1,9 @@
 package it.unibo.oop.lab.mvcio;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+
 /**
  * 
  */
@@ -26,6 +30,31 @@ public class Controller {
      * Windows) can be obtained as String through the method
      * System.getProperty("file.separator"). The combined use of those methods leads
      * to a software that runs correctly on every platform.
+     * I modified the file path in order to save the file on the desktop
      */
+    private static final String HOME = System.getProperty("user.home");
+    private static final String DESKTOP = "Desktop";
+    private static final String SEPARATOR = System.getProperty("file.separator");
+    private static final String DEFAULT_FILE = "output.txt";
+    
+    private File curFile = new File(HOME + SEPARATOR + DESKTOP + SEPARATOR + DEFAULT_FILE);
+    
+    public void setCurrentFile(final File file) {
+        this.curFile = file;
+    }
+    
+    public File getCurrentFile() {
+        return this.curFile;
+    }
+    
+    public String getCurrentFileAsString() {
+        return this.curFile.getAbsolutePath();
+    }
+    
+    public void saveToFile(final String text) throws IOException {
+        PrintStream myStream = new PrintStream(this.curFile);
+        myStream.println(text);
+        myStream.close();
+    }
 
 }
