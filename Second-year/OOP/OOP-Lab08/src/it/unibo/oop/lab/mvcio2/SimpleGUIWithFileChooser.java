@@ -1,11 +1,22 @@
 package it.unibo.oop.lab.mvcio2;
 
-/**
- * A very simple program using a graphical interface.
- * 
- */
-public final class SimpleGUIWithFileChooser {
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+
+import it.unibo.oop.lab.mvcio.Controller;
+import it.unibo.oop.lab.mvcio.SimpleGUI;
+
+public final class SimpleGUIWithFileChooser {
+    
     /*
      * TODO: Starting from the application in mvcio:
      * 
@@ -31,5 +42,49 @@ public final class SimpleGUIWithFileChooser {
      * update the UI: in this example the UI knows when should be updated, so
      * try to keep things separated.
      */
-
+    private final JFrame frame = new JFrame("SimpleGUI");
+    
+    public SimpleGUIWithFileChooser(final Controller ctrl) {
+        /*
+         * Make the frame half the resolution of the screen. This very method is
+         * enough for a single screen setup. In case of multiple monitors, the
+         * primary is selected.
+         */
+        final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();   // setting up the frame
+        final int sw = (int) screen.getWidth();
+        final int sh = (int) screen.getHeight();
+        frame.setSize(sw / 2, sh / 2);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationByPlatform(true);
+        
+        JPanel canvas = new JPanel();   // setting up the components
+        canvas.setLayout(new BorderLayout());
+        JTextArea textArea = new JTextArea();
+        JButton btnSave = new JButton("Save");
+        
+        canvas.add(textArea, BorderLayout.CENTER);   // adding the components to the canvas and frame
+        canvas.add(btnSave, BorderLayout.SOUTH);
+        frame.setContentPane(canvas);
+        
+        btnSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                try {
+                    ctrl.saveToFile(textArea.getText());
+                } catch (IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+    }
+    
+    public void display() {
+        frame.setVisible(true);
+    }
+    
+    public static void main(final String... a) {
+        SimpleGUIWithFileChooser myGUI = new SimpleGUIWithFileChooser(new Controller());
+        myGUI.display();
+    }
 }
