@@ -56,7 +56,7 @@ public final class SimpleGUI {
         JTextArea textArea = new JTextArea();
         JButton btnSave = new JButton("Save");
         
-        canvas.add(textArea, BorderLayout.NORTH);   // adding the components to the canvas and frame
+        canvas.add(textArea, BorderLayout.CENTER);   // adding the components to the canvas and frame
         canvas.add(btnSave, BorderLayout.SOUTH);
         frame.setContentPane(canvas);
         
