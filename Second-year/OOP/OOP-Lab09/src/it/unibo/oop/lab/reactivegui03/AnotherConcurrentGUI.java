@@ -19,9 +19,9 @@ public final class AnotherConcurrentGUI extends JFrame {
     private static final double WIDTH_PERC = 0.2;
     private static final double HEIGHT_PERC = 0.1;
     private final JLabel display = new JLabel();
-    private final JButton btDown = new JButton("down");
-    private final JButton btUp = new JButton("up");
-    private final JButton stop = new JButton("stop");
+    private final JButton btnDown = new JButton("down");
+    private final JButton btnUp = new JButton("up");
+    private final JButton btnStop = new JButton("stop");
 
     /**
      * Builds a new CGUI.
@@ -35,9 +35,9 @@ public final class AnotherConcurrentGUI extends JFrame {
         final JPanel panel = new JPanel();
         final JPanel buttonCanvas = new JPanel();
         buttonCanvas.setLayout(new BoxLayout(buttonCanvas, BoxLayout.X_AXIS));
-        buttonCanvas.add(btUp);
-        buttonCanvas.add(btDown);
-        buttonCanvas.add(stop);
+        buttonCanvas.add(btnUp);
+        buttonCanvas.add(btnDown);
+        buttonCanvas.add(btnStop);
         panel.add(display);
         panel.add(buttonCanvas);
         this.getContentPane().add(panel);
@@ -46,7 +46,7 @@ public final class AnotherConcurrentGUI extends JFrame {
         final Agent agent = new Agent();
         new Thread(agent).start();
 
-        stop.addActionListener(new ActionListener() {
+        btnStop.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -54,7 +54,7 @@ public final class AnotherConcurrentGUI extends JFrame {
             }
         });
         
-        btUp.addActionListener(new ActionListener() {
+        btnUp.addActionListener(new ActionListener() {
             
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -62,7 +62,7 @@ public final class AnotherConcurrentGUI extends JFrame {
             }
         });
         
-        btDown.addActionListener(new ActionListener() {
+        btnDown.addActionListener(new ActionListener() {
             
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -85,6 +85,7 @@ public final class AnotherConcurrentGUI extends JFrame {
 
         @Override
         public void run() {
+            new Thread(timeAgent).start();
             while (true) {    
                 try {
                     if (this.isCounting() && this.isValid()) {
@@ -101,6 +102,10 @@ public final class AnotherConcurrentGUI extends JFrame {
                             }
                         });
                         this.counter += intValOfDirection();
+                    } else {
+                        AnotherConcurrentGUI.this.btnDown.setEnabled(false);
+                        AnotherConcurrentGUI.this.btnUp.setEnabled(false);
+                        AnotherConcurrentGUI.this.btnStop.setEnabled(false);
                     }
                     Thread.sleep(100);
                 } catch (InvocationTargetException | InterruptedException ex) {
@@ -114,7 +119,7 @@ public final class AnotherConcurrentGUI extends JFrame {
          */
         public void stopCounting() {
             this.stop = true;
-            AnotherConcurrentGUI.this.stop.setText("start");
+            AnotherConcurrentGUI.this.btnStop.setText("start");
         }
         
         public boolean isValid() {
@@ -123,7 +128,7 @@ public final class AnotherConcurrentGUI extends JFrame {
         
         public void startCounting() {
             this.stop = false;
-            AnotherConcurrentGUI.this.stop.setText("stop");
+            AnotherConcurrentGUI.this.btnStop.setText("stop");
         }
         
         public boolean isCounting() {
@@ -157,7 +162,7 @@ public final class AnotherConcurrentGUI extends JFrame {
     
     private class TimerAgent implements Runnable {
         
-        private final int timeLimit = 1000;
+        private final int timeLimit = 10000;
         private boolean endTime;
 
         @Override
