@@ -33,7 +33,7 @@ public class Test {
 
 	@org.junit.Before
 	public void init() {
-		//this.factory = new ScannerFactoryImpl();
+		this.factory = new ScannerFactoryImpl();
 	}
 
 	@org.junit.Test
