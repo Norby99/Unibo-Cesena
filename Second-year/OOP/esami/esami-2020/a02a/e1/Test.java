@@ -1,4 +1,4 @@
-package a02a.e1;
+package e1;
 
 import static org.junit.Assert.*;
 import java.util.*;
@@ -33,7 +33,7 @@ public class Test {
 
 	@org.junit.Before
 	public void init() {
-		//this.factory = new ScannerFactoryImpl();
+		this.factory = new ScannerFactoryImpl();
 	}
 
 	@org.junit.Test

@@ -1,4 +1,4 @@
-package a02a.e2;
+package e2;
 
 /*
  * A standard generic Pair<X,Y>, with getters, hashCode, equals, and toString well implemented. 
@@ -6,8 +6,20 @@ package a02a.e2;
 
 public class Pair<X,Y> {
 	
-	private final X x;
-	private final Y y;
+	private X x;
+	public void setX(X x) {
+		this.x = x;
+	}
+
+	public void setY(Y y) {
+		this.y = y;
+	}
+
+	private Y y;
+	
+	public Pair() {
+		super();
+	}
 	
 	public Pair(X x, Y y) {
 		super();
