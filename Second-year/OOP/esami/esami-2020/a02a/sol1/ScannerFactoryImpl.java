@@ -1,4 +1,4 @@
-	package a02a.sol1;
+	package sol1;
 
 import java.util.Iterator;
 import java.util.LinkedList;
