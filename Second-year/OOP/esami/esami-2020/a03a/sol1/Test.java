@@ -1,4 +1,4 @@
-package a03a.sol1;
+package sol1;
 
 import static org.junit.Assert.*;
 

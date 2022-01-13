@@ -1,4 +1,4 @@
-package a03a.sol1;
+package sol1;
 
 import java.util.Set;
 import java.util.function.BiPredicate;

@@ -1,4 +1,4 @@
-package a03a.sol2;
+package sol2;
 
 import javax.swing.*;
 import java.util.*;

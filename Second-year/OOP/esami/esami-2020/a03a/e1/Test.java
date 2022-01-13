@@ -1,4 +1,4 @@
-package a03a.e1;
+package e1;
 
 import static org.junit.Assert.*;
 
@@ -44,7 +44,7 @@ public class Test {
 
 	@org.junit.Before
 	public void initFactory() {
-		//this.factory = new GroupingFactoryImpl();
+		this.factory = new GroupingFactoryImpl();
 	}
 
 	// Pari, dispari, negativi: una enum usata in alcuni test
