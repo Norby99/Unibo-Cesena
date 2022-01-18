@@ -1,4 +1,4 @@
-package a05.e2;
+package e2;
 
 /*
  * A standard generic Pair<X,Y>, with getters, hashCode, equals, and toString well implemented. 

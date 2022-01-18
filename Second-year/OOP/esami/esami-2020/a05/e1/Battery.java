@@ -1,4 +1,4 @@
-package a05.e1;
+package e1;
 
 /**
  * An interface modelling a battery, with initially 1.0 energy

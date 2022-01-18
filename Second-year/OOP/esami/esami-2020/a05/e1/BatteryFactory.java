@@ -1,4 +1,4 @@
-package a05.e1;
+package e1;
 
 /**
  * A Factory for various types of Battery

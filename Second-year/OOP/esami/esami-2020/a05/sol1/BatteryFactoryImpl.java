@@ -1,4 +1,4 @@
-package a05.sol1;
+package sol1;
 
 import java.util.function.BiFunction;
 

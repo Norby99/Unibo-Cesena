@@ -1,4 +1,4 @@
-package a05.e1;
+package e1;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -47,7 +47,7 @@ public class Test {
 
 	@org.junit.Before
 	public void initFactory() {
-		//this.factory = new BatteryFactoryImpl();
+		this.factory = new BatteryFactoryImpl();
 	}
 	
 	private static final double PRECISION = 0.01; // required when asserting equality of booleans
