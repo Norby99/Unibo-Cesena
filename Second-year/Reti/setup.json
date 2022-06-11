@@ -1,5 +1,7 @@
 {
-    "client-ip": "",
-    "gateway-ip": "",
+    "gateway": {
+        "ip": "192.168.1.106",
+        "port": "16000"
+    },
     "max-drones": 3
 }
