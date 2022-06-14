@@ -31,15 +31,7 @@ class Gateway():
     __is_client_connected: bool = False
 
     def __init__(self, gateway_port: int) -> None:
-        order = {
-            "drone_id": "drone_4",
-            "order_destination": "burundi"
-        }
-        if order["drone_id"] not in self.__drones.keys():
-            raise Exception("Wrong drone id")
         self._setup_gateway_client(gateway_port)
-
-        self.__connect_client()
 
     def _setup_gateway_client(self, gateway_port: int) -> None:
         """
