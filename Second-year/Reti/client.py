@@ -33,6 +33,17 @@ class Client():
         """
         self.__gateway_socket.send(message.encode())
 
+    def listen_for_drones(self) -> None:
+        """
+        Listen if there are free drones.
+        """
+        while True:
+            data = self.__gateway_socket.recv(self.__buffer_size)
+            if not data:
+                break
+            free_drones = eval(data.decode("utf-8"))
+            print(f"Free Drones: {free_drones}")
+
     def close_connection(self) -> None:
         """
         Close the connection between the client and the gateway.
@@ -43,6 +54,6 @@ if __name__ == '__main__':
     with open('setup.json') as json_file:
         data = json.load(json_file)
         client = Client(data['gateway']["ip"], int(data['gateway']["port"]))
-        client.send_message("Hello World")
-        
+        client.listen_for_drones()
+
         client.close_connection()
