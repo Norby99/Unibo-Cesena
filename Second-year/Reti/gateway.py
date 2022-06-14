@@ -48,26 +48,28 @@ class Gateway():
             print(f"Connected to Client: {self.__client['address']}")
             self.__is_client_connected = True
 
-        with self.__client["conn"]:
-            self.send_drone_information()
-
-        self.listen_for_orders()
-
     def listen_for_orders(self) -> None:
         """
         Listen if there are orders to be shipped.
         """
-        while True:
-            data = self.__client["conn"].recv(self.__buffer_size)
-            if not data:
-                break
-            order = eval(data.decode("utf-8"))
-            if not self._check_order(order):
-                #TODO: send error message to client
-                pass
+        self.__connect_client()
 
-            print(f"Order: {order}")
-            self._process_order(order)
+        try:
+            self.send_drone_information()
+
+            while True:
+                data = self.__client["conn"].recv(self.__buffer_size)
+                if not data:
+                    break
+                order = eval(data.decode("utf-8"))
+                if not self._check_order(order):
+                    self._send_message("Error: wrong order syntax")
+
+                print(f"Order: {order}")
+                self._process_order(order)
+        except:
+            print(f"Client {self.__client['address']} disconnected!")
+            self.__is_client_connected = True
 
     def send_drone_information(self) -> bool:
         """
@@ -121,5 +123,6 @@ if __name__ == '__main__':
     with open('setup.json') as json_file:
         data = json.load(json_file)
         gateway = Gateway(int(data['gateway']["port"]))
+        gateway.listen_for_orders()
 
         gateway.close_client_connection()
