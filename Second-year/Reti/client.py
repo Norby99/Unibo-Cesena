@@ -27,12 +27,6 @@ class Client():
         except:
             return False
 
-    def send_message(self, message: str) -> None:
-        """
-        Send a message to the gateway.
-        """
-        self.__gateway_socket.send(message.encode())
-
     def listen_for_drones(self) -> None:
         """
         Listen if there are free drones.
