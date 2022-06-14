@@ -39,9 +39,9 @@ class Gateway():
         """
         Setup the connection between the gateway and the client.
         """
-        self.__adress = ("", gateway_port)
+        self.__address = ("", gateway_port)
         self.__client["socket"] = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
-        self.__client["socket"].bind(self.__adress)
+        self.__client["socket"].bind(self.__address)
 
     def __connect_client(self) -> None:
         self.__client["socket"].listen()
