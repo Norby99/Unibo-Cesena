@@ -55,15 +55,16 @@ class Gateway():
         self.__connect_client()
 
         try:
-            self.send_drone_information()
-
             while True:
+                self.send_drone_information()
                 data = self.__client["conn"].recv(self.__buffer_size)
                 if not data:
                     break
                 order = eval(data.decode("utf-8"))
                 if not self._check_order(order):
                     self._send_message("Error: wrong order syntax")
+                elif "update" in order:
+                    continue
 
                 print(f"Order: {order}")
                 self._process_order(order)
@@ -101,6 +102,10 @@ class Gateway():
         """
         Check if the order is valid and if the drone is available.
         """
+
+        if "update" in order:
+            return True
+
         # check if the order syntax is valid
         if not all(keys in order for keys in ("drone_id", "order_destination")):
             print("Wrong order syntax")
