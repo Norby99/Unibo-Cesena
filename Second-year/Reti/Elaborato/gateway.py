@@ -25,7 +25,7 @@ class Gateway():
         "drone_3": {
             "id": "drone_3",
             "ip": "xxx",
-            "status": "shipping"
+            "status": "free"
         }
     }
     __is_client_connected: bool = False
