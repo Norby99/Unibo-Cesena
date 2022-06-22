@@ -10,7 +10,7 @@ class Client():
     def __init__(self, gateway_ip: str, gateway_port: int) -> None:
         self._setup_client_gateway(gateway_ip, gateway_port)
 
-        if not self.__connect():
+        if not self.__connect_to_gateway():
             raise Exception("Gateway is not available")
 
     def _setup_client_gateway(self, gateway_ip: str, gateway_port: int) -> None:
