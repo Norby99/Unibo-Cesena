@@ -84,6 +84,12 @@ class Gateway():
             self.__is_client_connected = False
             return False
 
+    def _send_message(self, message: str) -> None:
+        """
+        Send a message to the client.
+        """
+        self.__client["conn"].send(message.encode())
+
     def _process_order(self, order: dict) -> None:
         """
         Process the order and send the drone to the order destination.
