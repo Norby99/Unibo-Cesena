@@ -20,7 +20,10 @@ class Client():
         self.__adress = (gateway_ip, gateway_port)
         self.__gateway_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
 
-    def __connect(self) -> bool:
+    def __connect_to_gateway(self) -> bool:
+        """
+        Connects to the gateway
+        """
         try:
             self.__gateway_socket.connect(self.__adress)
             return True
@@ -37,15 +40,51 @@ class Client():
                 if not data:
                     break
                 free_drones = eval(data.decode("utf-8"))
-                print(type(free_drones))
+
                 if type(free_drones) != list:
                     print("Wrong drone data format")
                     continue
 
                 print(f"Free Drones: {free_drones}")
-        except:
+
+                self.request_shipment(self.choose_drone(free_drones))
+        except Exception as e:
+            print(e)
             print("Gateway disconnected!")
             self.close_connection()
+
+    def request_shipment(self, msg: dict) -> None:
+        """
+        send shipment request
+        """
+        msg = json.dumps(msg).encode()
+        self.__gateway_socket.send(msg)
+
+    def choose_drone(self, free_drones: list[str]) -> dict:
+        """
+        Ask the user to input the drone name and the destination address
+        Returns (chosen drone, destination address)
+        """
+        chosen_drone = ""
+        destination_address = ""
+        update_mode = False
+        msg = {}
+
+        while chosen_drone not in free_drones:
+            chosen_drone = input("Insert the drone nome (insert 'update' to update the drone list): ")
+            if chosen_drone == "update":
+                update_mode = True
+                break
+
+        if not update_mode:
+            destination_address = input("Insert the destination address: ")
+
+            msg["drone_id"] = chosen_drone
+            msg["order_destination"] = destination_address
+        else:
+            msg["update"] = 'update'
+
+        return msg
 
     def close_connection(self) -> None:
         """
