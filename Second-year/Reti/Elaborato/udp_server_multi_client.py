@@ -55,10 +55,9 @@ class UDPServerMultiClient(UDPServer):
                 try: # receive request from client
                     data, drone_address = self.__socket.recvfrom(self.__buffer_size)
 
-                    if not self.drone_exists(drone_address):
+                    if not self.drone_exist(drone_address):
                         drone = self.create_drone(drone_address)
                         self.__drones[drone['id']] = drone
-                        print(self.__drones)
 
                     c_thread = threading.Thread(target = self.handle_request,
                                             args = (data, drone_address))
