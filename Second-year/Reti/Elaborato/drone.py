@@ -9,15 +9,15 @@ class Drone:
 
     __address: tuple[str, int]
     __buffer_size: int = 1024
+    __socket: socket.socket
 
     def __init__(self, host, port):
         self.__address = (host, port)
-        self.sock = None    # Socket
 
     def configure_client(self):
         ''' Configure the client to use UDP protocol with IPv4 addressing '''
 
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         print('Socket created')
 
     def ship_order(self, order: str):
@@ -27,6 +27,7 @@ class Drone:
         print("Order recieved: " + order)
         # waiting...
         time.sleep(random.randint(5, 10))
+        print("Order shiped!")
 
 
     def interact_with_server(self):
@@ -36,12 +37,15 @@ class Drone:
             msg = ''
             while True:
                 # send data to server
-                print('Sending [free] message')
                 msg += 'free'
-                self.sock.sendto(msg.encode('utf-8'), self.__address)
+                print(f'Sending [{msg}] message')
+                self.__socket.sendto(msg.encode('utf-8'), self.__address)
+
+                print("Waiting for orders")
 
                 # receive data from server
-                order, server_address = self.sock.recvfrom(self.__buffer_size)
+                order, server_address = self.__socket.recvfrom(self.__buffer_size)
+                order = order.decode()
                 self.ship_order(order)
                 msg = 'order delivered '
 
@@ -50,7 +54,7 @@ class Drone:
             print("There is no available server")
 
         finally:
-            self.sock.close()
+            self.__socket.close()
 
 if __name__ == '__main__':
     with open('setup.json') as json_file:
