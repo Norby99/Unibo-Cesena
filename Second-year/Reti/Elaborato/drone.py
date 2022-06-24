@@ -47,10 +47,10 @@ class Drone:
 
         except OSError as err:
             print(err)
+            print("There is no available server")
 
         finally:
             self.sock.close()
-            print('Socket closed')
 
 if __name__ == '__main__':
     with open('setup.json') as json_file:
