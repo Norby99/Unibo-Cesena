@@ -69,8 +69,11 @@ class UDPServerMultiClient(UDPServer):
             if isinstance(msg, list) or isinstance(msg, tuple):
                 if len(msg) <= 2:
                     return True
-        finally:
-            return False
+        except:
+            pass
+
+        print("No valid Data format")
+        return False
 
 if __name__ == '__main__':
     with open('setup.json') as json_file:
