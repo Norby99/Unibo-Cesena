@@ -76,11 +76,12 @@ class UDPServerMultiClient(UDPServer):
         return False
 
     def drone_exists(self, address) -> bool:
+    def drone_exist(self, address) -> bool:
         """
         Return True if the drone already exists
         """
-        for i in self.__drones:
-            if i['address'] == address:
+        for key, val in self.__drones.items():
+            if val['address'] == address:
                 return True
 
         return False
