@@ -18,9 +18,7 @@ class Drone:
         '''
         Configure the client to use UDP protocol with IPv4 addressing
         '''
-
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        print('Socket created')
 
     def ship_order(self, order: str):
         """
@@ -38,10 +36,12 @@ class Drone:
         '''
 
         try:
-            msg = ''
+            msg = []
             while True:
                 # send data to server
-                msg += 'free'
+                msg.append('free')
+                msg = str(msg)
+
                 print(f'Sending [{msg}] message')
                 self.__socket.sendto(msg.encode('utf-8'), self.__address)
 
@@ -51,7 +51,7 @@ class Drone:
                 order, server_address = self.__socket.recvfrom(self.__buffer_size)
                 order = order.decode()
                 self.ship_order(order)
-                msg = 'order delivered '
+                msg = ['order delivered']
 
         except OSError as err:
             print(err)
