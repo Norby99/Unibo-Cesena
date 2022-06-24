@@ -1,56 +1,41 @@
 import socket
 from datetime import datetime
+from abc import ABC, abstractmethod
 
-class UDPServer():
+class UDPServer(ABC):
     ''' A simple UDP Server '''
+
+    __address: tuple[str, int]
+    __socket: socket.socket
     
     def __init__(self, host, port):
+        self.__address = (host, port)
 
-        self.host = host    # Host address
-        self.port = port    # Host port
-        self.sock = None    # Socket
-
-    def printwt(self, msg):
-        '''
-        Print message with current date and time
-        '''
-        current_date_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'[{current_date_time}] {msg}')
-
-    def configure_server(self):
+    def configure_server(self) -> socket.socket:
         '''
         Configure the server
         '''
-        self.printwt('Creating socket...')
-        self.printwt('Socket created')
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        print('Creating socket...')
+        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.printwt(f'Binding server to {self.host}:{self.port}...')
-        self.printwt(f'Server binded to {self.host}:{self.port}')
+        print(f'Binding server to {self.__address}...')
+        self.__socket.bind(self.__address)
+        return self.__socket
 
+    @abstractmethod
     def handle_request(self, data, client_address):
         '''
         Handle the client
         '''
-        name = data.decode('utf-8')
-        self.printwt(f'[ REQUEST from {client_address} ]')
-        print('\n', name, '\n')
-        resp = self.get_phone_no(name)
+        return
 
-        self.printwt(f'[ RESPONSE to {client_address} ]')
-        self.sock.sendto(resp.encode('utf-8'), client_address)
-        print('\n', resp, '\n')
-
+    @abstractmethod
     def wait_for_client(self):
-        ''' Wait for a client '''
-        try:
-            # receive message from a client
-            data, client_address = self.sock.recvfrom(1024)
-            # handle client's request
-            self.handle_request(data, client_address)
-        except OSError as err:
-            self.printwt(err)
+        '''
+        Wait for a client
+        '''
+        return
 
     def shutdown_server(self):
         ''' Shutdown the UDP server '''
-        self.sock.close()
+        self.__socket.close()
