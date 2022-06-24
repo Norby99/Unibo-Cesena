@@ -31,14 +31,13 @@ class UDPServerMultiClient(UDPServer):
         else:
             self.shutdown_server()
 
-        print(f'[ REQUEST from {drone_address} ]')
         print(resp)
 
-        msg = "ricevuto"
+        msg = "via Roma 7"
         # send response to the client
         with self.socket_lock:
             self.__socket.sendto(msg.encode('utf-8'), drone_address)
-        print('\n', resp, '\n')
+        print('\n', msg, '\n')
 
     def wait_for_client(self):
         '''
