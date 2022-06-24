@@ -25,6 +25,10 @@ class UDPServerMultiClient(UDPServer):
 
         # handle request
         resp = data.decode('utf-8')
+        if self.valid_response(resp):
+            resp = eval(resp)
+        else:
+            self.shutdown_server()
 
         print(f'[ REQUEST from {drone_address} ]')
         print(resp)
@@ -55,6 +59,18 @@ class UDPServerMultiClient(UDPServer):
 
         except KeyboardInterrupt:
             self.shutdown_server()
+
+    def valid_response(self, msg) -> bool:
+        """
+        Check if the drone response is correct
+        """
+        try:
+            msg = eval(msg)
+            if isinstance(msg, list) or isinstance(msg, tuple):
+                if len(msg) <= 2:
+                    return True
+        finally:
+            return False
 
 if __name__ == '__main__':
     with open('setup.json') as json_file:
