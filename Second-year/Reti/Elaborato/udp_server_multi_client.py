@@ -10,6 +10,7 @@ class UDPServerMultiClient(UDPServer):
 
     __buffer_size: int = 1024
     __socket: socket.socket
+    __drones: dict = {}
 
     def __init__(self, host, port):
         super().__init__(host, port)
@@ -49,6 +50,11 @@ class UDPServerMultiClient(UDPServer):
                 try: # receive request from client
                     data, drone_address = self.__socket.recvfrom(self.__buffer_size)
 
+                    if not self.drone_exists(drone_address):
+                        drone = self.create_drone(drone_address)
+                        self.__drones[drone['id']] = drone
+                        print(self.__drones)
+
                     c_thread = threading.Thread(target = self.handle_request,
                                             args = (data, drone_address))
                     c_thread.daemon = True
@@ -75,7 +81,18 @@ class UDPServerMultiClient(UDPServer):
         print("No valid Data format")
         return False
 
-    def drone_exists(self, address) -> bool:
+    def create_drone(self, address) -> dict:
+        """
+        Returns a drone dict
+        """
+        id = len(self.__drones)+1
+        drone_id = "drone_" + str(id)
+        return {
+            "id" : drone_id,
+            "address" : address,
+            "status" : "free"
+        }
+
     def drone_exist(self, address) -> bool:
         """
         Return True if the drone already exists
