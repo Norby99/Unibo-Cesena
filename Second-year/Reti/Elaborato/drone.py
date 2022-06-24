@@ -15,7 +15,9 @@ class Drone:
         self.__address = (host, port)
 
     def configure_client(self):
-        ''' Configure the client to use UDP protocol with IPv4 addressing '''
+        '''
+        Configure the client to use UDP protocol with IPv4 addressing
+        '''
 
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         print('Socket created')
@@ -31,7 +33,9 @@ class Drone:
 
 
     def interact_with_server(self):
-        ''' Send request to a UDP Server and receive reply from it. '''
+        '''
+        Send request to a UDP Server and receive reply from it.
+        '''
 
         try:
             msg = ''
