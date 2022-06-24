@@ -75,6 +75,16 @@ class UDPServerMultiClient(UDPServer):
         print("No valid Data format")
         return False
 
+    def drone_exists(self, address) -> bool:
+        """
+        Return True if the drone already exists
+        """
+        for i in self.__drones:
+            if i['address'] == address:
+                return True
+
+        return False
+
 if __name__ == '__main__':
     with open('setup.json') as json_file:
         data = json.load(json_file)
