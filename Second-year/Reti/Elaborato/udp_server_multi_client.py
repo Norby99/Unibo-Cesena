@@ -103,6 +103,18 @@ class UDPServerMultiClient(UDPServer):
 
         return False
 
+    def set_drone_status(self, address, status: str) -> bool:
+        """
+        Set free status to a given drone
+        """
+        for key, val in self.__drones.items():
+            if val['address'] == address:
+                self.__drones[key]['status'] = status
+                return True
+        
+        print("Error drone not found")
+        return False
+
 if __name__ == '__main__':
     with open('setup.json') as json_file:
         data = json.load(json_file)
