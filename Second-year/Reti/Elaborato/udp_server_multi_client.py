@@ -31,6 +31,12 @@ class UDPServerMultiClient(UDPServer):
         else:
             self.shutdown_server()
 
+        if 'free' in resp:
+            self.set_drone_status(drone_address, 'free')
+        else:
+            self.shutdown_server()
+
+        print(f'REQUEST from {drone_address}')
         print(resp)
 
         msg = "via Roma 7"
