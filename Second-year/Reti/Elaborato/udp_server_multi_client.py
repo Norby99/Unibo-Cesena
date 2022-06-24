@@ -120,6 +120,12 @@ class UDPServerMultiClient(UDPServer):
         print("Error drone not found")
         return False
 
+    def get_drones(self) ->dict:
+        """
+        Returns the dict of the drones
+        """
+        return self.__drones
+
 if __name__ == '__main__':
     with open('setup.json') as json_file:
         data = json.load(json_file)
