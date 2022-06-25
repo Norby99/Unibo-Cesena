@@ -76,6 +76,16 @@ class UDPServerMultiClient(UDPServer):
 
         return True
 
+    def is_drone_free(self, drone_id: int) -> bool:
+        """
+        Return True if the given drone is free
+        """
+        for key, val in self.__drones.items():
+            if val['id'] == drone_id:
+                return True
+
+        return False
+
     def valid_response(self, msg) -> bool:
         """
         Check if the drone response is correct
