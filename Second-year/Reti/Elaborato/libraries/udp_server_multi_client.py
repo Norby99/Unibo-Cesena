@@ -1,7 +1,12 @@
 import socket
 import threading
-from udp_server import UDPServer
+import os.path
+import sys
 import json
+# I must do in this way to use it both as a library and a separate program
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) 
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+from libraries.udp_server import UDPServer
 
 
 class UDPServerMultiClient(UDPServer):
