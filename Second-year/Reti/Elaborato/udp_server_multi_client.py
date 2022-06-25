@@ -113,6 +113,16 @@ class UDPServerMultiClient(UDPServer):
 
         return False
 
+    def get_dron_id_by_address(self, address) -> str:
+        """
+        Returns the id of the drone by the given address
+        """
+        for key, val in self.__drones.items():
+            if val['address'] == address:
+                return val['id']
+
+        return None
+
     def set_drone_status(self, address, status: str) -> bool:
         """
         Set free status to a given drone
