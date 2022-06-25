@@ -11,16 +11,19 @@ class Drone:
     __buffer_size: int = 1024
     __socket: socket.socket
 
-    def __init__(self, host, port):
+    def __init__(self, host, port) -> None:
+        """
+        Initializing the class
+        """
         self.__address = (host, port)
 
-    def configure_client(self):
+    def configure_client(self) -> None:
         '''
         Configure the client to use UDP protocol with IPv4 addressing
         '''
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    def ship_order(self, order: str):
+    def ship_order(self, order: str) -> None:
         """
         Ship an order
         """
@@ -29,12 +32,10 @@ class Drone:
         time.sleep(random.randint(5, 10))
         print("Order shiped!")
 
-
-    def interact_with_server(self):
+    def interact_with_server(self) -> None:
         '''
         Send request to a UDP Server and receive reply from it.
         '''
-
         try:
             msg = []
             while True:
