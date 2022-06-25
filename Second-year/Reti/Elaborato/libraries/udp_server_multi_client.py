@@ -62,6 +62,8 @@ class UDPServerMultiClient(UDPServer):
         with self.socket_lock:
             self.__socket.sendto(request.encode('utf-8'), drone_address)
 
+        self.set_drone_status(drone_address, "shipping")
+
     def wait_for_client(self) -> bool:
         '''
         Wait for clients and handle their requests
