@@ -1,5 +1,6 @@
 import json
 import socket
+from libraries.udp_server_multi_client import UDPServerMultiClient
 
 
 class Gateway():
@@ -12,6 +13,7 @@ class Gateway():
         "is_connected": False
     }
     __buffer_size: int = 1024
+    __drone_server: UDPServerMultiClient
     __drones: dict = {
         "drone_1": {
             "id": "drone_1",
@@ -31,14 +33,15 @@ class Gateway():
     }
     __is_client_connected: bool = False
 
-    def __init__(self, gateway_port: int) -> None:
-        self._setup_gateway_client(gateway_port)
+    def __init__(self, gateway_ip: str, gateway_port: int, max_drones: int) -> None:
+        self.__drone_server = UDPServerMultiClient(gateway_ip, gateway_port, max_drones)
+        self._setup_gateway_client(gateway_ip, gateway_port)
 
-    def _setup_gateway_client(self, gateway_port: int) -> None:
+    def _setup_gateway_client(self, gateway_ip: str, gateway_port: int) -> None:
         """
         Setup the connection between the gateway and the client.
         """
-        self.__address = ("", gateway_port)
+        self.__address = (gateway_ip, gateway_port)
         self.__client["socket"] = socket.socket(
             family=socket.AF_INET, type=socket.SOCK_STREAM)
         self.__client["socket"].bind(self.__address)
@@ -136,7 +139,7 @@ class Gateway():
 if __name__ == '__main__':
     with open('setup.json') as json_file:
         data = json.load(json_file)
-        gateway = Gateway(int(data['gateway']["port"]))
+        gateway = Gateway("", int(data['gateway']["port"]), data["max_drones"])
         gateway.listen_for_orders()
 
         gateway.close_client_connection()
