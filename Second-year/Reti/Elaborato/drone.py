@@ -56,7 +56,7 @@ class Drone:
                     self.__buffer_size)
                 order = order.decode()
                 self.ship_order(order)
-                msg = ['order delivered']
+                msg = ['order delivered -> ' + order]
 
         except OSError as err:
             print(err)
