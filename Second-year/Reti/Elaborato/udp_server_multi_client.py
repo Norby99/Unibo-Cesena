@@ -11,10 +11,12 @@ class UDPServerMultiClient(UDPServer):
     __buffer_size: int = 1024
     __socket: socket.socket
     __drones: dict = {}
+    __max_drone_limit: int
 
-    def __init__(self, host, port):
+    def __init__(self, host: str, port: int, drone_limit: int):
         super().__init__(host, port)
         self.socket_lock = threading.Lock()
+        self.__max_drone_limit = drone_limit
 
     def configure_server(self):
         self.__socket = super().configure_server()
@@ -51,21 +53,23 @@ class UDPServerMultiClient(UDPServer):
         '''
 
         try:
-            while True: # keep alive
-                try: # receive request from client
-                    data, drone_address = self.__socket.recvfrom(self.__buffer_size)
+            try: # receive request from client
+                data, drone_address = self.__socket.recvfrom(self.__buffer_size)
 
-                    if not self.drone_exist(drone_address):
-                        drone = self.create_drone(drone_address)
-                        self.__drones[drone['id']] = drone
+                if not self.drone_exist(drone_address):
+                    if len(self.__drones) >= self.__max_drone_limit:
+                        print("Max drone limit")
+                        return False
+                    drone = self.create_drone(drone_address)
+                    self.__drones[drone['id']] = drone
 
-                    c_thread = threading.Thread(target = self.handle_request,
-                                            args = (data, drone_address))
-                    c_thread.daemon = True
-                    c_thread.start()
+                c_thread = threading.Thread(target = self.handle_request,
+                                        args = (data, drone_address))
+                c_thread.daemon = True
+                c_thread.start()
 
-                except OSError as err:
-                    print(err)
+            except OSError as err:
+                print(err)
 
         except KeyboardInterrupt:
             self.shutdown_server()
@@ -129,6 +133,7 @@ if __name__ == '__main__':
     with open('setup.json') as json_file:
         data = json.load(json_file)
 
-        udp_server_multi_client = UDPServerMultiClient("", int(data['gateway']["port"]))
+        udp_server_multi_client = UDPServerMultiClient("", int(data['gateway']["port"]), int(data['max_drones']))
         udp_server_multi_client.configure_server()
-        udp_server_multi_client.wait_for_client()
+        while True:
+            udp_server_multi_client.wait_for_client()
