@@ -83,7 +83,6 @@ class Gateway():
         Send the drones id that are free to the client.
         """
         free_drones = self.__drone_server.get_free_drones()
-        print(free_drones)
         try:
             self.__client["conn"].send(str(free_drones).encode())
             return True
