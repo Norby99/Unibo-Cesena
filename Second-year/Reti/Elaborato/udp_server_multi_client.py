@@ -22,7 +22,7 @@ class UDPServerMultiClient(UDPServer):
     def configure_server(self):
         self.__socket = super().configure_server()
 
-    def handle_request(self, data: str, drone_address):
+    def _handle_request(self, data: str, drone_address):
         '''
         Handle the client
         '''

@@ -24,7 +24,7 @@ class UDPServer(ABC):
         return self.__socket
 
     @abstractmethod
-    def handle_request(self, data, client_address):
+    def _handle_request(self, data, client_address):
         '''
         Handle the client
         '''
