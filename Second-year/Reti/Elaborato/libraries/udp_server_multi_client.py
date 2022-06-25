@@ -1,12 +1,12 @@
+from libraries.udp_server import UDPServer
 import socket
 import threading
 import os.path
 import sys
 import json
 # I must do in this way to use it both as a library and a separate program
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
-from libraries.udp_server import UDPServer
 
 
 class UDPServerMultiClient(UDPServer):
@@ -41,7 +41,8 @@ class UDPServerMultiClient(UDPServer):
         else:
             self.shutdown_server()
 
-        print(f'MESSAGE from {self.get_dron_id_by_address(drone_address)} : {drone_address}: ' + str(resp))
+        print(
+            f'MESSAGE from {self.get_dron_id_by_address(drone_address)} : {drone_address}: ' + str(resp))
 
     def _send_request(self, request: str, drone_address) -> bool:
         """
@@ -181,6 +182,17 @@ class UDPServerMultiClient(UDPServer):
         Returns the dict of the drones
         """
         return self.__drones
+
+    def get_free_drones(self) -> dict:
+        """
+        Returns the dict of the free drones
+        """
+        drones = {}
+        for key, val in self.__drones.items():
+            if val['status'] == 'free':
+                drones[key] = val
+
+        return drones
 
 
 if __name__ == '__main__':
