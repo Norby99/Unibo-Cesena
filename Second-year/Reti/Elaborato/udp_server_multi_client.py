@@ -76,6 +76,24 @@ class UDPServerMultiClient(UDPServer):
 
         return True
 
+    def __thread_send_message(self, message, address) -> None:
+        """
+        Handles the send message with threads
+        """
+        send_req_thread = threading.Thread(target=self._send_request,
+                                           args=(message, address))
+        send_req_thread.daemon = True
+        send_req_thread.start()
+
+    def __thread_request_handle(self, request, address) -> None:
+        """
+        Handles the request with threads
+        """
+        req_thread = threading.Thread(target=self._handle_request,
+                                      args=(request, address))
+        req_thread.daemon = True
+        req_thread.start()
+
     def is_drone_free(self, drone_id: int) -> bool:
         """
         Return True if the given drone is free
