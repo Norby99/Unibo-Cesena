@@ -18,8 +18,6 @@ class UDPServerMultiClient(UDPServer):
         super().__init__(host, port)
         self.socket_lock = threading.Lock()
         self.__max_drone_limit = drone_limit
-
-    def configure_server(self):
         self.__socket = super().configure_server()
 
     def _handle_request(self, data: str, drone_address):
@@ -186,6 +184,5 @@ if __name__ == '__main__':
 
         udp_server_multi_client = UDPServerMultiClient(
             "", int(data['gateway']["port"]), int(data['max_drones']))
-        udp_server_multi_client.configure_server()
         while True:
             udp_server_multi_client.wait_for_client()
