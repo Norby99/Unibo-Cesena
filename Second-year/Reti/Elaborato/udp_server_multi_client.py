@@ -3,6 +3,7 @@ import threading
 from libraries.udp_server import UDPServer
 import json
 
+
 class UDPServerMultiClient(UDPServer):
     '''
     A simple UDP Server for handling multiple clients
@@ -25,7 +26,6 @@ class UDPServerMultiClient(UDPServer):
         '''
         Handle the client
         '''
-
         # handle request
         resp = data.decode('utf-8')
         if self.valid_response(resp):
@@ -51,10 +51,10 @@ class UDPServerMultiClient(UDPServer):
         Wait for clients and handle their requests
         return True if it's all ok
         '''
-
         try:
-            try: # receive request from client
-                data, drone_address = self.__socket.recvfrom(self.__buffer_size)
+            try:  # receive request from client
+                data, drone_address = self.__socket.recvfrom(
+                    self.__buffer_size)
 
                 if not self.drone_exist(drone_address):
                     if len(self.__drones) >= self.__max_drone_limit:
@@ -63,8 +63,8 @@ class UDPServerMultiClient(UDPServer):
                     drone = self.create_drone(drone_address)
                     self.__drones[drone['id']] = drone
 
-                c_thread = threading.Thread(target = self.handle_request,
-                                        args = (data, drone_address))
+                c_thread = threading.Thread(target=self.handle_request,
+                                            args=(data, drone_address))
                 c_thread.daemon = True
                 c_thread.start()
 
@@ -73,7 +73,7 @@ class UDPServerMultiClient(UDPServer):
 
         except KeyboardInterrupt:
             self.shutdown_server()
-        
+
         return True
 
     def valid_response(self, msg) -> bool:
@@ -98,9 +98,9 @@ class UDPServerMultiClient(UDPServer):
         id = len(self.__drones)+1
         drone_id = "drone_" + str(id)
         return {
-            "id" : drone_id,
-            "address" : address,
-            "status" : "free"
+            "id": drone_id,
+            "address": address,
+            "status": "free"
         }
 
     def drone_exist(self, address) -> bool:
@@ -121,21 +121,23 @@ class UDPServerMultiClient(UDPServer):
             if val['address'] == address:
                 self.__drones[key]['status'] = status
                 return True
-        
+
         print("Error drone not found")
         return False
 
-    def get_drones(self) ->dict:
+    def get_drones(self) -> dict:
         """
         Returns the dict of the drones
         """
         return self.__drones
 
+
 if __name__ == '__main__':
     with open('setup.json') as json_file:
         data = json.load(json_file)
 
-        udp_server_multi_client = UDPServerMultiClient("", int(data['gateway']["port"]), int(data['max_drones']))
+        udp_server_multi_client = UDPServerMultiClient(
+            "", int(data['gateway']["port"]), int(data['max_drones']))
         udp_server_multi_client.configure_server()
         while True:
             udp_server_multi_client.wait_for_client()

@@ -1,6 +1,7 @@
 import json
 import socket
 
+
 class Gateway():
 
     __address: tuple[str, int]
@@ -10,7 +11,7 @@ class Gateway():
         "conn": socket.socket,
         "is_connected": False
     }
-    __buffer_size:int = 1024
+    __buffer_size: int = 1024
     __drones: dict = {
         "drone_1": {
             "id": "drone_1",
@@ -38,7 +39,8 @@ class Gateway():
         Setup the connection between the gateway and the client.
         """
         self.__address = ("", gateway_port)
-        self.__client["socket"] = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
+        self.__client["socket"] = socket.socket(
+            family=socket.AF_INET, type=socket.SOCK_STREAM)
         self.__client["socket"].bind(self.__address)
 
     def __connect_client(self) -> None:
@@ -76,7 +78,8 @@ class Gateway():
         """
         Send the drones id that are free to the client.
         """
-        free_drones = [drone["id"] for drone in self.__drones.values() if drone['status'] == 'free']
+        free_drones = [drone["id"]
+                       for drone in self.__drones.values() if drone['status'] == 'free']
         try:
             self.__client["conn"].send(str(free_drones).encode())
             return True
@@ -96,7 +99,7 @@ class Gateway():
         Process the order and send the drone to the order destination.
         """
         self.__drones[order["drone_id"]]["status"] = "shipping"
-        #TODO: send drone to order destination
+        # TODO: send drone to order destination
 
     def _check_order(self, order: dict) -> bool:
         """
@@ -120,7 +123,7 @@ class Gateway():
         if self.__drones[order["drone_id"]]["status"] != "free":
             print("The selected drone is not free")
             return False
-        
+
         return True
 
     def close_client_connection(self) -> None:

@@ -4,11 +4,12 @@ from datetime import datetime
 import time
 import random
 
+
 class Drone:
     '''
     A simple UDP Client
     '''
-
+    
     __address: tuple[str, int]
     __buffer_size: int = 1024
     __socket: socket.socket
@@ -51,7 +52,8 @@ class Drone:
                 print("Waiting for orders")
 
                 # receive data from server
-                order, server_address = self.__socket.recvfrom(self.__buffer_size)
+                order, server_address = self.__socket.recvfrom(
+                    self.__buffer_size)
                 order = order.decode()
                 self.ship_order(order)
                 msg = ['order delivered']
@@ -62,6 +64,7 @@ class Drone:
 
         finally:
             self.__socket.close()
+
 
 if __name__ == '__main__':
     with open('setup.json') as json_file:

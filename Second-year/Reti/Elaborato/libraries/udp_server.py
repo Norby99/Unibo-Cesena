@@ -2,12 +2,13 @@ import socket
 from datetime import datetime
 from abc import ABC, abstractmethod
 
+
 class UDPServer(ABC):
     ''' A simple UDP Server '''
 
     __address: tuple[str, int]
     __socket: socket.socket
-    
+
     def __init__(self, host, port):
         self.__address = (host, port)
 
