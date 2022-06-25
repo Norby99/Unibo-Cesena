@@ -82,8 +82,8 @@ class Gateway():
         """
         Send the drones id that are free to the client.
         """
-        free_drones = [drone["id"]
-                       for drone in self.__drones.values() if drone['status'] == 'free']
+        free_drones = self.__drone_server.get_free_drones()
+        print(free_drones)
         try:
             self.__client["conn"].send(str(free_drones).encode())
             return True
@@ -102,8 +102,10 @@ class Gateway():
         """
         Process the order and send the drone to the order destination.
         """
+        # TODO: the code below is wrong
+        print(order)
+        self.__drone_server._send_request()
         self.__drones[order["drone_id"]]["status"] = "shipping"
-        # TODO: send drone to order destination
 
     def _check_order(self, order: dict) -> bool:
         """
@@ -119,12 +121,12 @@ class Gateway():
             return False
 
         # check if the drone exists
-        if order["drone_id"] not in self.__drones.keys():
+        if order["drone_id"] not in self.__drone_server.get_drones():
             print("The selected drone does not exist")
             return False
 
         # check if the drone is free
-        if self.__drones[order["drone_id"]]["status"] != "free":
+        if order["drone_id"] not in self.__drone_server.get_free_drones():
             print("The selected drone is not free")
             return False
 
