@@ -1,6 +1,6 @@
 import socket
 import threading
-from libraries.udp_server import UDPServer
+from udp_server import UDPServer
 import json
 
 
