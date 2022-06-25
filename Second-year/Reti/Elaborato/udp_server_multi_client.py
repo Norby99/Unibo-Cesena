@@ -46,9 +46,10 @@ class UDPServerMultiClient(UDPServer):
             self.__socket.sendto(msg.encode('utf-8'), drone_address)
         print(msg)
 
-    def wait_for_client(self):
+    def wait_for_client(self) -> bool:
         '''
         Wait for clients and handle their requests
+        return True if it's all ok
         '''
 
         try:
@@ -72,6 +73,8 @@ class UDPServerMultiClient(UDPServer):
 
         except KeyboardInterrupt:
             self.shutdown_server()
+        
+        return True
 
     def valid_response(self, msg) -> bool:
         """
