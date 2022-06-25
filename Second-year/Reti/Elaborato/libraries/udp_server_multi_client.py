@@ -1,4 +1,3 @@
-from libraries.udp_server import UDPServer
 import socket
 import threading
 import os.path
@@ -7,6 +6,7 @@ import json
 # I must do in this way to use it both as a library and a separate program
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
+from libraries.udp_server import UDPServer
 
 
 class UDPServerMultiClient(UDPServer):
@@ -71,18 +71,9 @@ class UDPServerMultiClient(UDPServer):
         '''
         try:
             try:  # receive request from client
-                data, drone_address = self.__socket.recvfrom(
-                    self.__buffer_size)
-
-                if not self.drone_exist(drone_address):
-                    if len(self.__drones) >= self.__max_drone_limit:
-                        print("Max drone limit")
-                        return False
-                    drone = self.create_drone(drone_address)
-                    self.__drones[drone['id']] = drone
-
-                self.thread_request_handle(data, drone_address)
-                self.thread_send_message("Via Roma 7", drone_address)
+                self.thread_request_handle()
+                #drone_address = self.__drones["drone_1"]["address"]
+                #self.thread_send_message("Via Roma 7", drone_address)
 
             except OSError as err:
                 print(err)
@@ -101,10 +92,20 @@ class UDPServerMultiClient(UDPServer):
         send_req_thread.daemon = True
         send_req_thread.start()
 
-    def thread_request_handle(self, request, address) -> None:
+    def thread_request_handle(self) -> None:
         """
         Handles the request with threads
         """
+        request, address = self.__socket.recvfrom(
+            self.__buffer_size)
+
+        if not self.drone_exist(address):
+            if len(self.__drones) >= self.__max_drone_limit:
+                print("Max drone limit")
+                return False
+            drone = self.create_drone(address)
+            self.__drones[drone['id']] = drone
+
         req_thread = threading.Thread(target=self._handle_request,
                                       args=(request, address))
         req_thread.daemon = True
