@@ -79,8 +79,8 @@ class UDPServerMultiClient(UDPServer):
                     drone = self.create_drone(drone_address)
                     self.__drones[drone['id']] = drone
 
-                self.__thread_request_handle(data, drone_address)
-                self.__thread_send_message("Via Roma 7", drone_address)
+                self.thread_request_handle(data, drone_address)
+                self.thread_send_message("Via Roma 7", drone_address)
 
             except OSError as err:
                 print(err)
@@ -90,7 +90,7 @@ class UDPServerMultiClient(UDPServer):
 
         return True
 
-    def __thread_send_message(self, message, address) -> None:
+    def thread_send_message(self, message, address) -> None:
         """
         Handles the send message with threads
         """
@@ -99,7 +99,7 @@ class UDPServerMultiClient(UDPServer):
         send_req_thread.daemon = True
         send_req_thread.start()
 
-    def __thread_request_handle(self, request, address) -> None:
+    def thread_request_handle(self, request, address) -> None:
         """
         Handles the request with threads
         """
