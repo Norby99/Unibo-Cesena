@@ -34,7 +34,8 @@ class Gateway():
     __is_client_connected: bool = False
 
     def __init__(self, gateway_ip: str, gateway_port: int, max_drones: int) -> None:
-        self.__drone_server = UDPServerMultiClient(gateway_ip, gateway_port, max_drones)
+        self.__drone_server = UDPServerMultiClient(
+            gateway_ip, gateway_port, max_drones)
         self._setup_gateway_client(gateway_ip, gateway_port)
 
     def _setup_gateway_client(self, gateway_ip: str, gateway_port: int) -> None:
