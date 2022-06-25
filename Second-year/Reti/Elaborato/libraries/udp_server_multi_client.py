@@ -183,14 +183,14 @@ class UDPServerMultiClient(UDPServer):
         """
         return self.__drones
 
-    def get_free_drones(self) -> dict:
+    def get_free_drones(self) -> list[dict]:
         """
-        Returns the dict of the free drones
+        Returns a list of the free drones
         """
-        drones = {}
+        drones = []
         for key, val in self.__drones.items():
             if val['status'] == 'free':
-                drones[key] = val
+                drones.append(val)
 
         return drones
 
