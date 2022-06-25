@@ -14,23 +14,6 @@ class Gateway():
     }
     __buffer_size: int = 1024
     __drone_server: UDPServerMultiClient
-    __drones: dict = {
-        "drone_1": {
-            "id": "drone_1",
-            "ip": "xxx",
-            "status": "free"
-        },
-        "drone_2": {
-            "id": "drone_2",
-            "ip": "xxx",
-            "status": "free"
-        },
-        "drone_3": {
-            "id": "drone_3",
-            "ip": "xxx",
-            "status": "free"
-        }
-    }
     __is_client_connected: bool = False
 
     def __init__(self, gateway_ip: str, gateway_port: int, max_drones: int) -> None:
@@ -68,7 +51,7 @@ class Gateway():
                     break
                 order = eval(data.decode("utf-8"))
                 if not self._check_order(order):
-                    self._send_message("Error: wrong order syntax")
+                    self._send_message_to_client("Error: wrong order syntax")
                 elif "update" in order:
                     continue
 
@@ -91,7 +74,7 @@ class Gateway():
             self.__is_client_connected = False
             return False
 
-    def _send_message(self, message: str) -> None:
+    def _send_message_to_client(self, message: str) -> None:
         """
         Send a message to the client.
         """
@@ -103,8 +86,7 @@ class Gateway():
         """
         # TODO: the code below is wrong
         print(order)
-        self.__drone_server._send_request()
-        self.__drones[order["drone_id"]]["status"] = "shipping"
+        self.__drone_server.thread_send_message(order["order_destination"], )
 
     def _check_order(self, order: dict) -> bool:
         """
