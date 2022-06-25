@@ -5,7 +5,9 @@ import time
 import random
 
 class Drone:
-    ''' A simple UDP Client '''
+    '''
+    A simple UDP Client
+    '''
 
     __address: tuple[str, int]
     __buffer_size: int = 1024
