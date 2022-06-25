@@ -40,11 +40,23 @@ class UDPServerMultiClient(UDPServer):
 
         print(f'MESSAGE from {drone_address}: ' + str(resp))
 
-        msg = "via Roma 7"
-        # send response to the client
+    def _send_request(self, request: str, drone_address) -> bool:
+        """
+        Send a requesto to a drone
+        return False if something went wrong
+        """
+        # if the drone exist
+        if not self.drone_exist(drone_address):
+            print("The drone does not exist")
+            return False
+
+        # if the drone is free
+        if not self.is_drone_free(self.get_dron_id_by_address(drone_address)):
+            False
+
+        # send response to the drone
         with self.socket_lock:
-            self.__socket.sendto(msg.encode('utf-8'), drone_address)
-        print(msg)
+            self.__socket.sendto(request.encode('utf-8'), drone_address)
 
     def wait_for_client(self) -> bool:
         '''
@@ -63,10 +75,8 @@ class UDPServerMultiClient(UDPServer):
                     drone = self.create_drone(drone_address)
                     self.__drones[drone['id']] = drone
 
-                c_thread = threading.Thread(target=self.handle_request,
-                                            args=(data, drone_address))
-                c_thread.daemon = True
-                c_thread.start()
+                self.__thread_request_handle(data, drone_address)
+                self.__thread_send_message("Via Roma 7", drone_address)
 
             except OSError as err:
                 print(err)
