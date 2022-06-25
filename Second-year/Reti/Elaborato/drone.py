@@ -42,7 +42,7 @@ class Drone:
                 msg.append('free')
                 msg = str(msg)
 
-                print(f'Sending [{msg}] message')
+                print(f'Sending {msg} message')
                 self.__socket.sendto(msg.encode('utf-8'), self.__address)
 
                 print("Waiting for orders")
