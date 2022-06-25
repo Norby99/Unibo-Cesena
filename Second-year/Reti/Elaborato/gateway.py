@@ -45,7 +45,10 @@ class Gateway():
 
         try:
             while True:
+                if self.__is_client_connected:
+                    self.__drone_server.thread_request_handle()
                 self.send_drone_information()
+
                 data = self.__client["conn"].recv(self.__buffer_size)
                 if not data:
                     break
