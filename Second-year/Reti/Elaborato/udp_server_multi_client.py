@@ -38,7 +38,7 @@ class UDPServerMultiClient(UDPServer):
         else:
             self.shutdown_server()
 
-        print(f'MESSAGE from {drone_address}: ' + str(resp))
+        print(f'MESSAGE from {self.get_dron_id_by_address(drone_address)} : {drone_address}: ' + str(resp))
 
     def _send_request(self, request: str, drone_address) -> bool:
         """
