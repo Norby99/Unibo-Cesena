@@ -71,7 +71,7 @@ class Client():
         msg = {}
 
         while chosen_drone not in free_drones:
-            chosen_drone = input("Insert the drone nome (insert 'update' to update the drone list): ")
+            chosen_drone = input("Insert the drone name (insert 'update' to update the drone list): ")
             if chosen_drone == "update":
                 update_mode = True
                 break
