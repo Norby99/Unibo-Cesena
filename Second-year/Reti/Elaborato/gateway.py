@@ -1,5 +1,6 @@
 import json
 import socket
+from threading import Thread
 from libraries.udp_server_multi_client import UDPServerMultiClient
 
 
@@ -42,12 +43,19 @@ class Gateway():
         Listen if there are orders to be shipped.
         """
         self.__connect_client()
+        drone_server_thread = Thread()
 
         try:
             while True:
-                if self.__is_client_connected:
-                    self.__drone_server.thread_request_handle()
                 self.send_drone_information()
+
+                # creating the drone listener thread
+                if self.__is_client_connected:
+                    if not drone_server_thread.is_alive():
+                        drone_server_thread = Thread(
+                            target=self.__drone_server.thread_request_handle)
+                        drone_server_thread.daemon = True
+                        drone_server_thread.start()
 
                 data = self.__client["conn"].recv(self.__buffer_size)
                 if not data:
