@@ -30,7 +30,7 @@ class Client():
         except:
             return False
 
-    def listen_for_drones(self) -> None:
+    def main_loop(self) -> None:
         """
         Listen if there are free drones.
         """
@@ -96,6 +96,6 @@ if __name__ == '__main__':
     with open('setup.json') as json_file:
         data = json.load(json_file)
         client = Client(data['gateway']["ip"], int(data['gateway']["port"]))
-        client.listen_for_drones()
+        client.main_loop()
 
         client.close_connection()
