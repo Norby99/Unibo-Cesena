@@ -42,7 +42,7 @@ class UDPServerMultiClient(UDPServer):
             self.shutdown_server()
 
         print(
-            f'MESSAGE from {self.get_dron_id_by_address(drone_address)} : {drone_address}: ' + str(resp))
+            f'MESSAGE from {self.get_drone_id_by_address(drone_address)} : {drone_address}: ' + str(resp))
 
     def _send_request(self, request: str, drone_address) -> bool:
         """
@@ -55,7 +55,7 @@ class UDPServerMultiClient(UDPServer):
             return False
 
         # if the drone is free
-        if not self.is_drone_free(self.get_dron_id_by_address(drone_address)):
+        if not self.is_drone_free(self.get_drone_id_by_address(drone_address)):
             False
 
         # send response to the drone
@@ -158,16 +158,6 @@ class UDPServerMultiClient(UDPServer):
 
         return False
 
-    def get_dron_id_by_address(self, address) -> str:
-        """
-        Returns the id of the drone by the given address
-        """
-        for key, val in self.__drones.items():
-            if val['address'] == address:
-                return val['id']
-
-        return None
-
     def set_drone_status(self, address, status: str) -> bool:
         """
         Set free status to a given drone
@@ -185,6 +175,24 @@ class UDPServerMultiClient(UDPServer):
         Returns the dict of the drones
         """
         return self.__drones
+
+    def get_drone_address_by_id(self, id) -> str:
+        """
+        Returns the drone address by the given id
+        """
+        for key, val in self.__drones.items():
+            if val['id'] == id:
+                return val['address']
+
+    def get_drone_id_by_address(self, address) -> str:
+        """
+        Returns the id of the drone by the given address
+        """
+        for key, val in self.__drones.items():
+            if val['address'] == address:
+                return val['id']
+
+        return None
 
     def get_free_drones(self) -> list[dict]:
         """
