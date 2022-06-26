@@ -58,8 +58,9 @@ class Gateway():
                         drone_server_thread.start()
                         time.sleep(0.5)
 
+                # handling the client
                 if not client_thread.is_alive():
-                    client_thread =  Thread(self.client_handling())
+                    client_thread = Thread(self.client_handling())
                     client_thread.daemon = True
                     client_thread.start()
 
