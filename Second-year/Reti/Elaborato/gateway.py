@@ -1,6 +1,7 @@
 import json
 import socket
 from threading import Thread
+import time
 from libraries.udp_server_multi_client import UDPServerMultiClient
 
 
@@ -47,8 +48,6 @@ class Gateway():
 
         try:
             while True:
-                self.send_drone_information()
-
                 # creating the drone listener thread
                 if self.__is_client_connected:
                     if not drone_server_thread.is_alive():
@@ -56,6 +55,9 @@ class Gateway():
                             target=self.__drone_server.thread_request_handle)
                         drone_server_thread.daemon = True
                         drone_server_thread.start()
+                        time.sleep(0.5)
+
+                self.send_drone_information()
 
                 data = self.__client["conn"].recv(self.__buffer_size)
                 if not data:
