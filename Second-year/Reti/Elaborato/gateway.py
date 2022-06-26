@@ -37,7 +37,7 @@ class Gateway():
             print(f"Connected to Client: {self.__client['address']}")
             self.__is_client_connected = True
 
-    def listen_for_orders(self) -> None:
+    def main_loop(self) -> None:
         """
         Listen if there are orders to be shipped.
         """
@@ -127,6 +127,6 @@ if __name__ == '__main__':
     with open('setup.json') as json_file:
         data = json.load(json_file)
         gateway = Gateway("", int(data['gateway']["port"]), data["max_drones"])
-        gateway.listen_for_orders()
+        gateway.main_loop()
 
         gateway.close_client_connection()
