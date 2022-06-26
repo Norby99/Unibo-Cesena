@@ -1,5 +1,5 @@
 import socket
-import threading
+from threading import *
 import os.path
 import sys
 import json
@@ -21,7 +21,7 @@ class UDPServerMultiClient(UDPServer):
 
     def __init__(self, host: str, port: int, drone_limit: int):
         super().__init__(host, port)
-        self.socket_lock = threading.Lock()
+        self.socket_lock = Lock()
         self.__max_drone_limit = drone_limit
         self.__socket = super().configure_server()
 
@@ -85,7 +85,7 @@ class UDPServerMultiClient(UDPServer):
         """
         Handles the send message with threads
         """
-        send_req_thread = threading.Thread(target=self._send_request,
+        send_req_thread = Thread(target=self._send_request,
                                            args=(message, address))
         send_req_thread.daemon = True
         send_req_thread.start()
@@ -97,14 +97,22 @@ class UDPServerMultiClient(UDPServer):
         request, address = self.__socket.recvfrom(
             self.__buffer_size)
 
+        if not request:
+            return
+
         if not self.drone_exist(address):
             if len(self.__drones) >= self.__max_drone_limit:
                 print("Max drone limit")
                 return False
             drone = self.create_drone(address)
             self.__drones[drone['id']] = drone
+        
+        if len(self.__drones) < self.__max_drone_limit:
+            temp_thread = Thread(target=self.thread_request_handle)
+            temp_thread.daemon = True
+            temp_thread.start()
 
-        req_thread = threading.Thread(target=self._handle_request,
+        req_thread = Thread(target=self._handle_request,
                                       args=(request, address))
         req_thread.daemon = True
         req_thread.start()
