@@ -68,7 +68,10 @@ class Gateway():
             print(f"Client {self.__client['address']} disconnected!")
             self.__is_client_connected = True
 
-    def client_handling(self):
+    def client_handling(self) -> None:
+        """
+        Handles the client
+        """
         self.send_drone_information()
 
         data = self.__client["conn"].recv(self.__buffer_size)

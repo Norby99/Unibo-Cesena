@@ -25,7 +25,7 @@ class UDPServerMultiClient(UDPServer):
         self.__max_drone_limit = drone_limit
         self.__socket = super().configure_server()
 
-    def _handle_request(self, data: str, drone_address):
+    def _handle_request(self, data: str, drone_address) -> None:
         '''
         Handle the client
         '''
