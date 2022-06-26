@@ -60,7 +60,7 @@ class Gateway():
 
                 print(f"Order: {order}")
                 self._process_order(order)
-        except:
+        except ConnectionResetError:
             print(f"Client {self.__client['address']} disconnected!")
             self.__is_client_connected = True
 
