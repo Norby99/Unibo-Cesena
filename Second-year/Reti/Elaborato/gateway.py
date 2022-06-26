@@ -45,6 +45,7 @@ class Gateway():
         """
         self.__connect_client()
         drone_server_thread = Thread()
+        client_thread = Thread()
 
         try:
             while True:
@@ -57,23 +58,27 @@ class Gateway():
                         drone_server_thread.start()
                         time.sleep(0.5)
 
-                self.send_drone_information()
-
-                data = self.__client["conn"].recv(self.__buffer_size)
-                if not data:
-                    break
-                order = eval(data.decode("utf-8"))
-                if not self._check_order(order):
-                    self._send_message_to_client("Error: wrong order syntax")
-                elif "update" in order:
-                    continue
-
-                print(f"Order: {order}")
-                self._process_order(order)
+                if not client_thread.is_alive():
+                    client_thread =  Thread(self.client_handling())
+                    client_thread.daemon = True
+                    client_thread.start()
 
         except ConnectionResetError:
             print(f"Client {self.__client['address']} disconnected!")
             self.__is_client_connected = True
+
+    def client_handling(self):
+        self.send_drone_information()
+
+        data = self.__client["conn"].recv(self.__buffer_size)
+        if not data:
+            return
+        order = eval(data.decode("utf-8"))
+        if not self._check_order(order):
+            self._send_message_to_client("Error: wrong order syntax")
+        elif not "update" in order:
+            print(f"Order: {order}")
+            self._process_order(order)
 
     def send_drone_information(self) -> bool:
         """
