@@ -68,6 +68,7 @@ class Gateway():
 
                 print(f"Order: {order}")
                 self._process_order(order)
+
         except ConnectionResetError:
             print(f"Client {self.__client['address']} disconnected!")
             self.__is_client_connected = True
@@ -77,8 +78,12 @@ class Gateway():
         Send the drones id that are free to the client.
         """
         free_drones = self.__drone_server.get_free_drones()
+        drones = []
+        for i in free_drones:
+            drones.append(i["id"])
+
         try:
-            self.__client["conn"].send(str(free_drones).encode())
+            self.__client["conn"].send(str(drones).encode())
             return True
         except:
             print(f"Client {self.__client['address']} disconnected!")
@@ -95,9 +100,9 @@ class Gateway():
         """
         Process the order and send the drone to the order destination.
         """
-        # TODO: the code below is wrong
         print(order)
-        self.__drone_server.thread_send_message(order["order_destination"], )
+        self.__drone_server.thread_send_message(
+            order["order_destination"], self.__drone_server.get_drone_address_by_id(order["drone_id"]))
 
     def _check_order(self, order: dict) -> bool:
         """
