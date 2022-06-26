@@ -72,8 +72,6 @@ class UDPServerMultiClient(UDPServer):
         try:
             try:  # receive request from client
                 self.thread_request_handle()
-                #drone_address = self.__drones["drone_1"]["address"]
-                #self.thread_send_message("Via Roma 7", drone_address)
 
             except OSError as err:
                 print(err)
