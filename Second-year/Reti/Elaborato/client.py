@@ -83,7 +83,7 @@ class Client():
             msg["drone_id"] = chosen_drone
             msg["order_destination"] = destination_address
         else:
-            self.request_update()
+            msg["update"] = 'update'
 
         return msg
 
