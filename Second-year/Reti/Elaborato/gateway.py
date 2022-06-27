@@ -81,7 +81,7 @@ class Gateway():
         if not self._check_order(order):
             self._send_message_to_client("Error: wrong order syntax")
         elif not "update" in order:
-            print(f"Order: {order}")
+            print(f"Clinet request: {order}")
             self._process_order(order)
 
     def send_drone_information(self) -> bool:
@@ -111,7 +111,6 @@ class Gateway():
         """
         Process the order and send the drone to the order destination.
         """
-        print(order)
         self.__drone_server.thread_send_message(
             order["order_destination"], self.__drone_server.get_drone_address_by_id(order["drone_id"]))
 
