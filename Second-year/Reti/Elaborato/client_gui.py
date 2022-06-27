@@ -38,6 +38,7 @@ class Client_GUI():
         self.drones_list = tk.Listbox(self.root, width=20)
         self.drones_list.insert(tk.END, "")
         self.drones_list.pack(side=tk.TOP, fill=tk.X)
+        self.drones_list.bind("<Double-Button-1>", self.drone_list_click)
 
         # ask for drone_id and shipment address on the right
         self.drone_id_label = tk.Label(self.root, text="Drone ID:")
@@ -51,7 +52,23 @@ class Client_GUI():
         self.shipment_entry.pack(side=tk.TOP)
         self.submit_button.pack(side=tk.TOP)
 
-    def update(self):
+        # show the status of the client
+        self.status_text = tk.Label(self.root, text="")
+        self.status_text.pack(side=tk.BOTTOM)
+
+    def drone_list_click(self, event):
+        """
+        When the user clicks on a drone in the list,
+        the drone_id entry is filled with the drone_id.
+        """
+        try:
+            drone_id = self.drones_list.get(self.drones_list.curselection())
+            self.drone_id_entry.delete(0, tk.END)
+            self.drone_id_entry.insert(tk.END, drone_id)
+        except:
+            pass
+
+    def update(self) -> None:
         """
         Update the list of drones.
         """
@@ -64,9 +81,20 @@ class Client_GUI():
         """
         Submit the order.
         """
+        msg = {}
+
         drone_id = self.drone_id_entry.get()
         shipment = self.shipment_entry.get()
-        self.client.request_shipment(drone_id, shipment)
+
+        msg["drone_id"] = drone_id
+        msg["order_destination"] = shipment
+
+        if self.client.order_checker(msg):
+            self.client.request_shipment(msg)
+            self.status_text.config(text="")
+        else:
+            self.status_text.config(text="Invalid drone")
+
         self.drone_id_entry.delete(0, tk.END)
         self.shipment_entry.delete(0, tk.END)
 
@@ -81,7 +109,7 @@ class Client_GUI():
         """
         Main task of the client.
         """
-        self.client.main_tick()
+        self.client.main_tick_thread()
         self.root.after(self.__time_after, self.task)
 
     def on_closing(self):
