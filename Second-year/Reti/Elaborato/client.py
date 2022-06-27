@@ -87,6 +87,23 @@ class Client():
 
         return msg
 
+    def order_checker(self, order: dict) -> bool:
+        """
+        Check if the order is valid.
+        """
+        if "drone_id" not in order:
+            print("Missing drone_id")
+            return False
+        if "order_destination" not in order:
+            print("Missing order_destination")
+            return False
+
+        if order["drone_id"] not in self.__free_drones:
+            print("Drone is not free")
+            return False
+
+        return True
+
     def get_free_drones(self) -> list[str]:
         """
         Returns the list of free drones.
