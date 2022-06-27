@@ -31,7 +31,6 @@ class Client_GUI():
         self.drones_list = tk.Listbox(self.root)
         self.drones_list.grid(row=0, column=0, columnspan=2)
         self.drones_list.insert(tk.END, "Available drones:")
-        self.update()
 
         # ask for drone_id and shipment address
         self.drone_id_label = tk.Label(self.root, text="Drone ID:")
@@ -44,17 +43,14 @@ class Client_GUI():
         self.shipment_entry.grid(row=2, column=1)
         self.submit_button = tk.Button(self.root, text="Submit", command=self.submit)
         self.submit_button.grid(row=3, column=0, columnspan=2)
-        self.update_button = tk.Button(self.root, text="Update", command=self.update)
-        self.update_button.grid(row=4, column=0, columnspan=2)
         self.quit_button = tk.Button(self.root, text="Quit", command=self.root.destroy)
-        self.quit_button.grid(row=5, column=0, columnspan=2)
+        self.quit_button.grid(row=4, column=0, columnspan=2)
 
 
 
     def update(self):
         self.client.request_update()
         self.drones_list.delete(0, tk.END)
-        print(self.client.get_free_drones())
         for drone in self.client.get_free_drones():
             self.drones_list.insert(tk.END, drone)
 
@@ -70,12 +66,8 @@ class Client_GUI():
         Main task of the client.
         """
         self.client.main_tick()
+        self.update()
         self.root.after(self.__time_after, self.task)
-
-    
-
-
-    
 
 if __name__ == "__main__":
     with open('setup.json') as json_file:
