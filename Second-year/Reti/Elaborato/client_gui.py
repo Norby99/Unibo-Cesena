@@ -10,7 +10,7 @@ class Client_GUI():
     __time_after: int = 100
     __time_update: int = 1000
 
-    def __init__(self, ip, port):
+    def __init__(self, ip, port) -> None:
         """
         Constructor of the Client_GUI class.
         """
@@ -22,14 +22,15 @@ class Client_GUI():
         self.client = Client(ip, port)
         self.create_widgets()
         
-        self.root.after(self.__time_after, self.task)
-        self.root.after(self.__time_after, self.update_task)
+        self.__time_after, self.task()
+        self.update_task()
+
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.root.mainloop()
         
         self.client.close_connection()
         
-    def create_widgets(self):
+    def create_widgets(self) -> None:
         """
         Create the widgets of the GUI.
         """
@@ -59,7 +60,7 @@ class Client_GUI():
         for drone in self.client.get_free_drones():
             self.drones_list.insert(tk.END, drone)
 
-    def submit(self):
+    def submit(self) -> None:
         """
         Submit the order.
         """
