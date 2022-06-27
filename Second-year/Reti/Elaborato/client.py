@@ -6,6 +6,7 @@ class Client():
     __adress: tuple[str, int]
     __gateway_socket: socket.socket
     __buffer_size: int = 1024
+    __free_drones: list[str]
 
     def __init__(self, gateway_ip: str, gateway_port: int) -> None:
         self._setup_client_gateway(gateway_ip, gateway_port)
@@ -39,15 +40,15 @@ class Client():
                 data = self.__gateway_socket.recv(self.__buffer_size)
                 if not data:
                     break
-                free_drones = eval(data.decode("utf-8"))
+                self.__free_drones = eval(data.decode("utf-8"))
 
-                if type(free_drones) != list:
+                if type(self.__free_drones) != list:
                     print("Wrong drone data format")
                     continue
 
-                print(f"Free Drones: {free_drones}")
+                print(f"Free Drones: {self.__free_drones}")
 
-                self.request_shipment(self.choose_drone(free_drones))
+                self.request_shipment(self.choose_drone(self.__free_drones))
         except Exception as e:
             print(e)
             print("Gateway disconnected!")
