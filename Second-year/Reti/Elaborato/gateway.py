@@ -118,7 +118,6 @@ class Gateway():
         """
         Check if the order is valid and if the drone is available.
         """
-
         if "update" in order:
             return True
 
