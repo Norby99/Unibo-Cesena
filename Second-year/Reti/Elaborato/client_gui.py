@@ -8,6 +8,7 @@ class Client_GUI():
     """
 
     __time_after: int = 100
+    __time_update: int = 1000
 
     def __init__(self, ip, port):
         # create the main window
@@ -20,6 +21,8 @@ class Client_GUI():
         self.create_widgets()
         
         self.root.after(self.__time_after, self.task)
+        self.root.after(self.__time_after, self.update_task)
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.root.mainloop()
         
         self.client.close_connection()
@@ -27,26 +30,22 @@ class Client_GUI():
 
     # create widgets for drone_id and shipment
     def create_widgets(self):
-        # show available drones
-        self.drones_list = tk.Listbox(self.root)
-        self.drones_list.grid(row=0, column=0, columnspan=2)
-        self.drones_list.insert(tk.END, "Available drones:")
+        # show available drones on the left with no grid
+        self.drones_list = tk.Listbox(self.root, width=20)
+        self.drones_list.insert(tk.END, "")
+        self.drones_list.pack(side=tk.TOP, fill=tk.X)
 
-        # ask for drone_id and shipment address
+        # ask for drone_id and shipment address on the right
         self.drone_id_label = tk.Label(self.root, text="Drone ID:")
-        self.drone_id_label.grid(row=1, column=0)
-        self.drone_id_entry = tk.Entry(self.root)
-        self.drone_id_entry.grid(row=1, column=1)
-        self.shipment_label = tk.Label(self.root, text="Shipment address:")
-        self.shipment_label.grid(row=2, column=0)
-        self.shipment_entry = tk.Entry(self.root)
-        self.shipment_entry.grid(row=2, column=1)
+        self.drone_id_entry = tk.Entry(self.root, width=20)
+        self.shipment_label = tk.Label(self.root, text="Shipment:")
+        self.shipment_entry = tk.Entry(self.root, width=20)
         self.submit_button = tk.Button(self.root, text="Submit", command=self.submit)
-        self.submit_button.grid(row=3, column=0, columnspan=2)
-        self.quit_button = tk.Button(self.root, text="Quit", command=self.root.destroy)
-        self.quit_button.grid(row=4, column=0, columnspan=2)
-
-
+        self.drone_id_label.pack(side=tk.TOP)
+        self.drone_id_entry.pack(side=tk.TOP)
+        self.shipment_label.pack(side=tk.TOP)
+        self.shipment_entry.pack(side=tk.TOP)
+        self.submit_button.pack(side=tk.TOP)
 
     def update(self):
         self.client.request_update()
@@ -61,13 +60,24 @@ class Client_GUI():
         self.drone_id_entry.delete(0, tk.END)
         self.shipment_entry.delete(0, tk.END)
 
+    def update_task(self) -> None:
+        """
+        Update task of the client.
+        """
+        self.update()
+        self.root.after(self.__time_update, self.update_task)
+
     def task(self) -> None:
         """
         Main task of the client.
         """
         self.client.main_tick()
-        self.update()
         self.root.after(self.__time_after, self.task)
+
+    def on_closing(self):
+        self.client.close_connection()
+        self.root.destroy()
+        self.root.quit()
 
 if __name__ == "__main__":
     with open('setup.json') as json_file:
