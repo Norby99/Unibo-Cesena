@@ -82,9 +82,16 @@ class Client():
             msg["drone_id"] = chosen_drone
             msg["order_destination"] = destination_address
         else:
-            msg["update"] = 'update'
+            self.request_update()
 
         return msg
+
+    def request_update(self) -> None:
+        """
+        Request the update of the drone list.
+        """
+        msg = {"update": "update"}
+        self.request_shipment(msg)
 
     def close_connection(self) -> None:
         """
