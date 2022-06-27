@@ -37,22 +37,16 @@ class Client():
 
     def main_loop(self) -> None:
         """
+        The main loop of the class.
         Listen if there are free drones.
         """
         try:
             while True:
-                data = self.__gateway_socket.recv(self.__buffer_size)
-                if not data:
-                    break
-                self.__free_drones = eval(data.decode("utf-8"))
-
-                if type(self.__free_drones) != list:
-                    print("Wrong drone data format")
-                    continue
+                self.__main_tick()
 
                 print(f"Free Drones: {self.__free_drones}")
-
                 self.request_shipment(self.choose_drone(self.__free_drones))
+
         except Exception as e:
             print(e)
             print("Gateway disconnected!")
