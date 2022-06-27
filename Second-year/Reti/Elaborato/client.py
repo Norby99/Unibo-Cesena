@@ -7,7 +7,7 @@ class Client():
     __adress: tuple[str, int]
     __gateway_socket: socket.socket
     __buffer_size: int = 1024
-    __free_drones: list[str]
+    __free_drones: list[str] = []
     __connection_thread : Thread
 
     def __init__(self, gateway_ip: str, gateway_port: int) -> None:
