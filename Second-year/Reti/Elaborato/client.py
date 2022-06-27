@@ -54,6 +54,34 @@ class Client():
             print("Gateway disconnected!")
             self.close_connection()
 
+    def main_tick_thread(self) -> None:
+        """
+        Main tick thread of the client.
+        """
+        if not self.__connection_thread.is_alive():
+            self.__connection_thread = Thread(target=self.__main_tick)
+            self.__connection_thread.daemon = True
+            self.__connection_thread.start()
+            
+
+    def __main_tick(self) -> None:
+        """
+        Main tick of the client.
+        """
+        try:
+            data = self.__gateway_socket.recv(self.__buffer_size)
+            if not data:
+                return
+
+            self.__free_drones = eval(data.decode("utf-8"))
+
+            if type(self.__free_drones) != list:
+                print("Wrong drone data format")
+        except:
+            print("Gateway disconnected!")
+            self.close_connection()
+            return
+
     def request_shipment(self, msg: dict) -> None:
         """
         send shipment request
