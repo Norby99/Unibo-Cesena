@@ -86,6 +86,12 @@ class Client():
 
         return msg
 
+    def get_free_drones(self) -> list[str]:
+        """
+        Returns the list of free drones.
+        """
+        return self.__free_drones
+
     def request_update(self) -> None:
         """
         Request the update of the drone list.
