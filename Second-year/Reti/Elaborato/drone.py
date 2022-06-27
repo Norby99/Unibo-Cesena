@@ -21,7 +21,7 @@ class Drone:
 
     def configure_client(self) -> None:
         '''
-        Configure the client to use UDP protocol with IPv4 addressing
+        Configure the client to use UDP protocol
         '''
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -30,7 +30,6 @@ class Drone:
         Ship an order
         """
         print("Order recieved: " + order)
-        # waiting...
         time.sleep(random.randint(5, 10))
         print("Order shiped!")
 
