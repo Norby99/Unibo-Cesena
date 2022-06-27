@@ -11,7 +11,9 @@ class Client_GUI():
     __time_update: int = 1000
 
     def __init__(self, ip, port):
-        # create the main window
+        """
+        Constructor of the Client_GUI class.
+        """
         self.root = tk.Tk()
         self.root.title("Client")
         self.root.geometry("300x300")
@@ -27,9 +29,10 @@ class Client_GUI():
         
         self.client.close_connection()
         
-
-    # create widgets for drone_id and shipment
     def create_widgets(self):
+        """
+        Create the widgets of the GUI.
+        """
         # show available drones on the left with no grid
         self.drones_list = tk.Listbox(self.root, width=20)
         self.drones_list.insert(tk.END, "")
@@ -48,12 +51,18 @@ class Client_GUI():
         self.submit_button.pack(side=tk.TOP)
 
     def update(self):
+        """
+        Update the list of drones.
+        """
         self.client.request_update()
         self.drones_list.delete(0, tk.END)
         for drone in self.client.get_free_drones():
             self.drones_list.insert(tk.END, drone)
 
     def submit(self):
+        """
+        Submit the order.
+        """
         drone_id = self.drone_id_entry.get()
         shipment = self.shipment_entry.get()
         self.client.request_shipment(drone_id, shipment)
@@ -75,6 +84,9 @@ class Client_GUI():
         self.root.after(self.__time_after, self.task)
 
     def on_closing(self):
+        """
+        Close the connection and close the window.
+        """
         self.client.close_connection()
         self.root.destroy()
         self.root.quit()
