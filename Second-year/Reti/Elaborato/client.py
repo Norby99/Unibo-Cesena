@@ -1,5 +1,6 @@
 import json
 import socket
+from threading import Thread
 
 class Client():
 
@@ -7,12 +8,15 @@ class Client():
     __gateway_socket: socket.socket
     __buffer_size: int = 1024
     __free_drones: list[str]
+    __connection_thread : Thread
 
     def __init__(self, gateway_ip: str, gateway_port: int) -> None:
         self._setup_client_gateway(gateway_ip, gateway_port)
 
         if not self.__connect_to_gateway():
             raise Exception("Gateway is not available")
+
+        self.__connection_thread = Thread()
 
     def _setup_client_gateway(self, gateway_ip: str, gateway_port: int) -> None:
         """
