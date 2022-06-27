@@ -125,5 +125,5 @@ if __name__ == "__main__":
         data = json.load(json_file)
         ip = data['gateway']["ip"]
         port = int(data['gateway']["port"])
-        client = Client_GUI(ip, port)
+        client = ClientGUI(ip, port)
 
