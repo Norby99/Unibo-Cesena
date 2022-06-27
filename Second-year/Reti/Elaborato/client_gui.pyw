@@ -2,7 +2,7 @@ import tkinter as tk
 import json
 from client import Client
 
-class Client_GUI():
+class ClientGUI():
     """
     Class that implements a GUI for the Client class
     """
