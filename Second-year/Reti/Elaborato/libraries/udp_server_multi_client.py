@@ -108,6 +108,7 @@ class UDPServerMultiClient(UDPServer):
             self.__drones[drone['id']] = drone
         
         if len(self.__drones) < self.__max_drone_limit:
+            # listens for new clients in case the limit is not reached
             temp_thread = Thread(target=self.thread_request_handle)
             temp_thread.daemon = True
             temp_thread.start()
