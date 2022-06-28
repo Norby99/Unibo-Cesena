@@ -1,0 +1,7 @@
+{
+    "gateway": {
+        "ip": "localhost",
+        "port": "16000"
+    },
+    "max_drones": 3
+}
