@@ -30,5 +30,8 @@ sph.gui: LDLIBS+=-lglut -lGL -lX11
 sph.gui: sph.c
 	$(CC) $(CFLAGS) $< $(LDLIBS) -o $@
 
+all-omp:
+	$(MAKE) CFLAGS+="-fopenmp"
+
 clean:
 	\rm -f $(EXE) *.o *~
