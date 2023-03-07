@@ -1,19 +1,17 @@
-# Makefile for the High Performance Computing programming project,
+# Makefile for the High Performance Computing programming project,compute_dens
 # Academic Year 2022/2023.
 #
 # Available targets:
 #
 # - sph: builds the non-GUI version (default)
 #
-# - sph.gui: builds the GUI version
-#
 # - all: builds both the GUI and non-GUI versions
 #
 # - clean: clean up
 #
-# Last modified on 2022-11-27 by Moreno Marzolla
+#? OMP_NUM_THREADS=N can be used to set the number of threads used by
 
-EXE:=sph sph.gui
+EXE:=sph
 CFLAGS+=-std=c99 -Wall -Wpedantic
 LDLIBS=-lm
 
@@ -21,17 +19,13 @@ LDLIBS=-lm
 
 sph: sph.c
 
-gui: sph.gui
+omp-sph: omp-sph.c
+	$(CC) $(CFLAGS) -fopenmp -o $@ $^ $(LDLIBS)
 
 all: $(EXE)
 
-sph.gui: CFLAGS+=-DGUI
-sph.gui: LDLIBS+=-lglut -lGL -lX11
-sph.gui: sph.c
-	$(CC) $(CFLAGS) $< $(LDLIBS) -o $@
-
-all-omp:
-	$(MAKE) CFLAGS+="-fopenmp"
+omp: omp-sph.c
+	$(CC) $(CFLAGS) -fopenmp -o omp-sph $< $(LDLIBS)
 
 clean:
-	\rm -f $(EXE) *.o *~
+	\rm -f $(EXE) omp-sph *.o *~
