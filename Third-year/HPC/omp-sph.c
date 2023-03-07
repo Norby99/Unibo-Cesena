@@ -28,14 +28,6 @@
  * SOFTWARE.
  *
  ****************************************************************************/
-#ifdef GUI
-#if __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -62,20 +54,10 @@ const float BOUND_DAMPING = -0.5;
 // (the following ought to be "const float", but then the compiler
 // would give an error because VIEW_WIDTH and VIEW_HEIGHT are
 // initialized with non-literal expressions)
-#ifdef GUI
-
-const int MAX_PARTICLES = 5000;
-#define WINDOW_WIDTH 1024
-#define WINDOW_HEIGHT 768
-
-#else
-
 const int MAX_PARTICLES = 20000;
 // Larger window size to accommodate more particles
 #define WINDOW_WIDTH 3000
 #define WINDOW_HEIGHT 2000
-
-#endif
 
 const int DAM_PARTICLES = 500;
 
@@ -282,96 +264,6 @@ void update( void )
     integrate();
 }
 
-#ifdef GUI
-/**
- ** GUI-specific functions. You can enable the GUI by compiling this
- ** program with the -DGUI flag. Note, however, that the GUI version
- ** will NOT be evaluated, and therefore is not required to work with
- ** the parallel code. You are allowed to completely remove the block
- ** #ifdef GUI ... #endif from the source code.
- **/
-
-/**
- * Place a ball with radius `r` centered at (cx, cy) into the frame.
- */
-void place_ball( float cx, float cy, float r )
-{
-    for (float y = cy-r; y<cy+r; y += H) {
-        for (float x = cx-r; x<cx+r; x += H) {
-            if ((n_particles < MAX_PARTICLES) &&
-                is_in_domain(x, y) &&
-                ((x-cx)*(x-cx) + (y-cy)*(y-cy) <= r*r)) {
-                /* Add a small random jitter to the points, so that
-                   the result will be more realistic */
-                const float jitterx = rand() / (float)RAND_MAX;
-                const float jittery = rand() / (float)RAND_MAX;
-                init_particle(particles + n_particles, x+jitterx, y+jittery);
-                n_particles++;
-            }
-        }
-    }
-}
-
-void init_gl( void )
-{
-    glClearColor(0.9, 0.9, 0.9, 1);
-    glEnable(GL_POINT_SMOOTH);
-    glPointSize(H / 2.0);
-    glMatrixMode(GL_PROJECTION);
-}
-
-void render( void )
-{
-    static const int MAX_FRAMES = 100;
-    static int frameno = 0;
-
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glLoadIdentity();
-    glOrtho(0, VIEW_WIDTH, 0, VIEW_HEIGHT, 0, 1);
-
-    glColor4f(0.2, 0.6, 1.0, 1);
-    glBegin(GL_POINTS);
-    for (int i=0; i<n_particles; i++) {
-        glVertex2f(particles[i].x, particles[i].y);
-    }
-    glEnd();
-
-    glutSwapBuffers();
-    glutPostRedisplay();
-    frameno++;
-    if (frameno > MAX_FRAMES) {
-        const float avg = avg_velocities();
-        printf("avgV=%f\n", avg);
-        frameno = 0;
-    }
-}
-
-/**
- * The compiler might issue a warning due to parameters `x` and `y`
- * being unused; this warning can be ignored.
- */
-void keyboard_handler(unsigned char c, int x, int y)
-{
-    if (c=='r' || c=='R')  {
-        init_sph(DAM_PARTICLES);
-    }
-}
-
-void mouse_handler(int button, int state, int x, int y)
-{
-    static const float RADIUS = 110.0;
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-        place_ball(1.5*x, VIEW_HEIGHT - 1.5*y, RADIUS);
-        printf("n. particles/max particles: %d/%d\n", n_particles, MAX_PARTICLES);
-    }
-}
-
-/**
- ** END of GUI-specific functions
- **/
-#endif
-
 int main(int argc, char **argv)
 {
     srand(1234);
@@ -379,21 +271,6 @@ int main(int argc, char **argv)
     particles = (particle_t*)malloc(MAX_PARTICLES * sizeof(*particles));
     assert( particles != NULL );
 
-#ifdef GUI
-    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-    glutInit(&argc, argv);
-    glutCreateWindow("Muller SPH");
-    glutDisplayFunc(render);
-    glutIdleFunc(update);
-    glutKeyboardFunc(keyboard_handler);
-    glutMouseFunc(mouse_handler);
-
-    init_gl();
-    init_sph(DAM_PARTICLES);
-
-    glutMainLoop();
-#else
     int n = DAM_PARTICLES;
     int nsteps = 50;
 
@@ -425,7 +302,7 @@ int main(int argc, char **argv)
         if (s % 10 == 0)
             printf("step %5d, avgV=%f\n", s, avg);
     }
-#endif
+
     free(particles);
     return EXIT_SUCCESS;
 }
