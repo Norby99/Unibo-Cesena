@@ -152,6 +152,7 @@ void compute_density_pressure( void )
        et al. */
     const float POLY6 = 4.0 / (M_PI * pow(H, 8));
 
+#pragma omp parallel for schedule(static) default(none) shared(POLY6, HSQ, MASS, GAS_CONST, particles, REST_DENS, n_particles)
     for (int i=0; i<n_particles; i++) {
         particle_t *pi = &particles[i];
         pi->rho = 0.0;
