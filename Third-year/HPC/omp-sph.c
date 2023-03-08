@@ -146,13 +146,14 @@ void init_sph( int n )
 void compute_density_pressure( void )
 {
     const float HSQ = H * H;    // radius^2 for optimization
+    const int thread_count = omp_get_max_threads();
 
     /* Smoothing kernels defined in Muller and their gradients adapted
        to 2D per "SPH Based Shallow Water Simulation" by Solenthaler
        et al. */
     const float POLY6 = 4.0 / (M_PI * pow(H, 8));
 
-#pragma omp parallel for schedule(static) default(none) shared(POLY6, HSQ, MASS, GAS_CONST, particles, REST_DENS, n_particles)
+#pragma omp parallel for schedule(static) default(none) shared(POLY6, HSQ, MASS, GAS_CONST, particles, REST_DENS, n_particles) num_threads(thread_count)
     for (int i=0; i<n_particles; i++) {
         particle_t *pi = &particles[i];
         pi->rho = 0.0;
