@@ -146,12 +146,13 @@ void init_sph( int n )
 void compute_density_pressure( void )
 {
     const float HSQ = H * H;    // radius^2 for optimization
-    const int thread_count = omp_get_max_threads();
 
     /* Smoothing kernels defined in Muller and their gradients adapted
        to 2D per "SPH Based Shallow Water Simulation" by Solenthaler
        et al. */
     const float POLY6 = 4.0 / (M_PI * pow(H, 8));
+
+    const int thread_count = omp_get_max_threads();
 
 #pragma omp parallel for schedule(static) default(none) shared(POLY6, HSQ, MASS, GAS_CONST, particles, REST_DENS, n_particles) num_threads(thread_count)
     for (int i=0; i<n_particles; i++) {
@@ -181,10 +182,14 @@ void compute_forces( void )
     const float VISC_LAP = 40.0 / (M_PI * pow(H, 5));
     const float EPS = 1e-6;
 
+    const int thread_count = omp_get_max_threads();
+
+#pragma omp parallel for schedule(static) default(none) shared(SPIKY_GRAD, VISC_LAP, MASS, VISC, DT, particles, n_particles, EPS) firstprivate(H, Gx, Gy) num_threads(thread_count)
     for (int i=0; i<n_particles; i++) {
         particle_t *pi = &particles[i];
         float fpress_x = 0.0, fpress_y = 0.0;
         float fvisc_x = 0.0, fvisc_y = 0.0;
+
 
         for (int j=0; j<n_particles; j++) {
             const particle_t *pj = &particles[j];
@@ -216,6 +221,9 @@ void compute_forces( void )
 
 void integrate( void )
 {
+    const int thread_count = omp_get_max_threads();
+
+#pragma omp parallel for schedule(static) default(none) shared(particles, n_particles, DT, BOUND_DAMPING, EPS, VIEW_WIDTH, VIEW_HEIGHT) num_threads(thread_count)
     for (int i=0; i<n_particles; i++) {
         particle_t *p = &particles[i];
         // forward Euler integration
@@ -247,9 +255,11 @@ void integrate( void )
 float avg_velocities( void )
 {
     double result = 0.0;
+
+    const int thread_count = omp_get_max_threads();
+
+#pragma omp parallel for schedule(static) default(none) shared(particles, n_particles) reduction(+:result) num_threads(thread_count)
     for (int i=0; i<n_particles; i++) {
-        /* the hypot(x,y) function is equivalent to sqrt(x*x +
-           y*y); */
         result += hypot(particles[i].vx, particles[i].vy) / n_particles;
     }
     return result;
