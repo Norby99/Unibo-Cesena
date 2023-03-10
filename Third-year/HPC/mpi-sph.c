@@ -184,7 +184,18 @@ void compute_forces( void )
     const float VISC_LAP = 40.0 / (M_PI * pow(H, 5));
     const float EPS = 1e-6;
 
-    for (int i=0; i<n_particles; i++) {
+    int rank, size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    int n_particles_per_proc = (n_particles + size - 1) / size;
+    int start = rank * n_particles_per_proc;
+    int end = (rank + 1) * n_particles_per_proc;
+    if (end > n_particles) {
+        end = n_particles;
+    }
+
+    for (int i=start; i<end; i++) {
         particle_t *pi = &particles[i];
         float fpress_x = 0.0, fpress_y = 0.0;
         float fvisc_x = 0.0, fvisc_y = 0.0;
@@ -215,6 +226,9 @@ void compute_forces( void )
         pi->fx = fpress_x + fvisc_x + fgrav_x;
         pi->fy = fpress_y + fvisc_y + fgrav_y;
     }
+
+    // collect the updated particle data from all processes
+    MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, particles, n_particles, PARTICLE_MPI_TYPE, MPI_COMM_WORLD);
 }
 
 void integrate( void )
