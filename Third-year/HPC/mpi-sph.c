@@ -294,7 +294,10 @@ int main(int argc, char **argv)
     }
 
     init_sph(n);
+    MPI_Init(&argc, &argv);
+
     double start = MPI_Wtime();
+
     for (int s=0; s<nsteps; s++) {
         update();
         /* the average velocities MUST be computed at each step, even
@@ -306,6 +309,7 @@ int main(int argc, char **argv)
     }
     printf("elapsed time: %f seconds", MPI_Wtime() - start);
 
+    MPI_Finalize();
     free(particles);
     return EXIT_SUCCESS;
 }
