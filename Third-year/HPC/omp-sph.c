@@ -310,10 +310,10 @@ int main(int argc, char **argv)
            iteration) */
         const float avg = avg_velocities();
         if (s % 10 == 0) {
-            printf("step %5d, avgV=%f, time=%f\n", s, avg, omp_get_wtime() - start);
-            start = omp_get_wtime();
+            printf("step %5d, avgV=%f\n", s, avg);
         }
     }
+    printf("elapsed time: %f seconds\n", omp_get_wtime() - start);
 
     free(particles);
     return EXIT_SUCCESS;
