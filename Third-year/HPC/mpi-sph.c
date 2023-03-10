@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <mpi.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -293,6 +294,7 @@ int main(int argc, char **argv)
     }
 
     init_sph(n);
+    double start = MPI_Wtime();
     for (int s=0; s<nsteps; s++) {
         update();
         /* the average velocities MUST be computed at each step, even
@@ -302,6 +304,7 @@ int main(int argc, char **argv)
         if (s % 10 == 0)
             printf("step %5d, avgV=%f\n", s, avg);
     }
+    printf("elapsed time: %f seconds", MPI_Wtime() - start);
 
     free(particles);
     return EXIT_SUCCESS;
