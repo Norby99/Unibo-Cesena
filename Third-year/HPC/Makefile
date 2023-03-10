@@ -14,6 +14,7 @@
 EXE:=sph
 CFLAGS+=-std=c99 -Wall -Wpedantic
 LDLIBS=-lm
+VARS=1000 200
 
 .PHONY: clean
 
@@ -26,6 +27,12 @@ omp: omp-sph.c
 
 mpi: mpi-sph.c
 	mpicc $(CFLAGS) -o mpi-sph $< $(LDLIBS)
+
+run-omp: omp
+	./omp-sph $(VARS)
+
+run-mpi: mpi
+	mpirun ./mpi-sph $(VARS)
 
 clean:
 	\rm -f $(EXE) omp-sph *.o *~
