@@ -27,5 +27,8 @@ all: $(EXE)
 omp: omp-sph.c
 	$(CC) $(CFLAGS) -fopenmp -o omp-sph $< $(LDLIBS)
 
+mpi: mpi-sph.c
+	mpicc $(CFLAGS) -o mpi-sph $< $(LDLIBS)
+
 clean:
 	\rm -f $(EXE) omp-sph *.o *~
