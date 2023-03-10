@@ -249,12 +249,26 @@ void integrate( void )
 
 float avg_velocities( void )
 {
+    double local_result = 0.0;
     double result = 0.0;
-    for (int i=0; i<n_particles; i++) {
-        /* the hypot(x,y) function is equivalent to sqrt(x*x +
-           y*y); */
-        result += hypot(particles[i].vx, particles[i].vy) / n_particles;
+    int rank, size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    int chunk_size = n_particles / size;
+    int chunk_start = rank * chunk_size;
+    int chunk_end = (rank == size-1) ? n_particles : chunk_start + chunk_size;
+
+    for (int i = chunk_start; i < chunk_end; i++) {
+        local_result += hypot(particles[i].vx, particles[i].vy) / chunk_size;
     }
+
+    MPI_Reduce(&local_result, &result, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        result /= n_particles;
+    }
+
     return result;
 }
 
