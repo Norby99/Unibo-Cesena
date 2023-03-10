@@ -157,22 +157,35 @@ void compute_density_pressure( void )
        et al. */
     const float POLY6 = 4.0 / (M_PI * pow(H, 8));
 
-    for (int i=0; i<n_particles; i++) {
-        particle_t *pi = &particles[i];
+    int rank, size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    // Distribuire l'array di puntatori delle particelle tra i processi
+    particle_t **local_particles = (particle_t**)malloc(n_particles * sizeof(particle_t*));
+    MPI_Scatter(particles, n_particles, MPI_PTR, local_particles, n_particles, MPI_PTR, 0, MPI_COMM_WORLD);
+    
+    // Calcolare la densità e la pressione per le particelle assegnate a ogni processo
+    for (int i=rank; i<n_particles; i+=size) {
+        particle_t *pi = local_particles[i];
         pi->rho = 0.0;
         for (int j=0; j<n_particles; j++) {
-            const particle_t *pj = &particles[j];
-
+            const particle_t *pj = particles[j];
             const float dx = pj->x - pi->x;
             const float dy = pj->y - pi->y;
             const float d2 = dx*dx + dy*dy;
-
             if (d2 < HSQ) {
                 pi->rho += MASS * POLY6 * pow(HSQ - d2, 3.0);
             }
         }
         pi->p = GAS_CONST * (pi->rho - REST_DENS);
     }
+
+    // Raccogliere i risultati parziali dai processi e aggiornare i dati delle particelle
+    MPI_Gather(local_particles, n_particles, MPI_PTR, particles, n_particles, MPI_PTR, 0, MPI_COMM_WORLD);
+    
+    free(local_particles);
+
 }
 
 void compute_forces( void )
