@@ -219,7 +219,18 @@ void compute_forces( void )
 
 void integrate( void )
 {
-    for (int i=0; i<n_particles; i++) {
+    int rank, size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    int n_particles_local = n_particles / size;
+    int start_idx = rank * n_particles_local;
+    int end_idx = (rank + 1) * n_particles_local;
+    if (rank == size - 1) {
+        end_idx = n_particles;
+    }
+
+    for (int i = start_idx; i < end_idx; i++) {
         particle_t *p = &particles[i];
         // forward Euler integration
         p->vx += DT * p->fx / p->rho;
@@ -245,6 +256,9 @@ void integrate( void )
             p->y = VIEW_HEIGHT - EPS;
         }
     }
+
+    // Allgather particles array to ensure each process has the updated positions and velocities
+    MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, particles, n_particles_local, particle_type, MPI_COMM_WORLD);
 }
 
 float avg_velocities( void )
