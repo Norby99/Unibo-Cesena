@@ -19,9 +19,6 @@ LDLIBS=-lm
 
 sph: sph.c
 
-omp-sph: omp-sph.c
-	$(CC) $(CFLAGS) -fopenmp -o $@ $^ $(LDLIBS)
-
 all: $(EXE)
 
 omp: omp-sph.c
