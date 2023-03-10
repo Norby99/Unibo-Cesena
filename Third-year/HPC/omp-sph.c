@@ -301,14 +301,16 @@ int main(int argc, char **argv)
     }
 
     init_sph(n);
+    double start;
     for (int s=0; s<nsteps; s++) {
+        start = omp_get_wtime();
         update();
         /* the average velocities MUST be computed at each step, even
            if it is not shown (to ensure constant workload per
            iteration) */
         const float avg = avg_velocities();
         if (s % 10 == 0)
-            printf("step %5d, avgV=%f\n", s, avg);
+            printf("step %5d, avgV=%f, time=%f\n", s, avg, omp_get_wtime() - start);
     }
 
     free(particles);
