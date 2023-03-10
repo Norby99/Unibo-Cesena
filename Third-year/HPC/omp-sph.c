@@ -308,9 +308,10 @@ int main(int argc, char **argv)
            if it is not shown (to ensure constant workload per
            iteration) */
         const float avg = avg_velocities();
-        if (s % 10 == 0)
+        if (s % 10 == 0) {
             printf("step %5d, avgV=%f, time=%f\n", s, avg, omp_get_wtime() - start);
             start = omp_get_wtime();
+        }
     }
 
     free(particles);
