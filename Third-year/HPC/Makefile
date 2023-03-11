@@ -34,5 +34,5 @@ run-omp: omp
 run-mpi: mpi
 	mpirun ./mpi-sph $(VARS)
 
-clean:
+clear:
 	\rm -f $(EXE) omp-sph *.o *~
