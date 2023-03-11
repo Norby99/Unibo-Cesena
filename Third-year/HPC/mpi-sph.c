@@ -158,6 +158,7 @@ void compute_density_pressure( void )
     const float POLY6 = 4.0 / (M_PI * pow(H, 8));
 
     int rank, size;
+    MPI_Init(NULL, NULL);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
@@ -184,6 +185,7 @@ void compute_density_pressure( void )
     // Raccogliere i risultati parziali dai processi e aggiornare i dati delle particelle
     MPI_Gather(local_particles, n_particles, MPI_PTR, particles, n_particles, MPI_PTR, 0, MPI_COMM_WORLD);
     
+    MPI_Finalize();
     free(local_particles);
 
 }
@@ -307,7 +309,6 @@ int main(int argc, char **argv)
     }
 
     init_sph(n);
-    MPI_Init(&argc, &argv);
 
     double start = MPI_Wtime();
 
@@ -322,7 +323,6 @@ int main(int argc, char **argv)
     }
     printf("elapsed time: %f seconds", MPI_Wtime() - start);
 
-    MPI_Finalize();
     free(particles);
     return EXIT_SUCCESS;
 }
