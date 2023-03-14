@@ -314,46 +314,60 @@ void update( void ) {
 }
 
 int main(int argc, char **argv) {
-    srand(1234);
-
-    particles = (particle_t*)malloc(MAX_PARTICLES * sizeof(*particles));
-    assert( particles != NULL );
-
+    int radius, my_rank, comm_sz;
     int n = DAM_PARTICLES;
     int nsteps = 50;
 
-    if (argc > 3) {
-        fprintf(stderr, "Usage: %s [nparticles [nsteps]]\n", argv[0]);
-        return EXIT_FAILURE;
+    double t_start;
+
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
+
+    // initial setup
+    if (my_rank == 0) {
+        srand(1234);
+
+        particles = (particle_t*)malloc(MAX_PARTICLES * sizeof(*particles));
+        assert( particles != NULL );
+
+        if (argc > 3) {
+            fprintf(stderr, "Usage: %s [nparticles [nsteps]]\n", argv[0]);
+            MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+        }
+
+        if (argc > 1) {
+            n = atoi(argv[1]);
+        }
+
+        if (argc > 2) {
+            nsteps = atoi(argv[2]);
+        }
+
+        if (n > MAX_PARTICLES) {
+            fprintf(stderr, "FATAL: the maximum number of particles is %d\n", MAX_PARTICLES);
+            MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+        }
+
+        init_sph(n);
     }
 
-    if (argc > 1) {
-        n = atoi(argv[1]);
+    if (my_rank == 0) {
+        double start = MPI_Wtime();
     }
-
-    if (argc > 2) {
-        nsteps = atoi(argv[2]);
-    }
-
-    if (n > MAX_PARTICLES) {
-        fprintf(stderr, "FATAL: the maximum number of particles is %d\n", MAX_PARTICLES);
-        return EXIT_FAILURE;
-    }
-
-    init_sph(n);
-
-    double start = MPI_Wtime();
-
+    
     for (int s=0; s<nsteps; s++) {
         update();
         /* the average velocities MUST be computed at each step, even
            if it is not shown (to ensure constant workload per
            iteration) */
         const float avg = avg_velocities();
-        if (s % 10 == 0)
+        if (my_rank == 0 && s % 10 == 0)
             printf("step %5d, avgV=%f\n", s, avg);
     }
-    printf("elapsed time: %f seconds", MPI_Wtime() - start);
+    if (my_rank == 0) {
+        printf("elapsed time: %f seconds", MPI_Wtime() - start);
+    }
 
     free(particles);
     return EXIT_SUCCESS;
