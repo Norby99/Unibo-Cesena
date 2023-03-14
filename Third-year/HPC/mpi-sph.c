@@ -83,8 +83,7 @@ int n_particles = 0;    // number of currently active particles
 /**
  * Return a random value in [a, b]
  */
-float randab(float a, float b)
-{
+float randab(float a, float b) {
     return a + (b-a)*rand() / (float)(RAND_MAX);
 }
 
@@ -92,8 +91,7 @@ float randab(float a, float b)
  * Set initial position of particle `*p` to (x, y); initialize all
  * other attributes to default values (zeros).
  */
-void init_particle( particle_t *p, float x, float y )
-{
+void init_particle( particle_t *p, float x, float y ) {
     p->x = x;
     p->y = y;
     p->vx = p->vy = 0.0;
@@ -105,8 +103,7 @@ void init_particle( particle_t *p, float x, float y )
 /**
  * Return nonzero iff (x, y) is within the frame
  */
-int is_in_domain( float x, float y )
-{
+int is_in_domain( float x, float y ) {
     return ((x < VIEW_WIDTH - EPS) &&
             (x > EPS) &&
             (y < VIEW_HEIGHT - EPS) &&
@@ -125,8 +122,7 @@ int is_in_domain( float x, float y )
  *
  * For CUDA: the CPU must initialize the domain.
  */
-void init_sph( int n )
-{
+void init_sph( int n ) {
     n_particles = 0;
     printf("Initializing with %d particles\n", n);
 
@@ -148,8 +144,7 @@ void init_sph( int n )
  ** You may parallelize the following four functions
  **/
 
-void compute_density_pressure( void )
-{
+void compute_density_pressure( void ) {
     const float HSQ = H * H;    // radius^2 for optimization
 
     /* Smoothing kernels defined in Muller and their gradients adapted
@@ -175,8 +170,7 @@ void compute_density_pressure( void )
     }
 }
 
-void compute_forces( void )
-{
+void compute_forces( void ) {
     /* Smoothing kernels defined in Muller and their gradients adapted
        to 2D per "SPH Based Shallow Water Simulation" by Solenthaler
        et al. */
@@ -217,8 +211,7 @@ void compute_forces( void )
     }
 }
 
-void integrate( void )
-{
+void integrate( void ) {
     for (int i=0; i<n_particles; i++) {
         particle_t *p = &particles[i];
         // forward Euler integration
@@ -247,8 +240,7 @@ void integrate( void )
     }
 }
 
-float avg_velocities( void )
-{
+float avg_velocities( void ) {
     double result = 0.0;
     for (int i=0; i<n_particles; i++) {
         /* the hypot(x,y) function is equivalent to sqrt(x*x +
@@ -258,15 +250,13 @@ float avg_velocities( void )
     return result;
 }
 
-void update( void )
-{
+void update( void ) {
     compute_density_pressure();
     compute_forces();
     integrate();
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     srand(1234);
 
     particles = (particle_t*)malloc(MAX_PARTICLES * sizeof(*particles));
