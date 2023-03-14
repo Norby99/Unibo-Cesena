@@ -179,8 +179,7 @@ void compute_density_pressure( void ) {
 
     // Raccogliere i risultati parziali dai processi e aggiornare i dati delle particelle
     MPI_Gather(local_particles, n_particles, MPI_PTR, particles, n_particles, MPI_PTR, 0, MPI_COMM_WORLD);
-    
-    MPI_Finalize();
+
     free(local_particles);
 
 }
