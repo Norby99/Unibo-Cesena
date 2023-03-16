@@ -65,6 +65,9 @@ const int DAM_PARTICLES = 500;
 const float VIEW_WIDTH = 1.5 * WINDOW_WIDTH;
 const float VIEW_HEIGHT = 1.5 * WINDOW_HEIGHT;
 
+// create a new MPI data type for the particle_t struct
+MPI_Datatype MPI_PARTICLE;
+
 /* Particle data structure; stores position, velocity, and force for
    integration stores density (rho) and pressure values for SPH.
 
@@ -159,7 +162,7 @@ void compute_density_pressure( void ) {
 
     // Distribuire l'array di puntatori delle particelle tra i processi
     particle_t **local_particles = (particle_t**)malloc(n_particles * sizeof(particle_t*));
-    MPI_Scatter(particles, n_particles, MPI_PTR, local_particles, n_particles, MPI_PTR, 0, MPI_COMM_WORLD);
+    MPI_Scatter(particles, n_particles, MPI_PARTICLE, local_particles, n_particles, MPI_PARTICLE, 0, MPI_COMM_WORLD);
     
     // Calcolare la densità e la pressione per le particelle assegnate a ogni processo
     for (int i=rank; i<n_particles; i+=size) {
@@ -178,7 +181,7 @@ void compute_density_pressure( void ) {
     }
 
     // Raccogliere i risultati parziali dai processi e aggiornare i dati delle particelle
-    MPI_Gather(local_particles, n_particles, MPI_PTR, particles, n_particles, MPI_PTR, 0, MPI_COMM_WORLD);
+    MPI_Gather(local_particles, n_particles, MPI_PARTICLE, particles, n_particles, MPI_PARTICLE, 0, MPI_COMM_WORLD);
 
     free(local_particles);
 
@@ -350,6 +353,10 @@ int main(int argc, char **argv) {
 
         init_sph(n);
     }
+
+    // initialize MPI particle type
+    MPI_Type_contiguous(6, MPI_FLOAT, &MPI_PARTICLE);
+    MPI_Type_commit(&MPI_PARTICLE);
 
     if (my_rank == 0) {
         double t_start = MPI_Wtime();
