@@ -147,7 +147,7 @@ void init_sph( int n ) {
  ** You may parallelize the following four functions
  **/
 
-void compute_density_pressure( void ) {
+void compute_density_pressure(int my_rank, int comm_sz) {
     const float HSQ = H * H;    // radius^2 for optimization
 
     /* Smoothing kernels defined in Muller and their gradients adapted
@@ -165,7 +165,7 @@ void compute_density_pressure( void ) {
     MPI_Scatter(particles, n_particles, MPI_PARTICLE, local_particles, n_particles, MPI_PARTICLE, 0, MPI_COMM_WORLD);
     
     // Calcolare la densità e la pressione per le particelle assegnate a ogni processo
-    for (int i=rank; i<n_particles; i+=size) {
+    for (int i=my_rank; i<n_particles; i+=comm_sz) {
         particle_t *pi = local_particles[i];
         pi->rho = 0.0;
         for (int j=0; j<n_particles; j++) {
@@ -187,7 +187,7 @@ void compute_density_pressure( void ) {
 
 }
 
-void compute_forces( void ) {
+void compute_forces(int my_rank, int comm_sz) {
     /* Smoothing kernels defined in Muller and their gradients adapted
        to 2D per "SPH Based Shallow Water Simulation" by Solenthaler
        et al. */
@@ -195,13 +195,9 @@ void compute_forces( void ) {
     const float VISC_LAP = 40.0 / (M_PI * pow(H, 5));
     const float EPS = 1e-6;
 
-    int rank, size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-    int n_particles_per_proc = (n_particles + size - 1) / size;
-    int start = rank * n_particles_per_proc;
-    int end = (rank + 1) * n_particles_per_proc;
+    int n_particles_per_proc = (n_particles + comm_sz - 1) / comm_sz;
+    int start = my_rank * n_particles_per_proc;
+    int end = (my_rank + 1) * n_particles_per_proc;
     if (end > n_particles) {
         end = n_particles;
     }
@@ -242,15 +238,11 @@ void compute_forces( void ) {
     MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, particles, n_particles, PARTICLE_MPI_TYPE, MPI_COMM_WORLD);
 }
 
-void integrate( void ) {
-    int rank, size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-    int n_particles_local = n_particles / size;
-    int start_idx = rank * n_particles_local;
-    int end_idx = (rank + 1) * n_particles_local;
-    if (rank == size - 1) {
+void integrate(int my_rank, int comm_sz) {
+    int n_particles_local = n_particles / comm_sz;
+    int start_idx = my_rank * n_particles_local;
+    int end_idx = (my_rank + 1) * n_particles_local;
+    if (my_rank == comm_sz - 1) {
         end_idx = n_particles;
     }
 
@@ -285,16 +277,13 @@ void integrate( void ) {
     MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, particles, n_particles_local, particle_type, MPI_COMM_WORLD);
 }
 
-float avg_velocities( void ) {
+float avg_velocities(int my_rank, int comm_sz) {
     double local_result = 0.0;
     double result = 0.0;
-    int rank, size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    int chunk_size = n_particles / size;
-    int chunk_start = rank * chunk_size;
-    int chunk_end = (rank == size-1) ? n_particles : chunk_start + chunk_size;
+    int chunk_size = n_particles / comm_sz;
+    int chunk_start = my_rank * chunk_size;
+    int chunk_end = (my_rank == comm_sz-1) ? n_particles : chunk_start + chunk_size;
 
     for (int i = chunk_start; i < chunk_end; i++) {
         local_result += hypot(particles[i].vx, particles[i].vy) / chunk_size;
@@ -302,17 +291,17 @@ float avg_velocities( void ) {
 
     MPI_Reduce(&local_result, &result, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    if (rank == 0) {
+    if (my_rank == 0) {
         result /= n_particles;
     }
 
     return result;
 }
 
-void update( void ) {
-    compute_density_pressure();
-    compute_forces();
-    integrate();
+void update(int my_rank, int comm_sz) {
+    compute_density_pressure(my_rank, comm_sz);
+    compute_forces(my_rank, comm_sz);
+    integrate(my_rank, comm_sz);
 }
 
 int main(int argc, char **argv) {
@@ -363,9 +352,9 @@ int main(int argc, char **argv) {
     }
     
     for (int s=0; s<nsteps; s++) {
-        update();
+        update(my_rank, comm_sz);
         
-        const float avg = avg_velocities();
+        const float avg = avg_velocities(my_rank, comm_sz);
         if (my_rank == 0 && s % 10 == 0)
             printf("step %5d, avgV=%f\n", s, avg);
     }
