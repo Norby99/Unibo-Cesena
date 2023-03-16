@@ -352,20 +352,18 @@ int main(int argc, char **argv) {
     }
 
     if (my_rank == 0) {
-        double start = MPI_Wtime();
+        double t_start = MPI_Wtime();
     }
     
     for (int s=0; s<nsteps; s++) {
         update();
-        /* the average velocities MUST be computed at each step, even
-           if it is not shown (to ensure constant workload per
-           iteration) */
+        
         const float avg = avg_velocities();
         if (my_rank == 0 && s % 10 == 0)
             printf("step %5d, avgV=%f\n", s, avg);
     }
     if (my_rank == 0) {
-        printf("elapsed time: %f seconds", MPI_Wtime() - start);
+        printf("elapsed time: %f seconds", MPI_Wtime() - t_start);
     }
 
     free(particles);
