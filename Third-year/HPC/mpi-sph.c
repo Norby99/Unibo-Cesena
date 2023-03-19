@@ -230,7 +230,7 @@ void compute_forces(int my_rank, int comm_sz) {
     }
 
     // collect the updated particle data from all processes
-    MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, particles, n_particles, PARTICLE_MPI_TYPE, MPI_COMM_WORLD);
+    MPI_Allgather(MPI_IN_PLACE, 0, MPI_PARTICLE, particles, n_particles, MPI_PARTICLE, MPI_COMM_WORLD);
 }
 
 void integrate(int my_rank, int comm_sz) {
@@ -269,7 +269,7 @@ void integrate(int my_rank, int comm_sz) {
     }
 
     // Allgather particles array to ensure each process has the updated positions and velocities
-    MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, particles, n_particles_local, particle_type, MPI_COMM_WORLD);
+    MPI_Allgather(MPI_IN_PLACE, 0, MPI_PARTICLE, particles, n_particles_local, MPI_PARTICLE, MPI_COMM_WORLD);
 }
 
 float avg_velocities(int my_rank, int comm_sz) {
@@ -300,7 +300,7 @@ void update(int my_rank, int comm_sz) {
 }
 
 int main(int argc, char **argv) {
-    int radius, my_rank, comm_sz;
+    int my_rank, comm_sz;
     int n = DAM_PARTICLES;
     int nsteps = 50;
 
@@ -343,7 +343,7 @@ int main(int argc, char **argv) {
     MPI_Type_commit(&MPI_PARTICLE);
 
     if (my_rank == 0) {
-        double t_start = MPI_Wtime();
+        t_start = MPI_Wtime();
     }
     
     for (int s=0; s<nsteps; s++) {
