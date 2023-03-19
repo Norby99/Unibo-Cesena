@@ -155,11 +155,6 @@ void compute_density_pressure(int my_rank, int comm_sz) {
        et al. */
     const float POLY6 = 4.0 / (M_PI * pow(H, 8));
 
-    int rank, size;
-    MPI_Init(NULL, NULL);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-
     // Distribuire l'array di puntatori delle particelle tra i processi
     particle_t **local_particles = (particle_t**)malloc(n_particles * sizeof(particle_t*));
     MPI_Scatter(particles, n_particles, MPI_PARTICLE, local_particles, n_particles, MPI_PARTICLE, 0, MPI_COMM_WORLD);
