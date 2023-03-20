@@ -291,10 +291,10 @@ float avg_velocities() {
     return result;
 }
 
-    compute_density_pressure(my_rank, comm_sz);
-    compute_forces(my_rank, comm_sz);
-    integrate(my_rank, comm_sz);
 void update() {
+    compute_density_pressure();
+    compute_forces();
+    integrate();
 }
 
 int main(int argc, char **argv) {
