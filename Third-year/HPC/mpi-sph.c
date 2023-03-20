@@ -342,6 +342,10 @@ int main(int argc, char **argv) {
     if (my_rank == 0) {
         t_start = MPI_Wtime();
     }
+
+    MPI_Bcast(&n_particles, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&nsteps, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(particles, n_particles, MPI_PARTICLE, 0, MPI_COMM_WORLD);
     
     for (int s=0; s<nsteps; s++) {
         update();
