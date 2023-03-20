@@ -83,6 +83,8 @@ typedef struct {
 particle_t *particles;
 int n_particles = 0;    // number of currently active particles
 
+int my_rank, comm_sz;
+
 /**
  * Return a random value in [a, b]
  */
@@ -143,7 +145,7 @@ void init_sph( int n ) {
     assert(n_particles == n);
 }
 
-void compute_density_pressure(int my_rank, int comm_sz) {
+void compute_density_pressure() {
     const float HSQ = H * H;    // radius^2 for optimization
 
     /* Smoothing kernels defined in Muller and their gradients adapted
@@ -178,7 +180,7 @@ void compute_density_pressure(int my_rank, int comm_sz) {
 
 }
 
-void compute_forces(int my_rank, int comm_sz) {
+void compute_forces() {
     /* Smoothing kernels defined in Muller and their gradients adapted
        to 2D per "SPH Based Shallow Water Simulation" by Solenthaler
        et al. */
@@ -229,7 +231,7 @@ void compute_forces(int my_rank, int comm_sz) {
     MPI_Allgather(MPI_IN_PLACE, 0, MPI_PARTICLE, particles, n_particles, MPI_PARTICLE, MPI_COMM_WORLD);
 }
 
-void integrate(int my_rank, int comm_sz) {
+void integrate() {
     int n_particles_local = n_particles / comm_sz;
     int start_idx = my_rank * n_particles_local;
     int end_idx = (my_rank + 1) * n_particles_local;
@@ -268,7 +270,7 @@ void integrate(int my_rank, int comm_sz) {
     MPI_Allgather(MPI_IN_PLACE, 0, MPI_PARTICLE, particles, n_particles_local, MPI_PARTICLE, MPI_COMM_WORLD);
 }
 
-float avg_velocities(int my_rank, int comm_sz) {
+float avg_velocities() {
     double local_result = 0.0;
     double result = 0.0;
 
@@ -289,14 +291,13 @@ float avg_velocities(int my_rank, int comm_sz) {
     return result;
 }
 
-void update(int my_rank, int comm_sz) {
     compute_density_pressure(my_rank, comm_sz);
     compute_forces(my_rank, comm_sz);
     integrate(my_rank, comm_sz);
+void update() {
 }
 
 int main(int argc, char **argv) {
-    int my_rank, comm_sz;
     int n = DAM_PARTICLES;
     int nsteps = 50;
 
@@ -343,10 +344,10 @@ int main(int argc, char **argv) {
     }
     
     for (int s=0; s<nsteps; s++) {
-        update(my_rank, comm_sz);
+        update();
         
-        const float avg = avg_velocities(my_rank, comm_sz);
         if (my_rank == 0 && s % 10 == 0)
+        const float avg = avg_velocities();
             printf("step %5d, avgV=%f\n", s, avg);
     }
     if (my_rank == 0) {
