@@ -153,31 +153,29 @@ void compute_density_pressure() {
        et al. */
     const float POLY6 = 4.0 / (M_PI * pow(H, 8));
 
-    // Distribuire l'array di puntatori delle particelle tra i processi
-    particle_t **local_particles = (particle_t**)malloc(n_particles * sizeof(particle_t*));
-    MPI_Scatter(particles, n_particles, MPI_PARTICLE, local_particles, n_particles, MPI_PARTICLE, 0, MPI_COMM_WORLD);
+    int particles_per_proc = n_particles / comm_sz;
+    int start = my_rank * particles_per_proc;
+    int end = (my_rank == comm_sz-1) ? n_particles : start + particles_per_proc;
     
-    // Calcolare la densità e la pressione per le particelle assegnate a ogni processo
-    for (int i=my_rank; i<n_particles; i+=comm_sz) {
-        particle_t *pi = local_particles[i];
+    for (int i=start; i<end; i++) {
+        particle_t *pi = &particles[i];
         pi->rho = 0.0;
         for (int j=0; j<n_particles; j++) {
             const particle_t *pj = &particles[j];
+
             const float dx = pj->x - pi->x;
             const float dy = pj->y - pi->y;
             const float d2 = dx*dx + dy*dy;
+
             if (d2 < HSQ) {
                 pi->rho += MASS * POLY6 * pow(HSQ - d2, 3.0);
             }
         }
         pi->p = GAS_CONST * (pi->rho - REST_DENS);
     }
-
-    // Raccogliere i risultati parziali dai processi e aggiornare i dati delle particelle
-    MPI_Gather(local_particles, n_particles, MPI_PARTICLE, particles, n_particles, MPI_PARTICLE, 0, MPI_COMM_WORLD);
-
-    free(local_particles);
-
+    
+    // Gather results from all processes
+    MPI_Allgather(MPI_IN_PLACE, 0, MPI_PARTICLE, particles, n_particles, MPI_PARTICLE, MPI_COMM_WORLD);
 }
 
 void compute_forces() {
@@ -350,9 +348,11 @@ int main(int argc, char **argv) {
     for (int s=0; s<nsteps; s++) {
         update();
         
-        if (my_rank == 0 && s % 10 == 0)
         const float avg = avg_velocities();
+        if (my_rank == 0 && s % 10 == 0) {
             printf("step %5d, avgV=%f\n", s, avg);
+        }
+        MPI_Barrier(MPI_COMM_WORLD);
     }
     if (my_rank == 0) {
         printf("elapsed time: %f seconds", MPI_Wtime() - t_start);
