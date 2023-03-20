@@ -143,10 +143,6 @@ void init_sph( int n ) {
     assert(n_particles == n);
 }
 
-/**
- ** You may parallelize the following four functions
- **/
-
 void compute_density_pressure(int my_rank, int comm_sz) {
     const float HSQ = H * H;    // radius^2 for optimization
 
@@ -164,7 +160,7 @@ void compute_density_pressure(int my_rank, int comm_sz) {
         particle_t *pi = local_particles[i];
         pi->rho = 0.0;
         for (int j=0; j<n_particles; j++) {
-            const particle_t *pj = particles[j];
+            const particle_t *pj = &particles[j];
             const float dx = pj->x - pi->x;
             const float dy = pj->y - pi->y;
             const float d2 = dx*dx + dy*dy;
