@@ -336,7 +336,7 @@ int main(int argc, char **argv) {
     }
 
     // initialize MPI particle type
-    MPI_Type_contiguous(6, MPI_FLOAT, &MPI_PARTICLE);
+    MPI_Type_contiguous(8, MPI_FLOAT, &MPI_PARTICLE);
     MPI_Type_commit(&MPI_PARTICLE);
 
     if (my_rank == 0) {
