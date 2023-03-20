@@ -306,12 +306,12 @@ int main(int argc, char **argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
 
+    particles = (particle_t*)malloc(MAX_PARTICLES * sizeof(*particles));
+    assert( particles != NULL );
+
     // initial setup
     if (my_rank == 0) {
         srand(1234);
-
-        particles = (particle_t*)malloc(MAX_PARTICLES * sizeof(*particles));
-        assert( particles != NULL );
 
         if (argc > 3) {
             fprintf(stderr, "Usage: %s [nparticles [nsteps]]\n", argv[0]);
@@ -354,5 +354,8 @@ int main(int argc, char **argv) {
     }
 
     free(particles);
+    MPI_Type_free(&MPI_PARTICLE);
+    
+    MPI_Finalize();
     return EXIT_SUCCESS;
 }
