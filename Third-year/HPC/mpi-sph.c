@@ -153,14 +153,15 @@ void compute_density_pressure() {
        et al. */
     const float POLY6 = 4.0 / (M_PI * pow(H, 8));
 
-    int particles_per_proc = n_particles / comm_sz;
-    int start = my_rank * particles_per_proc;
-    int end = (my_rank == comm_sz-1) ? n_particles : start + particles_per_proc;
-    
-    for (int i=start; i<end; i++) {
+    int particles_per_process = n_particles / comm_sz;
+    int remainder = n_particles % comm_sz;
+    int start = my_rank * particles_per_process + (my_rank < remainder ? my_rank : remainder);
+    int end = start + particles_per_process + (my_rank < remainder);
+
+    for (int i = start; i < end; i++) {
         particle_t *pi = &particles[i];
         pi->rho = 0.0;
-        for (int j=0; j<n_particles; j++) {
+        for (int j = 0; j < n_particles; j++) {
             const particle_t *pj = &particles[j];
 
             const float dx = pj->x - pi->x;
@@ -173,9 +174,27 @@ void compute_density_pressure() {
         }
         pi->p = GAS_CONST * (pi->rho - REST_DENS);
     }
-    
-    // Gather results from all processes
-    MPI_Allgather(MPI_IN_PLACE, 0, MPI_PARTICLE, particles, n_particles, MPI_PARTICLE, MPI_COMM_WORLD);
+
+    int *recvcounts = NULL;
+    int *displs = NULL;
+
+    if (my_rank == 0) {
+        recvcounts = malloc(comm_sz * sizeof(int));
+        displs = malloc(comm_sz * sizeof(int));
+        int displacement = 0;
+        for (int i = 0; i < comm_sz; i++) {
+            recvcounts[i] = particles_per_process + (i < remainder);
+            displs[i] = displacement;
+            displacement += recvcounts[i];
+        }
+    }
+
+    MPI_Gatherv(&particles[start], end - start, MPI_PARTICLE, particles, recvcounts, displs, MPI_PARTICLE, 0, MPI_COMM_WORLD);
+
+    if (my_rank == 0) {
+        free(recvcounts);
+        free(displs);
+    }
 }
 
 void compute_forces() {
