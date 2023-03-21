@@ -176,26 +176,19 @@ void compute_density_pressure() {
         pi->p = GAS_CONST * (pi->rho - REST_DENS);
     }
 
-    int *recvcounts = NULL;
-    int *displs = NULL;
-
-    if (my_rank == 0) {
-        recvcounts = malloc(comm_sz * sizeof(int));
-        displs = malloc(comm_sz * sizeof(int));
-        int displacement = 0;
-        for (int i = 0; i < comm_sz; i++) {
-            recvcounts[i] = particles_per_process + (i < remainder);
-            displs[i] = displacement;
-            displacement += recvcounts[i];
-        }
+    int *recvcounts = malloc(comm_sz * sizeof(int));
+    int *displs = malloc(comm_sz * sizeof(int));
+    int displacement = 0;
+    for (int i = 0; i < comm_sz; i++) {
+        recvcounts[i] = particles_per_process + (i < remainder);
+        displs[i] = displacement;
+        displacement += recvcounts[i];
     }
 
-    MPI_Gatherv(&particles[start], end - start, MPI_PARTICLE, particles, recvcounts, displs, MPI_PARTICLE, 0, MPI_COMM_WORLD);
+    MPI_Allgatherv(&particles[start], end - start, MPI_PARTICLE, particles, recvcounts, displs, MPI_PARTICLE, MPI_COMM_WORLD);
 
-    if (my_rank == 0) {
-        free(recvcounts);
-        free(displs);
-    }
+    free(recvcounts);
+    free(displs);
 }
 
 void compute_forces() {
