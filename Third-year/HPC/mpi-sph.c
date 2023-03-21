@@ -322,19 +322,15 @@ float avg_velocities() {
     double local_result = 0.0;
     double result = 0.0;
 
-    int chunk_size = n_particles / comm_sz;
-    int chunk_start = my_rank * chunk_size;
-    int chunk_end = (my_rank == comm_sz-1) ? n_particles : chunk_start + chunk_size;
+    int local_n = n_particles / comm_sz;
+    int start_i = my_rank * local_n;
+    int end_i = (my_rank == comm_sz - 1) ? n_particles : (my_rank + 1) * local_n;
 
-    for (int i = chunk_start; i < chunk_end; i++) {
-        local_result += hypot(particles[i].vx, particles[i].vy) / chunk_size;
+    for (int i = start_i; i < end_i; i++) {
+        local_result += hypot(particles[i].vx, particles[i].vy) / n_particles;
     }
 
-    MPI_Reduce(&local_result, &result, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-
-    if (my_rank == 0) {
-        result /= n_particles;
-    }
+    MPI_Allreduce(&local_result, &result, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
     return result;
 }
