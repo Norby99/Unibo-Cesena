@@ -275,14 +275,11 @@ void compute_forces() {
 }
 
 void integrate() {
-    int n_particles_local = n_particles / comm_sz;
-    int start_idx = my_rank * n_particles_local;
-    int end_idx = (my_rank + 1) * n_particles_local;
-    if (my_rank == comm_sz - 1) {
-        end_idx = n_particles;
-    }
+    int chunk_size = n_particles / comm_sz;
+    int start = my_rank * chunk_size;
+    int end = (my_rank == comm_sz - 1) ? n_particles : (my_rank + 1) * chunk_size;
 
-    for (int i = start_idx; i < end_idx; i++) {
+    for (int i = start; i < end; i++) {
         particle_t *p = &particles[i];
         // forward Euler integration
         p->vx += DT * p->fx / p->rho;
@@ -309,8 +306,16 @@ void integrate() {
         }
     }
 
-    // Allgather particles array to ensure each process has the updated positions and velocities
-    MPI_Allgather(MPI_IN_PLACE, 0, MPI_PARTICLE, particles, n_particles_local, MPI_PARTICLE, MPI_COMM_WORLD);
+    // Gather the results from all processes
+    int displs[comm_sz], recvcounts[comm_sz];
+    for (int i = 0; i < comm_sz; i++) {
+        displs[i] = i * chunk_size;
+        recvcounts[i] = (i == comm_sz - 1) ? n_particles - displs[i] : chunk_size;
+    }
+    MPI_Gatherv(&particles[start], end - start, MPI_PARTICLE, particles, recvcounts, displs, MPI_PARTICLE, 0, MPI_COMM_WORLD);
+
+    // Broadcast the updated particles array to all processes
+    MPI_Bcast(particles, n_particles, MPI_PARTICLE, 0, MPI_COMM_WORLD);
 }
 
 float avg_velocities() {
