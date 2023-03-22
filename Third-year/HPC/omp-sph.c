@@ -83,8 +83,7 @@ int n_particles = 0;    // number of currently active particles
 /**
  * Return a random value in [a, b]
  */
-float randab(float a, float b)
-{
+float randab(float a, float b) {
     return a + (b-a)*rand() / (float)(RAND_MAX);
 }
 
@@ -92,8 +91,7 @@ float randab(float a, float b)
  * Set initial position of particle `*p` to (x, y); initialize all
  * other attributes to default values (zeros).
  */
-void init_particle( particle_t *p, float x, float y )
-{
+void init_particle(particle_t *p, float x, float y) {
     p->x = x;
     p->y = y;
     p->vx = p->vy = 0.0;
@@ -105,8 +103,7 @@ void init_particle( particle_t *p, float x, float y )
 /**
  * Return nonzero iff (x, y) is within the frame
  */
-int is_in_domain( float x, float y )
-{
+int is_in_domain(float x, float y) {
     return ((x < VIEW_WIDTH - EPS) &&
             (x > EPS) &&
             (y < VIEW_HEIGHT - EPS) &&
@@ -125,8 +122,7 @@ int is_in_domain( float x, float y )
  *
  * For CUDA: the CPU must initialize the domain.
  */
-void init_sph( int n )
-{
+void init_sph(int n) {
     n_particles = 0;
     printf("Initializing with %d particles\n", n);
 
@@ -144,8 +140,7 @@ void init_sph( int n )
     assert(n_particles == n);
 }
 
-void compute_density_pressure( void )
-{
+void compute_density_pressure() {
     const float HSQ = H * H;    // radius^2 for optimization
 
     /* Smoothing kernels defined in Muller and their gradients adapted
@@ -153,9 +148,7 @@ void compute_density_pressure( void )
        et al. */
     const float POLY6 = 4.0 / (M_PI * pow(H, 8));
 
-    const int thread_count = omp_get_max_threads();
-
-#pragma omp parallel for default(none) shared(POLY6, HSQ, MASS, GAS_CONST, particles, REST_DENS, n_particles) num_threads(thread_count)
+#pragma omp parallel for schedule(static) default(none) shared(POLY6, HSQ, MASS, GAS_CONST, particles, REST_DENS, n_particles)
     for (int i=0; i<n_particles; i++) {
         particle_t *pi = &particles[i];
         pi->rho = 0.0;
@@ -174,8 +167,7 @@ void compute_density_pressure( void )
     }
 }
 
-void compute_forces( void )
-{
+void compute_forces() {
     /* Smoothing kernels defined in Muller and their gradients adapted
        to 2D per "SPH Based Shallow Water Simulation" by Solenthaler
        et al. */
@@ -183,9 +175,7 @@ void compute_forces( void )
     const float VISC_LAP = 40.0 / (M_PI * pow(H, 5));
     const float EPS = 1e-6;
 
-    const int thread_count = omp_get_max_threads();
-
-#pragma omp parallel for default(none) shared(SPIKY_GRAD, VISC_LAP, MASS, VISC, DT, particles, n_particles, EPS) firstprivate(H, Gx, Gy) num_threads(thread_count)
+#pragma omp parallel for schedule(static) default(none) shared(SPIKY_GRAD, VISC_LAP, MASS, VISC, DT, particles, n_particles, EPS) firstprivate(H, Gx, Gy)
     for (int i=0; i<n_particles; i++) {
         particle_t *pi = &particles[i];
         float fpress_x = 0.0, fpress_y = 0.0;
@@ -220,11 +210,8 @@ void compute_forces( void )
     }
 }
 
-void integrate( void )
-{
-    const int thread_count = omp_get_max_threads();
-
-#pragma omp parallel for default(none) shared(particles, n_particles, DT, BOUND_DAMPING, EPS, VIEW_WIDTH, VIEW_HEIGHT) num_threads(thread_count)
+void integrate( void ) {
+#pragma omp parallel for schedule(static) default(none) shared(particles, n_particles, DT, BOUND_DAMPING, EPS, VIEW_WIDTH, VIEW_HEIGHT)
     for (int i=0; i<n_particles; i++) {
         particle_t *p = &particles[i];
         // forward Euler integration
@@ -253,28 +240,23 @@ void integrate( void )
     }
 }
 
-float avg_velocities( void )
-{
+float avg_velocities() {
     double result = 0.0;
 
-    const int thread_count = omp_get_max_threads();
-
-#pragma omp parallel for default(none) shared(particles, n_particles) reduction(+:result) num_threads(thread_count)
+#pragma omp parallel for schedule(static) default(none) shared(particles, n_particles) reduction(+:result)
     for (int i=0; i<n_particles; i++) {
         result += hypot(particles[i].vx, particles[i].vy) / n_particles;
     }
     return result;
 }
 
-void update( void )
-{
+void update() {
     compute_density_pressure();
     compute_forces();
     integrate();
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     srand(1234);
 
     particles = (particle_t*)malloc(MAX_PARTICLES * sizeof(*particles));
