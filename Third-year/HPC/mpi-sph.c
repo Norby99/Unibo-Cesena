@@ -146,6 +146,24 @@ void init_sph( int n ) {
     assert(n_particles == n);
 }
 
+void sync_particles(int start, int end, int chunk_size) {
+    int remainder = n_particles % comm_sz;
+
+    int *recvcounts = malloc(comm_sz * sizeof(int));
+    int *displs = malloc(comm_sz * sizeof(int));
+    int displacement = 0;
+    for (int i = 0; i < comm_sz; i++) {
+        recvcounts[i] = chunk_size + (i < remainder);
+        displs[i] = displacement;
+        displacement += recvcounts[i];
+    }
+
+    MPI_Allgatherv(&particles[start], end - start, MPI_PARTICLE, particles, recvcounts, displs, MPI_PARTICLE, MPI_COMM_WORLD);
+
+    free(recvcounts);
+    free(displs);
+}
+
 void compute_density_pressure() {
     const float HSQ = H * H;    // radius^2 for optimization
 
@@ -154,10 +172,10 @@ void compute_density_pressure() {
        et al. */
     const float POLY6 = 4.0 / (M_PI * pow(H, 8));
 
-    int particles_per_process = n_particles / comm_sz;
+    int chunk_size = n_particles / comm_sz;
     int remainder = n_particles % comm_sz;
-    int start = my_rank * particles_per_process + (my_rank < remainder ? my_rank : remainder);
-    int end = start + particles_per_process + (my_rank < remainder);
+    int start = my_rank * chunk_size + (my_rank < remainder ? my_rank : remainder);
+    int end = start + chunk_size + (my_rank < remainder);
 
     for (int i = start; i < end; i++) {
         particle_t *pi = &particles[i];
@@ -176,19 +194,7 @@ void compute_density_pressure() {
         pi->p = GAS_CONST * (pi->rho - REST_DENS);
     }
 
-    int *recvcounts = malloc(comm_sz * sizeof(int));
-    int *displs = malloc(comm_sz * sizeof(int));
-    int displacement = 0;
-    for (int i = 0; i < comm_sz; i++) {
-        recvcounts[i] = particles_per_process + (i < remainder);
-        displs[i] = displacement;
-        displacement += recvcounts[i];
-    }
-
-    MPI_Allgatherv(&particles[start], end - start, MPI_PARTICLE, particles, recvcounts, displs, MPI_PARTICLE, MPI_COMM_WORLD);
-
-    free(recvcounts);
-    free(displs);
+    sync_particles(start, end, chunk_size);
 }
 
 void compute_forces() {
@@ -199,13 +205,10 @@ void compute_forces() {
     const float VISC_LAP = 40.0 / (M_PI * pow(H, 5));
     const float EPS = 1e-6;
 
-    int particles_per_proc = n_particles / comm_sz;
-    int start = my_rank * particles_per_proc;
-    int end = (my_rank + 1) * particles_per_proc;
-
-    if (my_rank == comm_sz - 1) {
-        end = n_particles;
-    }
+    int chunk_size = n_particles / comm_sz;
+    int remainder = n_particles % comm_sz;
+    int start = my_rank * chunk_size + (my_rank < remainder ? my_rank : remainder);
+    int end = start + chunk_size + (my_rank < remainder);
 
     for (int i=start; i<end; i++) {
         particle_t *pi = &particles[i];
@@ -239,45 +242,14 @@ void compute_forces() {
         pi->fy = fpress_y + fvisc_y + fgrav_y;
     }
 
-    particle_t *updated_particles = NULL;
-    if (my_rank == 0) {
-        updated_particles = (particle_t *)malloc(n_particles * sizeof(particle_t));
-    }
-
-    int *recvcounts = NULL;
-    int *displs = NULL;
-    if (my_rank == 0) {
-        recvcounts = (int *)malloc(comm_sz * sizeof(int));
-        displs = (int *)malloc(comm_sz * sizeof(int));
-
-        for (int i = 0; i < comm_sz; i++) {
-            recvcounts[i] = particles_per_proc;
-            if (i == comm_sz - 1) {
-                recvcounts[i] = n_particles - i * particles_per_proc;
-            }
-            displs[i] = i * particles_per_proc;
-        }
-    }
-
-    int sendcount = end - start;
-    MPI_Gatherv(&particles[start], sendcount, MPI_PARTICLE,
-                updated_particles, recvcounts, displs, MPI_PARTICLE, 0, MPI_COMM_WORLD);
-
-    if (my_rank == 0) {
-        memcpy(particles, updated_particles, n_particles * sizeof(particle_t));
-        free(updated_particles);
-        free(recvcounts);
-        free(displs);
-    }
-
-    // Broadcast the updated particles array to all processes
-    MPI_Bcast(particles, n_particles, MPI_PARTICLE, 0, MPI_COMM_WORLD);
+    sync_particles(start, end, chunk_size);
 }
 
 void integrate() {
     int chunk_size = n_particles / comm_sz;
-    int start = my_rank * chunk_size;
-    int end = (my_rank == comm_sz - 1) ? n_particles : (my_rank + 1) * chunk_size;
+    int remainder = n_particles % comm_sz;
+    int start = my_rank * chunk_size + (my_rank < remainder ? my_rank : remainder);
+    int end = start + chunk_size + (my_rank < remainder);
 
     for (int i = start; i < end; i++) {
         particle_t *p = &particles[i];
@@ -306,16 +278,7 @@ void integrate() {
         }
     }
 
-    // Gather the results from all processes
-    int displs[comm_sz], recvcounts[comm_sz];
-    for (int i = 0; i < comm_sz; i++) {
-        displs[i] = i * chunk_size;
-        recvcounts[i] = (i == comm_sz - 1) ? n_particles - displs[i] : chunk_size;
-    }
-    MPI_Gatherv(&particles[start], end - start, MPI_PARTICLE, particles, recvcounts, displs, MPI_PARTICLE, 0, MPI_COMM_WORLD);
-
-    // Broadcast the updated particles array to all processes
-    MPI_Bcast(particles, n_particles, MPI_PARTICLE, 0, MPI_COMM_WORLD);
+    sync_particles(start, end, chunk_size);
 }
 
 float avg_velocities() {
@@ -323,10 +286,10 @@ float avg_velocities() {
     double result = 0.0;
 
     int local_n = n_particles / comm_sz;
-    int start_i = my_rank * local_n;
-    int end_i = (my_rank == comm_sz - 1) ? n_particles : (my_rank + 1) * local_n;
+    int start = my_rank * local_n;
+    int end = (my_rank == comm_sz - 1) ? n_particles : (my_rank + 1) * local_n;
 
-    for (int i = start_i; i < end_i; i++) {
+    for (int i = start; i < end; i++) {
         local_result += hypot(particles[i].vx, particles[i].vy) / n_particles;
     }
 
