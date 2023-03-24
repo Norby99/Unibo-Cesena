@@ -160,7 +160,16 @@ void sync_particles(int start, int end, int chunk_size) {
         displacement += recvcounts[i];
     }
 
-    MPI_Allgatherv(&particles[start], end - start, MPI_PARTICLE, particles, recvcounts, displs, MPI_PARTICLE, MPI_COMM_WORLD);
+    MPI_Allgatherv(
+                    &particles[start],  // sendbuf
+                    end - start,        // sendcnts
+                    MPI_PARTICLE,       // sendtype
+                    particles,          // recvbuf
+                    recvcounts,         // recvcnts
+                    displs,             // displs
+                    MPI_PARTICLE,       // recvtype
+                    MPI_COMM_WORLD      // comm
+    );
 
     free(recvcounts);
     free(displs);
@@ -295,7 +304,13 @@ float avg_velocities() {
         local_result += hypot(particles[i].vx, particles[i].vy) / n_particles;
     }
 
-    MPI_Allreduce(&local_result, &result, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(
+                    &local_result,              // sendbuf
+                    &result,                    // recvbuf
+                    1,                          // count
+                    MPI_DOUBLE,                 // type
+                    MPI_SUM, MPI_COMM_WORLD     // comm
+    );
 
     return result;
 }
@@ -352,9 +367,27 @@ int main(int argc, char **argv) {
         t_start = MPI_Wtime();
     }
 
-    MPI_Bcast(&n_particles, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&nsteps, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(particles, n_particles, MPI_PARTICLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(
+                &n_particles,   // sendbuf
+                1,              // count
+                MPI_INT,        // type
+                0,              // root
+                MPI_COMM_WORLD  // comm
+    );
+    MPI_Bcast(
+                &nsteps,        // sendbuf
+                1,              // count
+                MPI_INT,        // type
+                0,              // root
+                MPI_COMM_WORLD  // comm
+    );
+    MPI_Bcast(
+                particles,      // sendbuf
+                n_particles,    // count
+                MPI_PARTICLE,   // type
+                0,              // root
+                MPI_COMM_WORLD  // comm
+    );
     
     for (int s=0; s<nsteps; s++) {
         update();
