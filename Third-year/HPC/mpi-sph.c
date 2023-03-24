@@ -1,5 +1,7 @@
 /****************************************************************************
  *
+ * Gabos Norbert - 0000970451
+ * 
  * sph.c -- Smoothed Particle Hydrodynamics
  *
  * https://github.com/cerrno/mueller-sph
