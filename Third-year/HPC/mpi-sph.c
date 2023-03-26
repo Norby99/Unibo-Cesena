@@ -68,7 +68,7 @@ const int DAM_PARTICLES = 500;
 const float VIEW_WIDTH = 1.5 * WINDOW_WIDTH;
 const float VIEW_HEIGHT = 1.5 * WINDOW_HEIGHT;
 
-// create a new MPI data type for the particle_t struct
+// create a new MPI data type for the particle_t struct to be used in communication
 MPI_Datatype MPI_PARTICLE;
 
 /* Particle data structure; stores position, velocity, and force for
@@ -148,6 +148,12 @@ void init_sph( int n ) {
     assert(n_particles == n);
 }
 
+/**
+ * Sincronize the particles between the processes
+ * @param start the start index of the particles to be sent
+ * @param end the end index of the particles to be sent
+ * @param chunk_size the size of the chunk of particles to be sent
+ */
 void sync_particles(int start, int end, int chunk_size) {
     int remainder = n_particles % comm_sz;
 
@@ -175,18 +181,16 @@ void sync_particles(int start, int end, int chunk_size) {
     free(displs);
 }
 
-void compute_density_pressure() {
+/**
+ * Compute the density and pressure of each particle
+*/
+void compute_density_pressure(int start, int end, int chunk_size) {
     const float HSQ = H * H;    // radius^2 for optimization
 
     /* Smoothing kernels defined in Muller and their gradients adapted
        to 2D per "SPH Based Shallow Water Simulation" by Solenthaler
        et al. */
     const float POLY6 = 4.0 / (M_PI * pow(H, 8));
-
-    int chunk_size = n_particles / comm_sz;
-    int remainder = n_particles % comm_sz;
-    int start = my_rank * chunk_size + (my_rank < remainder ? my_rank : remainder);
-    int end = start + chunk_size + (my_rank < remainder);
 
     for (int i = start; i < end; i++) {
         particle_t *pi = &particles[i];
@@ -208,18 +212,16 @@ void compute_density_pressure() {
     sync_particles(start, end, chunk_size);
 }
 
-void compute_forces() {
+/**
+ * Compute the forces on each particle
+*/
+void compute_forces(int start, int end, int chunk_size) {
     /* Smoothing kernels defined in Muller and their gradients adapted
        to 2D per "SPH Based Shallow Water Simulation" by Solenthaler
        et al. */
     const float SPIKY_GRAD = -10.0 / (M_PI * pow(H, 5));
     const float VISC_LAP = 40.0 / (M_PI * pow(H, 5));
     const float EPS = 1e-6;
-
-    int chunk_size = n_particles / comm_sz;
-    int remainder = n_particles % comm_sz;
-    int start = my_rank * chunk_size + (my_rank < remainder ? my_rank : remainder);
-    int end = start + chunk_size + (my_rank < remainder);
 
     for (int i=start; i<end; i++) {
         particle_t *pi = &particles[i];
@@ -256,12 +258,10 @@ void compute_forces() {
     sync_particles(start, end, chunk_size);
 }
 
-void integrate() {
-    int chunk_size = n_particles / comm_sz;
-    int remainder = n_particles % comm_sz;
-    int start = my_rank * chunk_size + (my_rank < remainder ? my_rank : remainder);
-    int end = start + chunk_size + (my_rank < remainder);
-
+/**
+ * Integrate the particles forward in time
+*/
+void integrate(int start, int end, int chunk_size) {
     for (int i = start; i < end; i++) {
         particle_t *p = &particles[i];
         // forward Euler integration
@@ -315,10 +315,10 @@ float avg_velocities() {
     return result;
 }
 
-void update() {
-    compute_density_pressure();
-    compute_forces();
-    integrate();
+void update(int start, int end, int chunk_size) {
+    compute_density_pressure(start, end, chunk_size);
+    compute_forces(start, end, chunk_size);
+    integrate(start, end, chunk_size);
 }
 
 int main(int argc, char **argv) {
@@ -388,9 +388,14 @@ int main(int argc, char **argv) {
                 0,              // root
                 MPI_COMM_WORLD  // comm
     );
+
+    int chunk_size = n_particles / comm_sz;
+    int remainder = n_particles % comm_sz;
+    int start = my_rank * chunk_size + (my_rank < remainder ? my_rank : remainder);
+    int end = start + chunk_size + (my_rank < remainder);
     
     for (int s=0; s<nsteps; s++) {
-        update();
+        update(start, end, chunk_size);
         
         const float avg = avg_velocities();
         if (my_rank == 0 && s % 10 == 0) {
