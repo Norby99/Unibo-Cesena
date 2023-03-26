@@ -292,6 +292,9 @@ void integrate(int start, int end, int chunk_size) {
     sync_particles(start, end, chunk_size);
 }
 
+/**
+ * Compute the average velocity of all particles
+*/
 float avg_velocities() {
     double local_result = 0.0;
     double result = 0.0;
@@ -304,6 +307,7 @@ float avg_velocities() {
         local_result += hypot(particles[i].vx, particles[i].vy) / n_particles;
     }
 
+    // reduce the local results to the root process
     MPI_Allreduce(
                     &local_result,              // sendbuf
                     &result,                    // recvbuf
