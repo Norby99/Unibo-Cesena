@@ -367,10 +367,6 @@ int main(int argc, char **argv) {
     MPI_Type_contiguous(8, MPI_FLOAT, &MPI_PARTICLE);
     MPI_Type_commit(&MPI_PARTICLE);
 
-    if (my_rank == 0) {
-        t_start = MPI_Wtime();
-    }
-
     MPI_Bcast(
                 &n_particles,   // sendbuf
                 1,              // count
@@ -397,6 +393,10 @@ int main(int argc, char **argv) {
     int remainder = n_particles % comm_sz;
     int start = my_rank * chunk_size + (my_rank < remainder ? my_rank : remainder);
     int end = start + chunk_size + (my_rank < remainder);
+
+    if (my_rank == 0) {
+        t_start = MPI_Wtime();
+    }
     
     for (int s=0; s<nsteps; s++) {
         update(start, end, chunk_size);
