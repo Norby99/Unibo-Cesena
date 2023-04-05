@@ -20,9 +20,21 @@ Il programma SPH si occupa di simulare il comportamento di fluidi in un ambiente
 Il programma è scritto in C ed è stato ideato per essere eseguito su un singolo processore.
 Nelle sezioni successive verranno presentate le varie versioni del programma, con le relative
 modifiche e le performance ottenute con l'uso di OpenMP e MPI.
+Per poter realizzare le versioni parallele del programma si è dovuto analizzare la versione
+sequenziale, per capire quali sono le parti del codice che possono essere eseguite in parallelo.
 
 \section{Versione OpenMP}
 
+Per creare la versione OpenMP, si è partiti dalla versione sequenziale analizzando il codice.
+Una volta individuati i punti da parallelizzare si sono anallizzate eventuali loop carry dependencies.
+La funzione più semplice da parallelizzare è stata la integrate in quanto consiste in un singolo ciclo.
+Per le funzioni compute_density_pressure e compute_forces si è deciso di parallelizzare il ciclo
+\begin{itemize}
+\item compute_density_pressure 
+\item compute_forces
+\item integrate
+\item avg_velocities
+\end{itemize}
 
 
 \section{Versione MPI}
