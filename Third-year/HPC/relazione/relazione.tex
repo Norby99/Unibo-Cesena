@@ -26,16 +26,19 @@ sequenziale, per capire quali sono le parti del codice che possono essere esegui
 \section{Versione OpenMP}
 
 Per creare la versione OpenMP, si è partiti dalla versione sequenziale analizzando il codice.
-Una volta individuati i punti da parallelizzare si sono anallizzate eventuali loop carry dependencies.
-La funzione più semplice da parallelizzare è stata la integrate in quanto consiste in un singolo ciclo.
-Per le funzioni compute_density_pressure e compute_forces si è deciso di parallelizzare il ciclo
-\begin{itemize}
-\item compute_density_pressure 
-\item compute_forces
-\item integrate
-\item avg_velocities
-\end{itemize}
-
+Una volta individuati i punti da parallelizzare si sono anallizzati eventuali loop carry dependencies
+e si è scoperto che tutti i cicli erano embarrassingly parallel.
+Si è partiti dalla funzione più semplice da parallelizzare, ovvero la "integrate" in quanto consiste in un
+singolo ciclo. Le funzioni compute_density_pressure e compute_forces contengono al loro interno due cicli
+annidati, quindi hanno richiesto un po' più di attenzione.
+Per la funzione "compute_density_pressure" l'intento era quello di parallelizzare entrambi i cicli mediante
+la clausola "collapse(2)", però i due cicli sono dipendendi uno dall'altro, quindi si è deciso di
+parallelizzare solo il ciclo esterno.
+Per la funzione "compute_forces" l'aproccio è stato quello di parallelizzare il ciclo interno eseguendo
+una "reduce" sulle variabili fpress_x, fpress_y, fvisc_x e fvisc_y. Questa soluzione purtroppo è stata
+scartata in quanto non ha portato ad un miglioramento delle prestazioni.
+Infine per la funzione "avg_velocities" si è deciso di utilizzare la funzione reduce sulla variabile
+"result" per ottenere il risultato finale.
 
 \section{Versione MPI}
 \section{Conclusioni}
