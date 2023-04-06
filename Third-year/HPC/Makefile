@@ -9,7 +9,6 @@
 #
 # - clean: clean up
 #
-#? OMP_NUM_THREADS=N can be used to set the number of threads used by
 
 EXE:=sph
 CFLAGS+=-std=c99 -Wall -Wpedantic
