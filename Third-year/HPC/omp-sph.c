@@ -183,7 +183,6 @@ void compute_forces() {
         float fpress_x = 0.0, fpress_y = 0.0;
         float fvisc_x = 0.0, fvisc_y = 0.0;
 
-
         for (int j=0; j<n_particles; j++) {
             const particle_t *pj = &particles[j];
 
