@@ -29,15 +29,15 @@ Per creare la versione OpenMP, si è partiti dalla versione sequenziale analizza
 Una volta individuati i punti da parallelizzare, si sono analizzate eventuali loop carry
 dependencies, e si è scoperto che tutti i cicli erano embarrassingly parallel. Si è partiti
 dalla funzione più semplice da parallelizzare, ovvero "integrate", in quanto consiste in un
-singolo ciclo. Le funzioni compute_density_pressure e compute_forces contengono al loro
+singolo ciclo. Le funzioni compute\_density\_pressure e compute\_forces contengono al loro
 interno due cicli annidati, quindi hanno richiesto un po' più di attenzione.
-Per la funzione "compute_density_pressure", l'intento era quello di parallelizzare entrambi
+Per la funzione "compute\_density\_pressure", l'intento era quello di parallelizzare entrambi
 i cicli mediante la clausola "collapse(2)", però i due cicli sono dipendenti uno dall'altro,
-quindi si è deciso di parallelizzare solo il ciclo esterno. Per la funzione "compute_forces",
+quindi si è deciso di parallelizzare solo il ciclo esterno. Per la funzione "compute\_forces",
 l'approccio è stato quello di parallelizzare il ciclo interno, eseguendo una "reduce" sulle
-variabili fpress_x, fpress_y, fvisc_x e fvisc_y. Questa soluzione, purtroppo, è stata scartata
-in quanto non ha portato ad un miglioramento delle prestazioni.
-Infine, per la funzione "avg_velocities", si è deciso di utilizzare la funzione reduce sulla
+variabili fpress\_x, fpress\_y, fvisc\_x e fvisc\_y. Questa soluzione, purtroppo, è stata
+scartata in quanto non ha portato ad un miglioramento delle prestazioni.
+Infine, per la funzione "avg\_velocities", si è deciso di utilizzare la funzione reduce sulla
 variabile "result" per ottenere il risultato finale.
 
 % manca la tabella con i tempi e la descrizione dei risultati
@@ -46,20 +46,20 @@ variabile "result" per ottenere il risultato finale.
 
 Durante l'inizializzazione della versione MPI, è stata impiegata la funzione Bcast per
 distribuire le informazioni relative alle particelle tra i processori. Inoltre, è stato
-creato il tipo di variabile "MPI_PARTICLE" per facilitare l'invio e la ricezione delle
+creato il tipo di variabile "MPI\_PARTICLE" per facilitare l'invio e la ricezione delle
 particelle tra i processori.
 L'approccio adottato per parallelizzare le varie funzioni ha previsto che ogni processo
 avesse le stesse particelle sia all'inizio che alla fine della funzione. A tal fine, è
-stata creata la funzione "sync_particles" che, mediante l'utilizzo di "MPI_Allgatherv",
+stata creata la funzione "sync\_particles" che, mediante l'utilizzo di "MPI\_Allgatherv",
 permette di raccogliere i dati delle particelle sparse su tutti i processori e di
 riorganizzarli in modo che ogni processo abbia le stesse particelle. La funzione
-"sync_particles" viene richiamata alla fine di ogni funzione che modifica le particelle.
+"sync\_particles" viene richiamata alla fine di ogni funzione che modifica le particelle.
 
 Per parallelizzare le funzioni si è diviso l'array in chunk e ogni processo ha eseguito
-solamente il proprio chunk. Per quanto riguarda la funzione "avg_velocities", è stata
+solamente il proprio chunk. Per quanto riguarda la funzione "avg\_velocities", è stata
 utilizzata la funzione "reduce" per ottenere il risultato finale e salvarlo tra tutti i
 processi. Questa soluzione avrebbe potuto essere implementata anche attraverso l'uso
-della funzione "MPI_Reduce", ma si è scelto di impiegare "MPI_Allreduce" per avere 
+della funzione "MPI\_Reduce", ma si è scelto di impiegare "MPI\_Allreduce" per avere 
 una soluzione più generale.
 
 \section{Conclusioni}
