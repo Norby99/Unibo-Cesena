@@ -40,7 +40,26 @@ in quanto non ha portato ad un miglioramento delle prestazioni.
 Infine, per la funzione "avg_velocities", si è deciso di utilizzare la funzione reduce sulla
 variabile "result" per ottenere il risultato finale.
 
+% manca la tabella con i tempi e la descrizione dei risultati
+
 \section{Versione MPI}
+
+Durante l'inizializzazione della versione MPI è stata usata la funzione Bcast, per distribuire le
+informazioni delle particelle tra i processori. Inoltre è stata creato il tipo di variabile
+"MPI_PARTICLE" per poter inviare e ricevere le particelle tra i processori.
+
+Per parallelizzare le varie funzioni l'aproccio è stato quello di fare un modo che ogni processo
+avesse le stesse particelle sia all'inizio che alla fine della funzione. Per fare ciò si è
+creata la funzione "sync_particles", che mediante la funzione "MPI_Allgatherv" permette di
+raccogliere i vari dati delle particelle sparse su tutti i processori e di riorganizzarli in
+modo che ogni processo abbia le stesse particelle. La funzione "sync_particles" viene richiamata
+alla fine di ogni funzione. Per parallelizzare tutti le funzione è stato utilizzato un aproccio
+simile, ovvero si è diviso l'array in chunk ed ogni processo ha eseguito solo il proprio chunk.
+Per quanto riguarda la funzione "avg_velocities", si è deciso di utilizzare la funzione "reduce"
+per ottenere il risultato finale e salvarlo tra tutti i processi, questa cosa si poteva risolvere anche
+solo con la funzione "MPI_Reduce", ma si è deciso di utilizzare la "MPI_Allreduce" per avere
+una soluzione più generale.
+
 \section{Conclusioni}
 
 \end{document}
