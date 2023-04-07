@@ -16,29 +16,29 @@
 
 \section{Introduzione}
 
-Il programma SPH si occupa di simulare il comportamento di fluidi in un ambiente virtuale.
-Il programma è scritto in C ed è stato ideato per essere eseguito su un singolo processore.
-Nelle sezioni successive verranno presentate le varie versioni del programma, con le relative
-modifiche e le performance ottenute con l'uso di OpenMP e MPI.
-Per poter realizzare le versioni parallele del programma si è dovuto analizzare la versione
-sequenziale, per capire quali sono le parti del codice che possono essere eseguite in parallelo.
+Il programma SPH è un simulatore che si occupa di modellare il comportamento dei fluidi in un
+ambiente virtuale. È stato scritto in linguaggio C e progettato per funzionare su un singolo
+processore. Per realizzare le versioni parallele del programma, è stato necessario analizzare
+la versione sequenziale, al fine di individuare le parti del codice che possono essere eseguite
+in parallelo. Le sezioni successive presentano le diverse versioni del programma, con le
+relative modifiche e le performance ottenute grazie all'utilizzo di OpenMP e MPI.
 
 \section{Versione OpenMP}
 
 Per creare la versione OpenMP, si è partiti dalla versione sequenziale analizzando il codice.
-Una volta individuati i punti da parallelizzare si sono anallizzati eventuali loop carry dependencies
-e si è scoperto che tutti i cicli erano embarrassingly parallel.
-Si è partiti dalla funzione più semplice da parallelizzare, ovvero la "integrate" in quanto consiste in un
-singolo ciclo. Le funzioni compute_density_pressure e compute_forces contengono al loro interno due cicli
-annidati, quindi hanno richiesto un po' più di attenzione.
-Per la funzione "compute_density_pressure" l'intento era quello di parallelizzare entrambi i cicli mediante
-la clausola "collapse(2)", però i due cicli sono dipendendi uno dall'altro, quindi si è deciso di
-parallelizzare solo il ciclo esterno.
-Per la funzione "compute_forces" l'aproccio è stato quello di parallelizzare il ciclo interno eseguendo
-una "reduce" sulle variabili fpress_x, fpress_y, fvisc_x e fvisc_y. Questa soluzione purtroppo è stata
-scartata in quanto non ha portato ad un miglioramento delle prestazioni.
-Infine per la funzione "avg_velocities" si è deciso di utilizzare la funzione reduce sulla variabile
-"result" per ottenere il risultato finale.
+Una volta individuati i punti da parallelizzare, si sono analizzate eventuali loop carry
+dependencies, e si è scoperto che tutti i cicli erano embarrassingly parallel. Si è partiti
+dalla funzione più semplice da parallelizzare, ovvero "integrate", in quanto consiste in un
+singolo ciclo. Le funzioni compute_density_pressure e compute_forces contengono al loro
+interno due cicli annidati, quindi hanno richiesto un po' più di attenzione.
+Per la funzione "compute_density_pressure", l'intento era quello di parallelizzare entrambi
+i cicli mediante la clausola "collapse(2)", però i due cicli sono dipendenti uno dall'altro,
+quindi si è deciso di parallelizzare solo il ciclo esterno. Per la funzione "compute_forces",
+l'approccio è stato quello di parallelizzare il ciclo interno, eseguendo una "reduce" sulle
+variabili fpress_x, fpress_y, fvisc_x e fvisc_y. Questa soluzione, purtroppo, è stata scartata
+in quanto non ha portato ad un miglioramento delle prestazioni.
+Infine, per la funzione "avg_velocities", si è deciso di utilizzare la funzione reduce sulla
+variabile "result" per ottenere il risultato finale.
 
 \section{Versione MPI}
 \section{Conclusioni}
