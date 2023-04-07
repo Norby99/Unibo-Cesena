@@ -295,13 +295,9 @@ void integrate(int start, int end, int chunk_size) {
 /**
  * Compute the average velocity of all particles
 */
-float avg_velocities() {
+float avg_velocities(int start, int end) {
     double local_result = 0.0;
     double result = 0.0;
-
-    int local_n = n_particles / comm_sz;
-    int start = my_rank * local_n;
-    int end = (my_rank == comm_sz - 1) ? n_particles : (my_rank + 1) * local_n;
 
     for (int i = start; i < end; i++) {
         local_result += hypot(particles[i].vx, particles[i].vy) / n_particles;
@@ -401,7 +397,7 @@ int main(int argc, char **argv) {
     for (int s=0; s<nsteps; s++) {
         update(start, end, chunk_size);
         
-        const float avg = avg_velocities();
+        const float avg = avg_velocities(start, end);
         if (my_rank == 0 && s % 10 == 0) {
             printf("step %5d, avgV=%f\n", s, avg);
         }
