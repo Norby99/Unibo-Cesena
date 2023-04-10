@@ -61,6 +61,9 @@ utilizzata la funzione "reduce" per ottenere il risultato finale e salvarlo tra 
 processi. Questa soluzione avrebbe potuto essere implementata anche attraverso l'uso
 della funzione "MPI_Reduce", ma si è scelto di impiegare "MPI_Allreduce" per avere 
 una soluzione più generale.
+Inoltre, alla fine di ogni ciclo, viene richiamata la funzione MPI_Barrier per garantire
+la sincronizzazione tra i processi, anche se questa precauzione potrebbe non essere
+strettamente necessaria.
 
 \section{Conclusioni}
 
