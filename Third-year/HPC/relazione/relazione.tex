@@ -40,8 +40,6 @@ scartata in quanto non ha portato ad un miglioramento delle prestazioni.
 Infine, per la funzione "avg\_velocities", si è deciso di utilizzare la funzione reduce sulla
 variabile "result" per ottenere il risultato finale.
 
-% manca la tabella con i tempi e la descrizione dei risultati
-
 \section{Versione MPI}
 
 Durante l'inizializzazione della versione MPI, è stata impiegata la funzione Bcast per
@@ -65,6 +63,27 @@ Inoltre, alla fine di ogni ciclo, viene richiamata la funzione MPI\_Barrier per 
 la sincronizzazione tra i processi, anche se questa precauzione potrebbe non essere
 strettamente necessaria.
 
-\section{Conclusioni}
+\section{Conclusioni}   % vedere se cambiare nome alla sezione
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{speedup.png}
+    \caption{Speedup}
+    \label{fig:speedup}
+\end
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{strong-scaling.png}
+    \caption{Strong Scaling Efficiency}
+    \label{fig:strong-scaling}
+\end
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{weak-scaling.png}
+    \caption{Weak Scaling Efficiency}
+    \label{fig:weak-scaling}
+\end
 
 \end{document}
