@@ -72,6 +72,16 @@ strettamente necessaria.
     \label{fig:speedup}
 \end
 
+Nella Figura \ref{fig:speedup}, si può osservare il grafico del speedup ottenuto attraverso
+le diverse versioni del programma. È interessante notare come la versione MPI abbia
+conseguito un speedup superiore rispetto alla versione OpenMP. Tuttavia, la differenza non
+è particolarmente marcata, con un valore medio del 4,71\%.
+
+È importante sottolineare che, nonostante il PC utilizzato disponga di 12 core, le
+misurazioni sono state effettuate utilizzando solamente 11 core. Questa scelta è stata
+fatta perché, utilizzando tutti i 12 core, le prestazioni del programma peggioravano a
+causa di altri processi in esecuzione che richiedevano risorse di sistema
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{strong-scaling.png}
