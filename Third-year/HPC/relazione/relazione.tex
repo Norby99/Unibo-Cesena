@@ -63,7 +63,7 @@ Inoltre, alla fine di ogni ciclo, viene richiamata la funzione MPI\_Barrier per 
 la sincronizzazione tra i processi, anche se questa precauzione potrebbe non essere
 strettamente necessaria.
 
-\section{Conclusioni}   % vedere se cambiare nome alla sezione
+\section{Prestazioni}
 
 \begin{figure}[h]
     \centering
@@ -71,16 +71,6 @@ strettamente necessaria.
     \caption{Speedup}
     \label{fig:speedup}
 \end{figure}
-
-Nella Figura \ref{fig:speedup}, si può osservare il grafico del speedup ottenuto attraverso
-le diverse versioni del programma. È interessante notare come la versione MPI abbia
-conseguito un speedup superiore rispetto alla versione OpenMP. Tuttavia, la differenza non
-è particolarmente marcata, con un valore medio del 4,71\%.
-
-È importante sottolineare che, nonostante il PC utilizzato disponga di 12 core, le
-misurazioni sono state effettuate utilizzando solamente 11 core. Questa scelta è stata
-fatta perché, utilizzando tutti i 12 core, le prestazioni del programma peggioravano a
-causa di altri processi in esecuzione che richiedevano risorse di sistema
 
 \begin{figure}[h]
     \centering
@@ -95,5 +85,24 @@ causa di altri processi in esecuzione che richiedevano risorse di sistema
     \caption{Weak Scaling Efficiency}
     \label{fig:weak-scaling}
 \end{figure}
+
+Nella Figura \ref{fig:speedup}, si può osservare il grafico del speedup ottenuto attraverso
+le diverse versioni del programma. È interessante notare come la versione MPI abbia
+conseguito un speedup superiore rispetto alla versione OpenMP. Tuttavia, la differenza non
+è particolarmente marcata, con un valore medio del 4,71\%.
+
+Nella Figura \ref{fig:strong-scaling}, è possibile osservare l'andamento dell'efficienza di
+strong scaling per entrambe le versioni del programma. Analogamente, la Figura \ref{fig:weak-scaling}
+illustra l'efficienza di weak scaling per OpenMP e MPI. L'analisi di queste due figure
+permette di avere una visione più completa e dettagliata delle prestazioni ottenute
+utilizzando le due diverse implementazioni del programma e di comprendere meglio le loro
+caratteristiche in termini di scalabilità. Questo ulteriore confronto conferma l'efficacia
+della versione MPI nel garantire una maggiore scalabilità e un migliore utilizzo delle
+risorse disponibili rispetto all'implementazione basata su OpenMP.
+
+È importante sottolineare che, nonostante il PC utilizzato disponga di 12 core, le
+misurazioni sono state effettuate utilizzando solamente 11 core. Questa scelta è stata
+fatta perché, utilizzando tutti i 12 core, le prestazioni del programma peggioravano a
+causa di altri processi in esecuzione che richiedevano risorse di sistema
 
 \end{document}
