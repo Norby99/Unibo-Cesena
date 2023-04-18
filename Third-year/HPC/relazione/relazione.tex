@@ -40,6 +40,43 @@ scartata in quanto non ha portato ad un miglioramento delle prestazioni.
 Infine, per la funzione "avg\_velocities", si è deciso di utilizzare la funzione reduce sulla
 variabile "result" per ottenere il risultato finale.
 
+\subsection{Analisi delle strategie di scheduling}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{scheduling.png}
+    \caption{Scheduling}
+    \label{fig:scheduling}
+\end{figure}
+
+Nell'implementazione OpenMP del programma, sono state valutate diverse strategie di scheduling
+per i loop parallelizzati, al fine di determinare l'approccio più efficace per bilanciare il
+carico di lavoro tra i thread e massimizzare le prestazioni. In particolare, abbiamo
+confrontato il scheduling statico, dinamico con grana fine e dinamico con grana grossa.
+
+\begin{itemize}
+\item \textbf{Scheduling statico:} Con questa strategia, i loop vengono divisi in blocchi di
+dimensioni uguali e assegnati staticamente ai thread. Il vantaggio di questo approccio è la
+riduzione dell'overhead di comunicazione tra i thread, poiché non vi è alcun meccanismo di
+load balancing dinamico. Tuttavia, il scheduling statico potrebbe portare a uno squilibrio nel
+carico di lavoro, soprattutto se i loop contengono operazioni con tempi di esecuzione variabili.
+\item \textbf{Scheduling dinamico con grana fine:} In questa strategia, i loop vengono divisi
+in blocchi di dimensioni più piccole rispetto al scheduling statico e assegnati dinamicamente
+ai thread disponibili. Il vantaggio di questo approccio è un migliore bilanciamento del carico
+di lavoro, a scapito di un maggiore overhead di comunicazione tra i thread.
+\item \textbf{Scheduling dinamico con grana grossa:} Questa strategia combina gli aspetti del
+scheduling statico e dinamico, dividendo i loop in blocchi di dimensioni intermedie e
+assegnandoli dinamicamente ai thread. Ciò consente di ottenere un compromesso tra il bilanciamento
+del carico di lavoro e l'overhead di comunicazione.
+\end{itemize}
+
+Nella nostra analisi (vedi Figura \ref{fig:scheduling}), si è osservato che il scheduling dinamico con grana grossa ha fornito le
+migliori prestazioni complessive, poiché garantisce un buon bilanciamento del carico di lavoro tra
+i thread senza introdurre un eccessivo overhead di comunicazione. Tuttavia, è importante notare che
+la scelta della strategia di scheduling ottimale dipende dalle specifiche caratteristiche del
+problema e dall'architettura hardware utilizzata. Pertanto, si consiglia di eseguire test
+empirici per determinare la strategia di scheduling più adatta al caso d'uso specifico.
+
 \section{Versione MPI}
 
 Durante l'inizializzazione della versione MPI, è stata impiegata la funzione Bcast per
