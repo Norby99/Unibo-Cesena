@@ -15,7 +15,7 @@ make omp
 Si può utilizzare il comando:
 
 ```
-make omp
+make mpi
 ```
 
 ---
