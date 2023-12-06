@@ -29,13 +29,14 @@ inserire o modificare le proprie pizze.
 \subsection{Intervista}
 
 Si intende gestire la clientela del negozio registrando il nome, il
-cognome, il numero di telefono e l'indirizzo di ogni individuo. Ogni
+cognome, l'email, il numero di telefono e l'indirizzo di ogni individuo. Ogni
 cliente deve essere in grado di effettuare il proprio ordine, con un
 limite massimo di 10 pizze. Si possono avere al massimo 4 ordini ogni
 quarto d'ora, al fine di garantire la consegna degli ordini nelle
 fasce orarie successive in modo puntuale.
 Inoltre il cliente potrà scegliere se farsi recapitare a casa proprie
-le pizze, oppure se le vuole venire a prendere lui.
+le pizze, oppure se le vuole venire a prendere lui, nel primo caso
+bisogna chiedere all'utente l'indirizzo a cui recapitare le pizze.
 
 Si vuole tener traccia dello storico degli ordini di ciascun utente in
 modo da garantire al proprietario di effettuare delle stime sui propri
@@ -88,9 +89,10 @@ Gli ordini saranno catalogati in intervalli di quindici minuti,
 dall'orario di apertura a quello di chiusura, con limitazioni sia
 sul numero complessivo di ordini che sul numero di pizze per ogni
 ordine. Gli ordini possono essere di due tipi: consegna a domicilio o
-ritiro dell'ordine. Ogni utente potrà visualizzare la propria
-cronologia degli ordini, ma solo il proprietario avrà accesso a tutti
-gli ordini effettuati.
+ritiro dell'ordine, nel primo caso bisogna anche memorizzare l'indirizzo
+di recapito. Ogni utente potrà visualizzare la propria cronologia degli
+ordini, ma solo il proprietario avrà accesso a tutti gli ordini
+effettuati.
 
 Per ogni pizza, è necessario memorizzare il nome come identificatore
 unico, il tipo, gli ingredienti, gli allergeni e il prezzo.
@@ -118,6 +120,17 @@ Elenco delle principali azioni richieste:
 
 \section{Progettazione Concettuale}
 \subsection{Schema scheletro}
+
+Per l'entità \textbf{Cliente}, si è deciso di modellarla come
+generalizzazione, assieme a \textbf{Proprietario}, di \textbf{Utente}.
+
+Dall'analisi del dominio si evince che solo un numero limitato di ordini
+più essere effettuato in una certa fascia oraria, per ciò è stata creata
+l'entità \textbf{Fascia oraria} e \textbf{Ordine}, con un limite di 4
+istanze per fascia oraria. Inoltre l'entità \textbf{Ordine} è identificata
+da una data, dalla fascia oraria e dall'id del cliente, cosi si evita che
+un cliente possa effettuare ordini multipli saturando il limite imposto.
+
 \subsection{Schema finale}
 
 \section{Progettazione Logica}
