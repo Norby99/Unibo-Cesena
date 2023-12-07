@@ -28,38 +28,45 @@ inserire o modificare le proprie pizze.
 
 \subsection{Intervista}
 
-Si intende gestire la clientela del negozio registrando il nome, il
-cognome, l'email, il numero di telefono e l'indirizzo di ogni individuo. Ogni
-cliente deve essere in grado di effettuare il proprio ordine, con un
-limite massimo di 10 pizze. Si possono avere al massimo 4 ordini ogni
-quarto d'ora, al fine di garantire la consegna degli ordini nelle
-fasce orarie successive in modo puntuale.
-Inoltre il cliente potrà scegliere se farsi recapitare a casa proprie
-le pizze, oppure se le vuole venire a prendere lui, nel primo caso
-bisogna chiedere all'utente l'indirizzo a cui recapitare le pizze.
+Si prevede la gestione della clientela del negozio registrando il nome,
+il cognome, l'email, il numero di telefono e l'indirizzo di ciascun
+individuo. Ogni cliente deve poter effettuare il proprio ordine con un
+limite massimo di 10 pizze. È consentito effettuare al massimo 4 ordini
+ogni mezz'ora per garantire la consegna puntuale negli orari successivi.
 
-Si vuole tener traccia dello storico degli ordini di ciascun utente in
-modo da garantire al proprietario di effettuare delle stime sui propri
-prodotti. Gli utenti devono anche poter visualizzare tutti i propri
-ordini e avere la possibilità di modificare o cancellare il proprio
-account. In caso di cancellazione dell'account di un cliente si devono
-anche cancellare tutte le operazione che esso ha effettuato, come i
-propri ordini o eventuali future funzioni. Ciò serve per garantire la
-privacy degli individui.
+Inoltre, il cliente potrà scegliere se farsi recapitare le pizze a casa
+propria o se desidera ritirarle personalmente. Nel primo caso, è
+necessario richiedere all'utente l'indirizzo di consegna.
 
-Ciascuna pizza deve appartenere a una categoria, tra cui "Pizze
-classiche", "Pizze speciali" e "Impasto napoletano". Ogni pizza è
-caratterizzata da un prezzo, un nome e una lista di ingredienti e
-allergeni, come latticini, noci, uova, ecc.
+I clienti devono essere in grado di prenotare un tavolo per quante
+persone desiderano, ma non è permesso prenotare più di un tavolo ogni
+mezz'ora. Inoltre, non possono esserci più di 10 tavoli prenotati
+contemporaneamente per garantire la disponibilità di posti per i
+clienti senza prenotazione.
 
-Infine, è necessario tenere traccia dei pizzaioli, che devono essere
-in grado di modificare le pizze e gli ingredienti, cancellare quelli
-esistenti o aggiungerne di nuovi.
+Si desidera mantenere uno storico degli ordini di ciascun utente per
+consentire al proprietario di stimare la domanda dei propri prodotti.
+Gli utenti devono poter visualizzare l'elenco di tutti i loro ordini e
+avere la possibilità di modificarli o cancellare il proprio account. In
+caso di cancellazione dell'account di un cliente, devono essere
+eliminati tutti i dati relativi alle operazioni effettuate, inclusi
+ordini e altre attività future, per garantire la privacy degli
+individui.
 
-Possono anche consultare il portale per visualizzare la classifica delle
-pizze più vendute e meno vendute. Ciò server per apportare modifiche
-al menu alla fine dell'anno, come la modifica, oppure la cancellazione
-di alcune pizze.
+Ogni pizza deve appartenere a una categoria, tra cui "Pizze classiche",
+"Pizze speciali" e "Impasto napoletano". Ciascuna pizza è caratterizzata
+da un prezzo, un nome e una lista di ingredienti e allergeni, come
+latticini, noci, uova, ecc.
+
+Infine, è essenziale monitorare le attività dei pizzaioli, che devono
+poter modificare pizze e ingredienti, eliminare quelli esistenti o
+aggiungerne di nuovi. Possono anche consultare il portale per
+visualizzare la classifica delle pizze più vendute e meno vendute.
+Cosa più importante, è necessario che esista una pagina dove poter
+visualizzare tutti gli ordini ancora non processati da utilizzare 
+per sapere qual'è il prossimo ordine da preparare.
+Ciò è utile per apportare eventuali modifiche al menu alla fine
+dell'anno, come la modifica o la cancellazione di alcune pizze.
 
 \newpage
 \begin{figure}[h]
@@ -75,32 +82,40 @@ Dopo aver esaminato e compreso i requisiti, si procede con la redazione
 di un testo che sintetizza tutti i concetti, concentrandosi in
 particolare sull'estrazione dei principali e sulla rimozione delle
 ambiguità individuate in precedenza.
+
+TODO: Aggiungere immagine con tavella di cosa fa ogni entità principale
+
 \begin{quote}
 
-Per ciascun cliente, è necessario registrare il proprio nome, cognome,
-numero di telefono, indirizzo email e un identificativo univoco assegnato
-al momento della creazione dell'account. Ogni cliente avrà accesso a un
-listino completo delle pizze e potrà selezionare quelle desiderate per
-aggiungerle al proprio ordine. Inoltre, l'applicazione gestirà
-completamente la funzione del carrello, salvando eventuali modifiche
-sul dispositivo dell'utente.
+Per ogni cliente, è essenziale registrare il proprio nome, cognome,
+numero di telefono, indirizzo email, una password per il login e un
+identificativo univoco assegnato al momento della creazione
+dell'account. Ciascun cliente avrà accesso a un listino completo delle
+pizze e potrà selezionare quelle desiderate per aggiungerle al proprio
+ordine. L'applicazione gestirà integralmente la funzione del carrello,
+salvando eventuali modifiche sul dispositivo dell'utente.
 
 Gli ordini saranno catalogati in intervalli di quindici minuti,
-dall'orario di apertura a quello di chiusura, con limitazioni sia
-sul numero complessivo di ordini che sul numero di pizze per ogni
-ordine. Gli ordini possono essere di due tipi: consegna a domicilio o
-ritiro dell'ordine, nel primo caso bisogna anche memorizzare l'indirizzo
-di recapito. Ogni utente potrà visualizzare la propria cronologia degli
-ordini, ma solo il proprietario avrà accesso a tutti gli ordini
-effettuati.
+dall'orario di apertura a quello di chiusura, con limitazioni sia sul
+numero complessivo di ordini che sul numero di pizze per ogni ordine.
+Gli ordini possono essere di due tipi: consegna a domicilio o ritiro
+dell'ordine; nel primo caso, è necessario memorizzare anche
+l'indirizzo di recapito. Ogni utente potrà visualizzare la propria
+cronologia degli ordini, ma solo il proprietario avrà accesso a tutti
+gli ordini effettuati.
+
+Ciascun tavolo deve possedere un identificatore per evitare che più
+clienti prenotino lo stesso tavolo contemporaneamente; inoltre, non
+possono esserci più di 10 prenotazioni a mezz'ora, e un cliente non
+può prenotare più di un tavolo in una determinata fascia oraria.
 
 Per ogni pizza, è necessario memorizzare il nome come identificatore
-unico, il tipo, gli ingredienti, gli allergeni e il prezzo.
+unico, il tipo, gli ingredienti, gli allergeni e il prezzo. Il
+proprietario avrà la capacità di visualizzare e modificare tutte le
+informazioni relative a ciascuna pizza. Infine, avrà la possibilità
+di consultare una classifica contenente le 5 pizze più vendute e
+meno vendute.
 
-Il proprietario avrà la capacità di visualizzare e modificare tutte
-le informazioni relative a ciascuna pizza. Infine, avrà la possibilità
-di consultare una classifica contenente le 5 pizze più vendute e meno
-vendute.
 \end{quote}
 
 Elenco delle principali azioni richieste:
@@ -109,6 +124,7 @@ Elenco delle principali azioni richieste:
     \item Eliminazione di un cliente
     \item Inserimento di un socio
     \item Creazione di un ordine
+    \item Prenotazione di un tavolo
     \item Eliminazione di una pizza
     \item Modifica delle caratteristiche di una pizza
     \item Aggiunta di ingredienti nuovi
@@ -121,15 +137,46 @@ Elenco delle principali azioni richieste:
 \section{Progettazione Concettuale}
 \subsection{Schema scheletro}
 
-Per l'entità \textbf{Cliente}, si è deciso di modellarla come
-generalizzazione, assieme a \textbf{Proprietario}, di \textbf{Utente}.
+Per l'entità \textbf{Cliente}, ho scelto di modellarla come una
+generalizzazione, insieme a \textbf{Proprietario}, di \textbf{Utente}.
 
-Dall'analisi del dominio si evince che solo un numero limitato di ordini
-più essere effettuato in una certa fascia oraria, per ciò è stata creata
-l'entità \textbf{Fascia oraria} e \textbf{Ordine}, con un limite di 4
-istanze per fascia oraria. Inoltre l'entità \textbf{Ordine} è identificata
-da una data, dalla fascia oraria e dall'id del cliente, cosi si evita che
-un cliente possa effettuare ordini multipli saturando il limite imposto.
+TODO: inserire immagine
+
+Dall'analisi del dominio emerge che è possibile effettuare solo un
+numero limitato di ordini in una determinata fascia oraria. Pertanto,
+ho introdotto le entità \textbf{Fascia oraria} e \textbf{Ordine},
+con un limite di 4 istanze per ogni fascia oraria. Inoltre, ho
+stabilito che un cliente non può effettuare più di un ordine a mezz'ora.
+Per gestire questa limitazione, l'entità \textbf{Ordine} è
+identificata da una data, dalla fascia oraria e dall'ID del cliente,
+evitando così che io possa effettuare ordini multipli e superare il
+limite imposto. Inoltre, l'entità \textbf{Ordine} ha due sottoclassi,
+\textbf{Ordine da ritirare} e \textbf{Ordine da consegnare}, con
+quest'ultima che richiede un indirizzo per la consegna.
+
+TODO: inserire immagine
+
+Per quanto riguarda l'entità \textbf{Prenotazione tavolo}, la
+situazione è più complessa. Ogni tavolo può essere prenotato solo una
+volta durante una fascia oraria, e contemporaneamente, non posso
+prenotare più di un tavolo per la stessa fascia oraria. Come soluzione,
+ho pensato di utilizzare una chiave duplice: la prima comprende la data
+della prenotazione, l'identificatore del tavolo e la fascia oraria,
+mentre la seconda comprende la data della prenotazione,
+l'identificatore dell'utente e la fascia oraria. In questo modo, tutti
+i vincoli precedenti sono stati soddisfatti.
+
+TODO: inserire immagine
+
+Per quanto riguarda l'entità \textbf{Pizze}, ciascuna pizza memorizza
+un prezzo e un nome che la identifica. Ho anche introdotto l'entità
+\textbf{Tipo pizza}, che rappresenta il tipo di pizza identificato dal
+proprio nome. Ogni pizza è composta da un numero di ingredienti, quindi
+ho creato l'entità \textbf{Ingrediente}, che contiene il proprio nome
+come identificatore e una descrizione. Infine, ogni ingrediente ha il
+proprio allergene, modellato dall'entità \textbf{Allergene}.
+
+TODO: inserire immagine
 
 \subsection{Schema finale}
 
