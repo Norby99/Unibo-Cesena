@@ -9,6 +9,10 @@
 \usepackage[italian]{babel}
 \pagestyle{plain}
 \usepackage{graphicx}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{tabularx}
+\usepackage{ragged2e}               % migliora la formattazione del testo all'interno delle celle
+\renewcommand{\arraystretch}{1.5}   % aggiunge margine alle celle
 \graphicspath{{images/}}
 
 \begin{document}
@@ -182,6 +186,54 @@ TODO: inserire immagine
 
 \section{Progettazione Logica}
 \subsection{Stima del volume dei dati}
+
+\begin{table}
+\begin{tabularx}{1\textwidth}{>{\RaggedRight\arraybackslash}X>{\Centering\arraybackslash}X>{\Centering\arraybackslash}X}
+    \rowcolor[HTML]{039e0b} 
+    {\color[HTML]{FFFFFF} Concetto} & {\color[HTML]{FFFFFF} Costrutto} & {\color[HTML]{FFFFFF} Volume} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Cliente & E & 1000 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Proprietario & E & 1 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Effettuazione & R & 0 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Ordine da ritirare & E & 150000 \\ \hline
+    \rowcolor[HTML]{FFFFFF}
+    Ordine da consegnare & E & 100000 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Associato a & R & 0 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Fascia oraria & E & 16 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Pianificazione prenotazioni & R & 0 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Prenotazione tavolo & E & 50000 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Riservazione & R & 0 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Tavolo & E & 30 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Richiesta & R & 0 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Comprende & R & 0 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Pizza & E & 90 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Tipologia & R & 90 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Tipo pizza & E & 3 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Composizione & R & 0 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Ingrediente & E & 45 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Contiene & R & 45 \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Allergene & E & 5
+\end{tabularx}
+\end{table}
+
 \subsection{Descrizione delle operazioni principali e stima della loro frequenza}
 \subsection{Schemi di navigazioni e tabelle degli accessi}
 \subsection{Raffinamento dello schema}
