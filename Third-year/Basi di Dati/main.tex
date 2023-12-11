@@ -72,8 +72,7 @@ per sapere qual'è il prossimo ordine da preparare.
 Ciò è utile per apportare eventuali modifiche al menu alla fine
 dell'anno, come la modifica o la cancellazione di alcune pizze.
 
-\newpage
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{esempio_pizze.png}
     \caption{Esempio dell'elenco di pizze.}
@@ -99,7 +98,7 @@ pizze e potrà selezionare quelle desiderate per aggiungerle al proprio
 ordine. L'applicazione gestirà integralmente la funzione del carrello,
 salvando eventuali modifiche sul dispositivo dell'utente.
 
-Gli ordini saranno catalogati in intervalli di quindici minuti,
+Gli ordini saranno catalogati in intervalli di 30 minuti,
 dall'orario di apertura a quello di chiusura, con limitazioni sia sul
 numero complessivo di ordini che sul numero di pizze per ogni ordine.
 Gli ordini possono essere di due tipi: consegna a domicilio o ritiro
@@ -125,17 +124,16 @@ meno vendute.
 Elenco delle principali azioni richieste:
 \begin{enumerate}
     \item Inserimento di un nuovo cliente
-    \item Eliminazione di un cliente
     \item Inserimento di un socio
     \item Creazione di un ordine
     \item Prenotazione di un tavolo
-    \item Eliminazione di una pizza
+    \item Aggiunta di una pizza
     \item Modifica delle caratteristiche di una pizza
-    \item Aggiunta di ingredienti nuovi
+    \item Aggiunta di un ingrediente nuovo
     \item Eliminazione di un ingrediente
     \item Visualizzazione delle pizze con relativi dettagli
     \item Visualizzazione degli ordini dei relativi clienti
-    \item Visualizzazione della classifica delle pizze più e meno vendute
+    \item Visualizzazione della classifica delle pizze più vendute
 \end{enumerate}
 
 \section{Progettazione Concettuale}
@@ -186,13 +184,14 @@ TODO: inserire immagine
 
 TODO: inserire immagine
 
+\newpage
 \section{Progettazione Logica}
 \subsection{Stima del volume dei dati}
 
-\begin{table}
+\begin{table}[ht]
 \begin{tabularx}{1\textwidth}{>{\RaggedRight\arraybackslash}X>{\Centering\arraybackslash}X>{\Centering\arraybackslash}X}
-    \rowcolor[HTML]{039e0b} 
-    {\color[HTML]{FFFFFF} Concetto} & {\color[HTML]{FFFFFF} Costrutto} & {\color[HTML]{FFFFFF} Volume} \\ \hline
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Costrutto} & \textcolor{white}{Volume} \\ \hline
     \rowcolor[HTML]{FFFFFF} 
     Cliente & E & 1000 \\ \hline
     \rowcolor[HTML]{FFFFFF} 
@@ -228,7 +227,14 @@ TODO: inserire immagine
     \rowcolor[HTML]{FFFFFF} 
     Composizione & R & 450 \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    Ingrediente & E & 45 \\ \hline
+    Ingrediente & E & 45
+\end{tabularx}
+\end{table}
+
+\begin{table}[ht]
+\begin{tabularx}{1\textwidth}{>{\RaggedRight\arraybackslash}X>{\Centering\arraybackslash}X>{\Centering\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Costrutto} & \textcolor{white}{Volume} \\ \hline
     \rowcolor[HTML]{FFFFFF} 
     Contiene & R & 45 \\ \hline
     \rowcolor[HTML]{FFFFFF} 
@@ -237,7 +243,156 @@ TODO: inserire immagine
 \end{table}
 
 \subsection{Descrizione delle operazioni principali e stima della loro frequenza}
+
+Le attività da eseguire coincidono con quelle precedentemente
+dettagliate durante la fase di analisi. Di seguito è presente
+una tabella che fornisce la loro descrizione e la frequenza
+associata:
+
+\begin{table}[ht]
+\begin{tabularx}{\textwidth}{>{\hsize=0.2\hsize\RaggedRight\arraybackslash}X>{\hsize=1.8\hsize\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Num} & \textcolor{white}{Operazione} & \textcolor{white}{Frequenza} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    1 & Inserimento di un nuovo cliente & 1 alla settimana \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    2 & Inserimento di un socio & 1 all'anno \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    3 & Creazione di un ordine & 64 al giorno \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    4 & Prenotazione di un tavolo & 80 al giorno \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    5 & Aggiunta di una pizza & 10 all'anno \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    6 & Modifica delle caratteristiche di una pizza & 20 al mese \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    7 & Aggiunta di un ingrediente nuovo & 2 all'anno \\ \hline
+    \rowcolor[HTML]{FFFFFF}  
+    8 & Visualizzazione delle pizze con relativi dettagli & 300 al giorno \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    9 & Visualizzazione degli ordini dei relativi clienti & 20 al giorno \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    10 & Visualizzazione della classifica delle pizze più vendute & 2 all'anno
+\end{tabularx}
+\end{table}
+
 \subsection{Schemi di navigazioni e tabelle degli accessi}
+
+Dopo aver analizzato il volume dei dati e associato ogni
+richiesta operativa alla sua frequenza e tipologia
+corrispondente, si procede con la creazione delle tabelle
+degli accessi e dei relativi schemi di navigazione per
+ciascuna operazione. È importante notare che le operazioni di
+scrittura avranno un costo doppio rispetto a quelle di
+lettura.
+
+\paragraph{OP 1 - Inserimento di un nuovo cliente}
+
+\hphantom{A}    % se no la tabella si sposta sopra il paragrafo
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Cliente & E & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    \multicolumn{4}{c}{\textbf{Totale}: 1S → 1 alla settimana = (1 x 2) x 1 / 7 = \textbf{0,285}}
+\end{tabularx}
+\end{table}
+
+\paragraph{OP 2 - Inserimento di un socio}
+
+\hphantom{A}    % se no la tabella si sposta sopra il paragrafo
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Proprietario & E & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    \multicolumn{4}{c}{\textbf{Totale}: 1S → 1 all'anno = (1 x 2) x 1 / 365 = \textbf{0,005}}
+\end{tabularx}
+\end{table}
+
+\paragraph{OP 3 - Creazione di un ordine}
+
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+
+TODO: L'id dell'utente e l'id di ogni pizza si sanno gia. Si fa una lettura su fascia oraria per vedere se c'è disponibilità
+e 64 ordini al gionro, perche 4 ogni mezz'ora...
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Ordine & E & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Comprende & R & 5 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Effettuazione & R & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Associato a & R & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Fascia oraria & E & 16 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    \multicolumn{4}{c}{\textbf{Totale}: 8S + 16L → 64 al giorno = (8 x 2) + (16 x 1) x 64 = \textbf{1040}}
+\end{tabularx}
+\end{table}
+
+\paragraph{OP 4 - Prenotazione di un tavolo}
+
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+
+TODO: l'id dell'utente lo so gia...
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Prenotazione tavolo & E & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Richiesta & R & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Riservazione & R & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Tavolo & E & 30 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Pianificazione prenotazioni & R & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Fascia oraria & E & 16 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    \multicolumn{4}{c}{\textbf{Totale}: 4S + 46L → 80 al giorno = (4 x 2) + (46 x 1) x 80 = \textbf{3688}}
+\end{tabularx}
+\end{table}
+
+\paragraph{OP 5 - Aggiunta di una pizza}
+
+A
+
+\paragraph{OP 6 - Modifica delle caratteristiche di una pizza}
+
+A
+
+\paragraph{OP 7 - Aggiunta di un ingrediente nuovo}
+
+A
+
+\paragraph{OP 8 - Visualizzazione delle pizze con relativi dettagli}
+
+A
+
+\paragraph{OP 9 - Visualizzazione degli ordini dei relativi clienti}
+
+A
+
+\paragraph{OP 10 - Visualizzazione della classifica delle pizze più vendute}
+
+A
+
 \subsection{Raffinamento dello schema}
 \subsection{Analisi delle ridondanze}
 \subsection{Traduzione di entità e associazioni in relazioni}
