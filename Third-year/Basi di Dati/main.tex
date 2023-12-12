@@ -86,7 +86,18 @@ di un testo che sintetizza tutti i concetti, concentrandosi in
 particolare sull'estrazione dei principali e sulla rimozione delle
 ambiguità individuate in precedenza.
 
-TODO: Aggiungere immagine con tavella di cosa fa ogni entità principale
+\begin{table}[ht]
+\begin{tabularx}{\textwidth}{>{\hsize=0.5\hsize\RaggedRight\arraybackslash}X>{\hsize=2\hsize\RaggedRight\arraybackslash}X>{\hsize=0.5\hsize\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Termine} & \textcolor{white}{Descrizione} & \textcolor{white}{Sinonimi} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Cliente & Colui che effettua ordini o prenotazioni tramite il portale & Utente \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Proprietario & Colui che monitora l'ordine dei propri clienti e apporta modifiche alle pizze & Pizzaiolo \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Processato & Si riferisce agli ordini e si intende se un ordine è stato o meno preparato & Eseguito
+\end{tabularx}
+\end{table}
 
 \begin{quote}
 
@@ -217,7 +228,7 @@ TODO: inserire immagine
     \rowcolor[HTML]{FFFFFF} 
     Richiesta & R & 50000 \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    Comprende & R & 250000 \\ \hline
+    Comprende & R & 1250000 \\ \hline
     \rowcolor[HTML]{FFFFFF} 
     Pizza & E & 90 \\ \hline
     \rowcolor[HTML]{FFFFFF} 
@@ -272,7 +283,7 @@ associata:
     \rowcolor[HTML]{FFFFFF} 
     9 & Visualizzazione degli ordini dei relativi clienti & 20 al giorno \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    10 & Visualizzazione della classifica delle pizze più vendute & 2 all'anno
+    10 & Visualizzazione della classifica delle pizze più vendute & 4 all'anno
 \end{tabularx}
 \end{table}
 
@@ -305,6 +316,9 @@ lettura.
 
 \hphantom{A}    % se no la tabella si sposta sopra il paragrafo
 
+Il proprietario è uno solo, ma si vuole tener conto il caso
+di un'espansione dei propri affari.
+
 \begin{table}[h]
 \begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
     \rowcolor[HTML]{f66c19} 
@@ -320,8 +334,12 @@ lettura.
 
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
 
-TODO: L'id dell'utente e l'id di ogni pizza si sanno gia. Si fa una lettura su fascia oraria per vedere se c'è disponibilità
-e 64 ordini al gionro, perche 4 ogni mezz'ora...
+In caso della creazione dell'ordine si presuppone che il
+sistema con cui il cliente sta effettuando l'ordine sappia
+già in anticipo l'id dell'utente e gli identificatori di
+ogni pizza da lui selezionato. Per raffigurare le entità
+ordine ho usato l'entità madre Ordine, poiché non c'è
+differenza di accessi tra le due sotto entità.
 
 \begin{table}[h]
 \begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
@@ -338,7 +356,7 @@ e 64 ordini al gionro, perche 4 ogni mezz'ora...
     \rowcolor[HTML]{FFFFFF} 
     Fascia oraria & E & 16 & L \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    \multicolumn{4}{c}{\textbf{Totale}: 8S + 16L → 64 al giorno = (8 x 2) + (16 x 1) x 64 = \textbf{1040}}
+    \multicolumn{4}{c}{\textbf{Totale}: 8S + 16L → 64 al giorno = (8 x 2 + 16 x 1) x 64 = \textbf{2048}}
 \end{tabularx}
 \end{table}
 
@@ -346,7 +364,14 @@ e 64 ordini al gionro, perche 4 ogni mezz'ora...
 
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
 
-TODO: l'id dell'utente lo so gia...
+Per poter prenotare un tavolo, bisogna sapere l'id dell'utente,
+che è già noto, l'identificatore del tavolo e la fascia oraria,
+che otteniamo chiedendo all'utente visualizzandogli le varie
+scelte, perciò oltre alla scrittura dell'ordine su
+\textbf{Prenotazione tavolo} e le varie relazioni, si esegue
+una lettura su \textbf{Fascia oraria} e \textbf{Tavolo} per
+vedere se quei tavoli sono effettivamente liberi in quel
+determinato orario.
 
 \begin{table}[h]
 \begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
@@ -365,33 +390,185 @@ TODO: l'id dell'utente lo so gia...
     \rowcolor[HTML]{FFFFFF} 
     Fascia oraria & E & 16 & L \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    \multicolumn{4}{c}{\textbf{Totale}: 4S + 46L → 80 al giorno = (4 x 2) + (46 x 1) x 80 = \textbf{3688}}
+    \multicolumn{4}{c}{\textbf{Totale}: 4S + 46L → 80 al giorno = (4 x 2 + 46 x 1) x 80 = \textbf{4320}}
 \end{tabularx}
 \end{table}
 
 \paragraph{OP 5 - Aggiunta di una pizza}
 
-A
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+
+Per aggiungere una pizza, oltre a dover eseguire una scrittura
+su \textbf{Pizza}, c'è bisogno di leggere l'elenco degli
+ingredienti e il \textbf{Tipo pizza}. Infine bisogna anche
+conosce il numero medio di ingredienti per ogni pizza, 
+per stimare il numero di scrittura da dover fare su
+\textbf{Composizione}. Per ottenere il numero medio di
+ingredienti per pizza bisogna dividere il volume di
+\textbf{Composizione} per il volume di \textbf{Pizza} (450 / 90)
+e otteniamo una media di 5 ingredienti.
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Pizza & E & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Composizione & R & 5 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Ingrediente & E & 45 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Tipologia a & R & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Tipo pizza & E & 3 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    \multicolumn{4}{c}{\textbf{Totale}: 7S + 48L → 10 all'anno = (7 x 2 + 58 x 1) x 10 / 365 = \textbf{2,71}}
+\end{tabularx}
+\end{table}
 
 \paragraph{OP 6 - Modifica delle caratteristiche di una pizza}
 
-A
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+
+Si presuppone che la tipologia della pizza rimanga invariata;
+inoltre, si ipotizza che, in media, venga apportata una sola
+modifica agli ingredienti per ogni alterazione.
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Pizza & E & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Composizione & R & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Ingrediente & E & 45 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    \multicolumn{4}{c}{\textbf{Totale}: 2S + 45L → 20 al mese = (2 x 2 + 45 x 1) x 20 / 30 = \textbf{32,7}}
+\end{tabularx}
+\end{table}
 
 \paragraph{OP 7 - Aggiunta di un ingrediente nuovo}
 
-A
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Ingrediente & E & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Contiene & R & 1 & S \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Allergene & E & 5 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    \multicolumn{4}{c}{\textbf{Totale}: 2S + 5L → 2 all'anno = (2 x 2 + 5 x 1) x 2 / 365 = \textbf{0,049}}
+\end{tabularx}
+\end{table}
 
 \paragraph{OP 8 - Visualizzazione delle pizze con relativi dettagli}
 
-A
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+
+Prima di tutto, si esaminano tutte le pizze all'interno
+dell'entità \textbf{Pizza}. Questo processo consente di
+ottenere un elenco completo di tutti gli identificatori delle
+pizze. Successivamente, vengono esaminati tutti i dettagli,
+tra cui \textbf{Ingrediente} e \textbf{Tipo pizza}, assumendo
+una media di 5 ingredienti per pizza.
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Pizza & E & 90 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Tipologia & R & 90 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Tipo pizza & E & 3 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Composizione & R & 5 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Ingrediente & E & 45 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Contiene & R & 45 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Allergene & E & 5 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    \multicolumn{4}{c}{\textbf{Totale}: 283L → 300 al giorno = (283 x 1) x 300 = \textbf{84900}}
+\end{tabularx}
+\end{table}
 
 \paragraph{OP 9 - Visualizzazione degli ordini dei relativi clienti}
 
-A
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+
+%non so se aggiungere anche gli ingredienti
+Si presume di avere accesso all'identificativo dell'utente.
+Inoltre, la media degli ordini per ciascun cliente è calcolata
+dividendo il numero totale di ordini registrati nell'entità
+\textbf{Ordine} per il numero di \textbf{Utente} (250,000 /
+100), risultando in una media di 250 ordini per utente.
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
+    \rowcolor[HTML]{FFFFFF}
+    Effettuazione & R & 250 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Ordine & E & 1 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Associato a & R & 1 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Fascia oraria & E & 1 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF}
+    Comprende & R & 5 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF}
+    Pizza & E & 5 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF}
+    \multicolumn{4}{c}{\textbf{Totale}: 263L → 20 al giorno = (263 x 1) x 20 = \textbf{5260}}
+\end{tabularx}
+\end{table}
 
 \paragraph{OP 10 - Visualizzazione della classifica delle pizze più vendute}
 
-A
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+
+Innanzitutto è essenziale recuperare tutte le pizze ordinate.
+Per farlo, è sufficiente esaminare tutte le pizze presenti
+nella relazione \textbf{Comprende}. Successivamente, è
+necessario leggere tutte le caratteristiche delle diverse
+pizze.
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Comprende & R & 1250000 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Pizza & E & 90 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Tipologia & R & 90 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Tipo pizza & E & 3 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Composizione & R & 450 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Ingrediente & E & 45 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Contiene & R & 45 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF}
+    Allergene & E & 5 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    \multicolumn{4}{c}{\textbf{Totale}: 5L → 4 all'anno = 1250728 x 4 / 365 = \textbf{13706}}
+\end{tabularx}
+\end{table}
 
 \subsection{Raffinamento dello schema}
 \subsection{Analisi delle ridondanze}
