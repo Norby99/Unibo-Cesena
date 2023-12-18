@@ -15,6 +15,8 @@
 \renewcommand{\arraystretch}{1.5}   % aggiunge margine alle celle
 \graphicspath{{images/}}
 
+\definecolor{darkBlue}{RGB}{21, 69, 179}
+
 \begin{document}
 
 \maketitle
@@ -144,7 +146,7 @@ Elenco delle principali azioni richieste:
     \item Visualizzazione delle pizze con relativi dettagli
     \item Visualizzazione degli ordini dei relativi clienti
     \item Visualizzazione della classifica delle pizze più vendute
-    \item Visualizzare tutti gli ordini da preparare per una certa fascia oraria
+    \item Visualizzare tutti gli ordini da preparare per una certa fascia oraria e data
 \end{enumerate}
 
 \section{Progettazione Concettuale}
@@ -285,7 +287,7 @@ associata:
     \rowcolor[HTML]{FFFFFF} 
     10 & Visualizzazione della classifica delle pizze più vendute & 4 all'anno \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    11 & Visualizzare tutti gli ordini da preparare per una certa fascia oraria & 16 al giorno 
+    11 & Visualizzare tutti gli ordini da preparare per una certa fascia oraria e data & 16 al giorno 
 \end{tabularx}
 \end{table}
 
@@ -554,9 +556,26 @@ pizze.
 \end{tabularx}
 \end{table}
 
-\paragraph{OP 11 - Visualizzare tutti gli ordini da preparare per una certa fascia oraria}
+\paragraph{OP 11 - Visualizzare tutti gli ordini da preparare per una certa fascia oraria e data}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
-TODO
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+    \rowcolor[HTML]{f66c19} 
+    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Ordine & E & 250000 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Associato a & E & 250000 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Fascia oraria & R & 16 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Comprende & R & 1250000 & L \\ \hline
+    \rowcolor[HTML]{FFFFFF} 
+    Pizza & E & 90 & L \\ \hline
+    \multicolumn{4}{c}{\textbf{Totale}: 1750106L → 16 al giorno = 1750106 x 16 = \textbf{28001696}}
+\end{tabularx}
+\end{table}
 
 \subsection{Raffinamento dello schema}
 
@@ -597,7 +616,7 @@ Nello schema E/R sono eliminate le seguenti relazioni:
 \begin{itemize}
     \item Riserva tavolo, importando idTavolo in Prenotazione tavolo
     \item Pianificazione prenotazioni, importando oraInizio in Prenotazione Tavolo
-    \item Associato a, importando oraInizio in Ordine
+    \item Associato a, importando oraInizio e dataOrdine in Ordine
     \item Richiesta, importando idUtente in Prenotazione Tavolo
     \item Effettuazione, importando idUtente in Ordine
     \item Contiene, importando nomeAllergene in Ingrediente
@@ -613,20 +632,157 @@ TODO: op10 si potrebbe aggiungere un contatore ad ogni pizza
 
 \subsection{Traduzione di entità e associazioni in relazioni}
 
-\textbf{TAVOLI}(\underline{idTavolo}, posizione, numeroPersone) \\
-\textbf{PRENOTAZIONI TAVOLO}(\underline{idTAvolo}, \underline{dataPrenotazione}, \underline{ordaInizio}, \underline{idUtente}) \\
-\textbf{FASCE ORARIE}(\underline{oraInizio}, oraFine) \\
-\textbf{UTENTI}(\underline{idUtente}, nome, cognome, email, telefono*, numeroCivico*, via*, cliente) \\
-\textbf{ORDINI}(\underline{idUtente}, \underline{oraInizio}, \underline{dataOrdine}, note*, processato, nCivicoDiconsegna*, viaDiConsegna*) \\
-\textbf{COMPRENDE}(\underline{oraInizio}, \underline{idUtente}, \underline{dataOrdine}, \underline{nomePizza}) \\
-\textbf{PIZZE}(\underline{nome}, prezzo, nomeTipo) \\
-\textbf{TIPI PIZZA}(\underline{nomeTipo}) \\
-\textbf{COMPOSIZIONE}(\underline{nomePizza}, \underline{nomeIngrediente}) \\
-\textbf{INGREDIENTI}(\underline{nome}, descrizione, nomeAllergene) \\
-\textbf{ALLERGENI}(\underline{nome}) \\
+\textbf{TAVOLI}(\underline{IdTavolo}, Posizione, NumeroPersone) \\
+\textbf{PRENOTAZIONI\_TAVOLO}(\underline{IdTavolo}, \underline{DataPrenotazione}, \underline{OraInizio}, \underline{IdUtente}) \\
+\textcolor{darkBlue}{FK: OraInizio \textit{REFERENCES} FASCE\_ORARIE} \\
+\textcolor{darkBlue}{FK: IdTavolo \textit{REFERENCES} TAVOLI} \\
+\textcolor{darkBlue}{FK: IdUtente \textit{REFERENCES} UTENTI} \\
+\textbf{FASCE\_ORARIE}(\underline{OraInizio}, OraFine) \\
+\textbf{UTENTI}(\underline{IdUtente}, Nome, Cognome, Email, Telefono*, NumeroCivico*, Via*, Cliente) \\
+\textbf{ORDINI}(\underline{IdUtente}, \underline{OraInizio}, \underline{DataOrdine}, Note*, Processato, NCivicoDiConsegna*, ViaDiConsegna*) \\
+\textcolor{darkBlue}{FK: OraInizio \textit{REFERENCES} FASCE\_ORARIE} \\
+\textcolor{darkBlue}{FK: IdUtente \textit{REFERENCES} UTENTI} \\
+\textbf{COMPRENDE}(\underline{OraInizio}, \underline{IdUtente}, \underline{DataOrdine}, \underline{NomePizza}) \\
+\textcolor{darkBlue}{FK: NomePizza \textit{REFERENCES} PIZZE} \\
+\textcolor{darkBlue}{FK: (OraInizio, IdUtente, DataOrdine) \textit{REFERENCES} ORDINI} \\
+\textbf{PIZZE}(\underline{Nome}, Prezzo, NomeTipo) \\
+\textcolor{darkBlue}{FK: NomeTipo \textit{REFERENCES} TIPI\_PIZZA} \\
+\textbf{TIPI\_PIZZA}(\underline{NomeTipo}) \\
+\textbf{COMPOSIZIONE}(\underline{NomePizza}, \underline{NomeIngrediente}) \\
+\textcolor{darkBlue}{FK: NomeIngrediente \textit{REFERENCES} INGREDIENTI} \\
+\textcolor{darkBlue}{FK: NomePizza \textit{REFERENCES} PIZZE} \\
+\textbf{INGREDIENTI}(\underline{Nome}, Descrizione, NomeAllergene) \\
+\textcolor{darkBlue}{FK: NomeAllergene \textit{REFERENCES} ALLERGENI} \\
+\textbf{ALLERGENI}(\underline{Nome}) \\
 
 \subsection{Schema relazionale finale}
+
+TODO: inserire immagine
+
 \subsection{Traduzione delle operazioni in query SQL}
+
+\paragraph{1 - Inserimento di un nuovo cliente}
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+\textcolor{darkBlue}{\textbf{INSERT INTO}} utenti (idUtente, nome, cognome, email, telefono, numeroCivico, via, cliente)
+\\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?, ?, ?, ?, ?, ?, ?)
+
+\paragraph{2 - Inserimento di un socio}
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+\textcolor{darkBlue}{\textbf{INSERT INTO}} utenti (idUtente, nome, cognome, email, telefono, numeroCivico, via, cliente)
+\\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?, ?, ?, ?, ?, ?, ?)
+
+\paragraph{3 - Creazione di un ordine}
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+Prima bisogna far selezionare all'utente la fascia oraria in cui vuole che le proprie pizze vengano consegnate/ritirate
+\\\\
+TODO: inserire query
+\\\\
+Dopo aver ottenuto l'identificatore della fascia oraria, si può procedere creando l'istanza dell'ordine
+\\\\
+\textcolor{darkBlue}{\textbf{INSERT INTO}} ordini (idUtente, oraInizio, dataOrdine, note, processato, nCivicoDiConsegna, viaDiConsegna)
+\\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?, ?, ?, ?, ?, ?)
+\\\\
+Infine si inseriscono all'interno dell'ordine tutte le pizze che ha selezionato l'utente
+\\\\
+\textcolor{darkBlue}{\textbf{INSERT INTO}} composizione (nomePizza, nomeIngrediente)
+\\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?)
+
+\paragraph{4 - Prenotazione di un tavolo}
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+Prima bisogna far selezionare all'utente la fascia oraria in cui vuole prenotare il tavolo
+\\\\
+TODO: inserire la query
+\\\\
+Inoltre bisonga far scegliere all'utente il tavolo che vuole prenotare
+\\\\
+TODO: inserire la query
+\\\\
+Una volta ottenuto il tavolo e la fascia oraria in cui vuole prenotare il tavolo, si procede creando l'istanza della prenotazione
+\\\\
+\textcolor{darkBlue}{\textbf{INSERT INTO}} prenotazioni\_tavolo (idTavolo, dataPrenotazione, oraInizio, idUtente)
+\\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?, ?, ?)
+
+\paragraph{5 - Aggiunta di una pizza}
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+Prima di tutte l'utente deve scegliere quali ingredienti inserire all'interno della pizza
+\\\\
+\textcolor{darkBlue}{\textbf{SELECT}} *
+\\\textcolor{darkBlue}{\textbf{FROM}} ingredienti
+\\\\
+Inoltre l'utente deve scegliere a quale tipo deve appartenere la pizza
+\\\\
+\textcolor{darkBlue}{\textbf{SELECT}} *
+\\\textcolor{darkBlue}{\textbf{FROM}} tipi\_pizza
+\\\\
+Dopo di che si può procedere inserendo l'istanza della pizza
+\\\\
+\textcolor{darkBlue}{\textbf{INSERT INTO}} pizza (nome, prezzo, nomeTipo)
+\\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?, ?)
+\\\\
+Infine si aggiungono gli ingredienti
+\\\\
+\textcolor{darkBlue}{\textbf{INSERT INTO}} composizione (nomePizza, nomeIngrediente)
+\\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?)
+
+\paragraph{6 - Modifica delle caratteristiche di una pizza}
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+Si deve poter cambiare il prezzo della pizza
+\\\\
+\textcolor{darkBlue}{\textbf{UPDATE}} pizze
+\\\textcolor{darkBlue}{\textbf{SET}} prezzo = ?
+\\\textcolor{darkBlue}{\textbf{WHERE}} nome = ?
+\\\\
+Oppure si devono poter cambiare gli ingredienti, ma per fare ciò bisogna prima far scegliere all'utente quali ingredienti cambiare
+\\\\
+\textcolor{darkBlue}{\textbf{SELECT}} *
+\\\textcolor{darkBlue}{\textbf{FROM}} ingredienti
+\\\\
+Infine si aggiungono gli ingredienti nuovi
+\\\\
+TODO: inserire query
+\\\\
+
+\paragraph{7 - Aggiunta di un ingrediente nuovo}
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+Visualizzo tutti gli allergeni
+\\\\
+\textcolor{darkBlue}{\textbf{SELECT}} *
+\\\textcolor{darkBlue}{\textbf{FROM}} allergeni
+\\\\
+Si inserisce l'ingrediente con l'allergene selezionato
+\\\\
+\textcolor{darkBlue}{\textbf{INSERT INTO}} ingredienti (nomePizza, descrizione, nomeAllergene)
+\\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?, ?)
+\\\\
+
+\paragraph{8 - Visualizzazione delle pizze con relativi dettagli}
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+
+TODO: inserire query
+
+\paragraph{9 - Visualizzazione degli ordini dei relativi clienti}
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+\\
+\textcolor{darkBlue}{\textbf{SELECT}} *
+\\\textcolor{darkBlue}{\textbf{FROM}} ordini
+\\\textcolor{darkBlue}{\textbf{WHERE}} idUtente = ?
+
+\paragraph{10 - Visualizzazione della classifica delle pizze più vendute}
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+TODO: inserire query
+
+\paragraph{11 - Visualizzare tutti gli ordini da preparare per una certa fascia oraria e data}
+\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
+Prima l'utente deve scegliere la fascia oraria
+\\\\
+\textcolor{darkBlue}{\textbf{SELECT}} *
+\\\textcolor{darkBlue}{\textbf{FROM}} fascia\_oraria
+\\\\
+\textcolor{darkBlue}{\textbf{SELECT}} *
+\\\textcolor{darkBlue}{\textbf{FROM}} ordini
+\\\textcolor{darkBlue}{\textbf{WHERE}} oraInizio = ?
+\\\textcolor{darkBlue}{\textbf{AND}} dataOridne = ?
+
 
 \section{Progettazione dell'applicazione}
 \subsection{Descrizione dell'architettura dell'applicazione realizzata}
