@@ -324,7 +324,7 @@ associata:
     \rowcolor[HTML]{FFFFFF}  
     8 & Visualizzazione delle pizze con relativi dettagli & 300 al giorno \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    9 & Visualizzazione degli ordini dei relativi clienti & 10 al mese \\ \hline
+    9 & Visualizzazione degli ordini dei relativi clienti & 3 al giorno \\ \hline
     \rowcolor[HTML]{FFFFFF} 
     10 & Visualizzazione della classifica delle pizze più vendute & 1 al mese \\ \hline
     \rowcolor[HTML]{FFFFFF} 
@@ -556,17 +556,17 @@ dividendo il numero totale di ordini registrati nell'entità
     \rowcolor[HTML]{FFFFFF}
     Effettuazione & R & 250 & L \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    Ordine & E & 250000 & L \\ \hline
+    Ordine & E & 250 & L \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    Associato a & R & 250000 & L \\ \hline
+    Associato a & R & 250 & L \\ \hline
     \rowcolor[HTML]{FFFFFF} 
     Fascia oraria & E & 16 & L \\ \hline
     \rowcolor[HTML]{FFFFFF}
-    Comprende & R & 250000 & L \\ \hline
+    Comprende & R & 1250 & L \\ \hline
     \rowcolor[HTML]{FFFFFF}
-    Pizza & E & 5 & L \\ \hline
+    Pizza & E & 90 & L \\ \hline
     \rowcolor[HTML]{FFFFFF}
-    \multicolumn{4}{c}{\textbf{Totale}: 750271L → 10 al mese = (750271 x 1) x 10 / 30 = \textbf{250090}}
+    \multicolumn{4}{c}{\textbf{Totale}: 2106L → 3 al giorno = (2106 x 1) x 3 = \textbf{6318}}
 \end{tabularx}
 \end{table}
 
@@ -606,25 +606,26 @@ pizze.
 
 \paragraph{OP 11 - Visualizzare tutti gli ordini da preparare per una certa fascia oraria e data}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
-Per visualizzare tutti gli ordini da preparare, bisogna
-innanzitutto visualizzare tutto l'elenco delle
-fasce oraria.
+Si procede individuando ogni ordine associato alla fascia
+oraria e alla data ordine desiderata. Successivamente,
+vengono esaminate le pizze pertinenti a ciascun
+ordine individuato.
 
 \begin{table}[h]
 \begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
     \rowcolor[HTML]{f66c19} 
     \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    Ordine & E & 250000 & L \\ \hline
+    Fascia oraria & E & 1 & L \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    Associato a & E & 250000 & L \\ \hline
+    Associato a & E & 4 & L \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    Fascia oraria & R & 16 & L \\ \hline
+    Ordine & E & 4 & L \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    Comprende & R & 1250000 & L \\ \hline
+    Comprende & R & 20 & L \\ \hline
     \rowcolor[HTML]{FFFFFF} 
-    Pizza & E & 90 & L \\ \hline
-    \multicolumn{4}{c}{\textbf{Totale}: 1750106L → 16 al giorno = 1750106 x 16 = \textbf{28001696}}
+    Pizza & E & 20 & L \\ \hline
+    \multicolumn{4}{c}{\textbf{Totale}: 49L → 16 al giorno = 49 x 16 = \textbf{784}}
 \end{tabularx}
 \end{table}
 
@@ -691,16 +692,14 @@ Nello schema E/R sono eliminate le seguenti relazioni:
 \end{itemize}
 
 \subsection{Analisi delle ridondanze}
-Sono state apportate due modifiche per ottimizzare le prestazioni:
+È stato introdotto un contatore per ciascuna pizza al
+fine di tenere traccia di ogni vendita effettuata.
 
-\begin{enumerate}
-    \item È stato introdotto un contatore per ciascuna pizza al fine di tenere traccia di ogni vendita effettuata.
-    \item Sono state aggiunte due entità nuove: \textbf{Ordine Processato} e \textbf{Comprende Processato}, nella quali vengono memorizzati tutti gli ordini già consegnati e le relative pizze. Si sottolinea che l'entità \textbf{Ordine Processato} non include né le note del cliente né l'eventuale indirizzo di consegna, al fine di garantire la privacy del cliente.
-\end{enumerate}
-
+\newpage
 \paragraph{OP 3 - Creazione di un ordine}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
-Bisogna aggiungere 5 scritture per tener traccia del numero di pizze vendute
+Bisogna aggiungere una scrittura per ogni pizza
+aggiunta all'ordine.
 
 \begin{table}[h]
 \begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
@@ -724,12 +723,6 @@ Bisogna aggiungere 5 scritture per tener traccia del numero di pizze vendute
     \multicolumn{4}{c}{\textbf{Senza ridondanza}: \textbf{2048}}
 \end{tabularx}
 \end{table}
-
-\paragraph{OP 9 - Visualizzazione degli ordini dei relativi clienti}
-\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
-Per quanto riguarda la lettura degli ordini dei clienti, l'unica cosa che 
-ambia è che i dati vengono letti da \textbf{Ordine Processato}, invece che
-\textbf{Ordine}.
 
 \paragraph{OP 10 - Visualizzazione della classifica delle pizze più vendute}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
@@ -761,59 +754,6 @@ venduta.
 \end{tabularx}
 \end{table}
 
-\paragraph{OP 11 - Visualizzare tutti gli ordini da preparare per una certa fascia oraria e data}
-\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
-Si presume che l'entità \textbf{Ordine} avrà un volume di 64, poiché
-ci sono 16 fasce orarie e al massimo 4 ordini per fascia. Per quanto
-riguarda l'entità \textbf{Comprende}, si stima un volume di 320,
-considerando che in media ogni ordine comprende 5 pizze.
-
-\begin{table}[h]
-\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
-    \rowcolor[HTML]{f66c19} 
-    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
-    \rowcolor[HTML]{FFFFFF} 
-    Ordine & E & 64 & L \\ \hline
-    \rowcolor[HTML]{FFFFFF} 
-    Associato a & E & 64 & L \\ \hline
-    \rowcolor[HTML]{FFFFFF} 
-    Fascia oraria & R & 16 & L \\ \hline
-    \rowcolor[HTML]{FFFFFF} 
-    Comprende & R & 320 & L \\ \hline
-    \rowcolor[HTML]{FFFFFF} 
-    Pizza & E & 90 & L \\ \hline
-    \multicolumn{4}{c}{\textbf{Totale}: 554L → 16 al giorno = 554 x 16 = \textbf{8864}} \\ \hline
-    \rowcolor[HTML]{FFFFFF} 
-    \multicolumn{4}{c}{\textbf{Senza ridondanza}: \textbf{28001696}}
-\end{tabularx}
-\end{table}
-
-\paragraph{OP 12 - Processare un ordine}
-\hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
-Per processare un ordine, si deve prima di tutto leggere la lista di
-tutti gli ingredienti, per poi eliminare tutti gli ingredienti e l'ordine
-dall'entità \textbf{Ordine}, infine si ricrea l'ordine all'interno di
-\textbf{Ordine Processato}, infine si riscrivono gli ingredienti
-dentro a \textbf{Comprende Processato}
-
-\begin{table}[h]
-\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
-    \rowcolor[HTML]{f66c19} 
-    \textcolor{white}{Concetto} & \textcolor{white}{Construtto} & \textcolor{white}{Accessi} & \textcolor{white}{Tipo} \\ \hline
-    \rowcolor[HTML]{FFFFFF} 
-    Ordine & E & 1 & L \\ \hline
-    \rowcolor[HTML]{FFFFFF} 
-    Comprende & R & 320 & L \\ \hline
-    \rowcolor[HTML]{FFFFFF} 
-    Ordine Processato & E & 1 & S \\ \hline
-    \rowcolor[HTML]{FFFFFF} 
-    Comprende Processato & R & 5 & S \\ \hline
-    \multicolumn{4}{c}{\textbf{Totale}: 321L + 6S → 64 al giorno = (321 + 6 x 2) x 64 = \textbf{21312}} \\ \hline
-    \rowcolor[HTML]{FFFFFF} 
-    \multicolumn{4}{c}{\textbf{Senza ridondanza}: \textbf{128}}
-\end{tabularx}
-\end{table}
-
 \subsection{Traduzione di entità e associazioni in relazioni}
 
 \textbf{TAVOLI}(\underline{IdTavolo}, Posizione, NumeroPersone) \\
@@ -837,14 +777,9 @@ dentro a \textbf{Comprende Processato}
 \textcolor{darkBlue}{FK: NomePizza \textit{REFERENCES} PIZZE} \\
 \textbf{INGREDIENTI}(\underline{Nome}, Descrizione, NomeAllergene) \\
 \textcolor{darkBlue}{FK: NomeAllergene \textit{REFERENCES} ALLERGENI} \\
-\textbf{ALLERGENI}(\underline{Nome}) \\
-\textbf{ORDINI\_PROCESSATI}(\underline{IdUtente}, \underline{OraInizio}, \underline{DataOrdine}) \\
-\textcolor{darkBlue}{FK: OraInizio \textit{REFERENCES} FASCE\_ORARIE} \\
-\textcolor{darkBlue}{FK: IdUtente \textit{REFERENCES} UTENTI} \\
-\textbf{COMPRENDE\_PROCESSATO}(\underline{OraInizio}, \underline{IdUtente}, \underline{DataOrdine}, \underline{NomePizza}) \\
-\textcolor{darkBlue}{FK: NomePizza \textit{REFERENCES} PIZZE} \\
-\textcolor{darkBlue}{FK: (OraInizio, IdUtente, DataOrdine) \textit{REFERENCES} ORDINI} \\
+\textbf{ALLERGENI}(\underline{Nome})
 
+\newpage
 \subsection{Schema relazionale finale}
 
 TODO: inserire immagine
