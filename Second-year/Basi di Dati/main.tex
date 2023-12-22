@@ -16,6 +16,7 @@
 \graphicspath{{images/}}
 
 \definecolor{darkBlue}{RGB}{21, 69, 179}
+\definecolor{lightPink}{RGB}{242, 10, 172}
 
 \begin{document}
 
@@ -200,9 +201,9 @@ Per quanto riguarda l'entità \textbf{Prenotazione tavolo}, la
 situazione è più complessa. Ogni tavolo può essere prenotato solo una
 volta durante una fascia oraria, e contemporaneamente, non posso
 prenotare più di un tavolo per la stessa fascia oraria. Come soluzione,
-ho pensato di utilizzare una chiave duplice: la prima comprende la data
+ho pensato di utilizzare due identificatori: il primo comprende la data
 della prenotazione, l'identificatore del tavolo e la fascia oraria,
-mentre la seconda comprende la data della prenotazione,
+mentre il secondo comprende la data della prenotazione,
 l'identificatore dell'utente e la fascia oraria. In questo modo, tutti
 i vincoli precedenti sono stati soddisfatti.
 
@@ -675,6 +676,13 @@ nei rispettivi sotto-attributi.
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
 Le chiavi primarie per la maggior parte delle entità sono
 chiaramente indicate nel diagramma, evitando ogni ambiguità.
+Nella progettazione delle tabelle
+\textbf{Prenotazioni\_tavolo} e \textbf{Ordini}, ho preso la
+decisione di utilizzare una chiave unica separata anziché una
+chiave composta costituita da tre attributi distinti. Questa
+scelta è stata motivata principalmente da considerazioni
+pratiche e dalla necessità di semplificare la gestione dei
+dati nel contesto del nostro sistema.
 
 \paragraph{Eliminazione degli identificatori esterni}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
@@ -757,32 +765,37 @@ venduta.
 \subsection{Traduzione di entità e associazioni in relazioni}
 
 \textbf{TAVOLI}(\underline{IdTavolo}, Posizione, NumeroPersone) \\
-\textbf{PRENOTAZIONI\_TAVOLO}(\underline{IdTavolo}, \underline{DataPrenotazione}, \underline{OraInizio}, \underline{IdUtente}) \\
+\textbf{PRENOTAZIONI\_TAVOLO}(\underline{IdPrenotazioneTavolo}, IdTavolo, DataPrenotazione, OraInizio, IdUtente) \\
 \textcolor{darkBlue}{FK: OraInizio \textit{REFERENCES} FASCE\_ORARIE} \\
 \textcolor{darkBlue}{FK: IdTavolo \textit{REFERENCES} TAVOLI} \\
 \textcolor{darkBlue}{FK: IdUtente \textit{REFERENCES} UTENTI} \\
+\textcolor{darkBlue}{UNIQUE(IdTavolo, DataPrenotazione, OraInizio)} \\
+\textcolor{darkBlue}{UNIQUE(IdUtente, DataPrenotazione, OraInizio)} \\
 \textbf{FASCE\_ORARIE}(\underline{OraInizio}, OraFine) \\
 \textbf{UTENTI}(\underline{IdUtente}, Nome, Cognome, Email, Telefono*, NumeroCivico*, Via*, Cliente) \\
-\textbf{ORDINI}(\underline{IdUtente}, \underline{OraInizio}, \underline{DataOrdine}, Note*, NCivicoDiConsegna*, ViaDiConsegna*) \\
+\textbf{ORDINI}(\underline{IdOrdine}, IdUtente, OraInizio, DataOrdine, Note*, NCivicoDiConsegna*, ViaDiConsegna*, processato) \\
 \textcolor{darkBlue}{FK: OraInizio \textit{REFERENCES} FASCE\_ORARIE} \\
 \textcolor{darkBlue}{FK: IdUtente \textit{REFERENCES} UTENTI} \\
-\textbf{COMPRENDE}(\underline{OraInizio}, \underline{IdUtente}, \underline{DataOrdine}, \underline{NomePizza}) \\
+\textcolor{darkBlue}{UNIQUE(IdUtente, OraInizio, DataOrdine)} \\
+\textbf{COMPRENDE}(\underline{IdOrdine}, \underline{NomePizza}) \\
 \textcolor{darkBlue}{FK: NomePizza \textit{REFERENCES} PIZZE} \\
-\textcolor{darkBlue}{FK: (OraInizio, IdUtente, DataOrdine) \textit{REFERENCES} ORDINI} \\
-\textbf{PIZZE}(\underline{Nome}, Prezzo, NomeTipo) \\
+\textcolor{darkBlue}{FK: IdOrdine \textit{REFERENCES} ORDINI} \\
+\textbf{PIZZE}(\underline{Nome}, Prezzo, NomeTipo, vendute) \\
 \textcolor{darkBlue}{FK: NomeTipo \textit{REFERENCES} TIPI\_PIZZA} \\
 \textbf{TIPI\_PIZZA}(\underline{NomeTipo}) \\
 \textbf{COMPOSIZIONE}(\underline{NomePizza}, \underline{NomeIngrediente}) \\
 \textcolor{darkBlue}{FK: NomeIngrediente \textit{REFERENCES} INGREDIENTI} \\
 \textcolor{darkBlue}{FK: NomePizza \textit{REFERENCES} PIZZE} \\
-\textbf{INGREDIENTI}(\underline{Nome}, Descrizione, NomeAllergene) \\
+\textbf{INGREDIENTI}(\underline{Nome}, Descrizione, NomeAllergene*) \\
 \textcolor{darkBlue}{FK: NomeAllergene \textit{REFERENCES} ALLERGENI} \\
 \textbf{ALLERGENI}(\underline{Nome})
 
 \newpage
 \subsection{Schema relazionale finale}
 
-TODO: inserire immagine
+\vspace*{\fill}
+
+\noindent\makebox[\textwidth]{\includegraphics[width=\textwidth]{images/schema_logico.png}}
 
 \subsection{Traduzione delle operazioni in query SQL}
 
@@ -800,27 +813,36 @@ TODO: inserire immagine
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
 Prima bisogna far selezionare all'utente la fascia oraria in cui vuole che le proprie pizze vengano consegnate/ritirate
 \\\\
-TODO: inserire query
+\textcolor{darkBlue}{\textbf{SELECT}} *
+\\\textcolor{darkBlue}{\textbf{FROM}} fasce\_oraria
 \\\\
 Dopo aver ottenuto l'identificatore della fascia oraria, si può procedere creando l'istanza dell'ordine
 \\\\
 \textcolor{darkBlue}{\textbf{INSERT INTO}} ordini (idUtente, oraInizio, dataOrdine, note, processato, nCivicoDiConsegna, viaDiConsegna)
 \\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?, ?, ?, ?, ?, ?)
 \\\\
-Infine si inseriscono all'interno dell'ordine tutte le pizze che ha selezionato l'utente
+Si inseriscono all'interno dell'ordine tutte le pizze che ha selezionato l'utente
 \\\\
-\textcolor{darkBlue}{\textbf{INSERT INTO}} composizione (nomePizza, nomeIngrediente)
+\textcolor{darkBlue}{\textbf{INSERT INTO}} comprende (\textcolor{lightPink}{LAST\_INSERT\_ID()}, nomePizza)
 \\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?)
+\\\\
+Infine si aggiornano i contatori delle vendite di ogni pizza
+\\\\
+\textcolor{darkBlue}{\textbf{UPDATE}} pizze
+\\\textcolor{darkBlue}{\textbf{SET}} processato = processato + 1
+\\\textcolor{darkBlue}{\textbf{WHERE}} nomePizza = ?
 
 \paragraph{4 - Prenotazione di un tavolo}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
 Prima bisogna far selezionare all'utente la fascia oraria in cui vuole prenotare il tavolo
 \\\\
-TODO: inserire la query
+\textcolor{darkBlue}{\textbf{SELECT}} *
+\\\textcolor{darkBlue}{\textbf{FROM}} fasce\_oraria
 \\\\
 Inoltre bisonga far scegliere all'utente il tavolo che vuole prenotare
 \\\\
-TODO: inserire la query
+\textcolor{darkBlue}{\textbf{SELECT}} posizione, numeroPersone
+\\\textcolor{darkBlue}{\textbf{FROM}} tavoli
 \\\\
 Una volta ottenuto il tavolo e la fascia oraria in cui vuole prenotare il tavolo, si procede creando l'istanza della prenotazione
 \\\\
@@ -831,8 +853,9 @@ Una volta ottenuto il tavolo e la fascia oraria in cui vuole prenotare il tavolo
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
 Prima di tutte l'utente deve scegliere quali ingredienti inserire all'interno della pizza
 \\\\
-\textcolor{darkBlue}{\textbf{SELECT}} *
-\\\textcolor{darkBlue}{\textbf{FROM}} ingredienti
+\textcolor{darkBlue}{\textbf{SELECT}} i.nome, i.descrizione, a.nome
+\\\textcolor{darkBlue}{\textbf{FROM}} ingredienti i
+\\\textcolor{darkBlue}{\textbf{INNER JOIN}} allergeni a \textcolor{darkBlue}{\textbf{ON}} i.nomeAllergene = a.nome
 \\\\
 Inoltre l'utente deve scegliere a quale tipo deve appartenere la pizza
 \\\\
@@ -841,12 +864,12 @@ Inoltre l'utente deve scegliere a quale tipo deve appartenere la pizza
 \\\\
 Dopo di che si può procedere inserendo l'istanza della pizza
 \\\\
-\textcolor{darkBlue}{\textbf{INSERT INTO}} pizza (nome, prezzo, nomeTipo)
+\textcolor{darkBlue}{\textbf{INSERT INTO}} pizze (nome, prezzo, nomeTipo)
 \\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?, ?)
 \\\\
 Infine si aggiungono gli ingredienti
 \\\\
-\textcolor{darkBlue}{\textbf{INSERT INTO}} composizione (nomePizza, nomeIngrediente)
+\textcolor{darkBlue}{\textbf{INSERT INTO}} composizione (\textcolor{lightPink}{LAST\_INSERT\_ID()}, nomeIngrediente)
 \\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?)
 
 \paragraph{6 - Modifica delle caratteristiche di una pizza}
@@ -859,13 +882,17 @@ Si deve poter cambiare il prezzo della pizza
 \\\\
 Oppure si devono poter cambiare gli ingredienti, ma per fare ciò bisogna prima far scegliere all'utente quali ingredienti cambiare
 \\\\
-\textcolor{darkBlue}{\textbf{SELECT}} *
-\\\textcolor{darkBlue}{\textbf{FROM}} ingredienti
+\textcolor{darkBlue}{\textbf{SELECT}} i.nome, i.descrizione, a.nome
+\\\textcolor{darkBlue}{\textbf{FROM}} ingredienti i
+\\\textcolor{darkBlue}{\textbf{INNER JOIN}} allergeni a \textcolor{darkBlue}{\textbf{ON}} i.nomeAllergene = a.nome
 \\\\
-Infine si aggiungono gli ingredienti nuovi
+Si eliminano tutti i vecchi ingredienti per poi riaggiungere quelli nuovi
 \\\\
-TODO: inserire query
+\textcolor{darkBlue}{\textbf{DELETE FROM}} composizione
+\\\textcolor{darkBlue}{\textbf{WHERE}} nomePizza = ?
 \\\\
+\textcolor{darkBlue}{\textbf{INSERT INTO}} composizione (nomePizza, nomeIngrediente)
+\\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?)
 
 \paragraph{7 - Aggiunta di un ingrediente nuovo}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
@@ -878,12 +905,16 @@ Si inserisce l'ingrediente con l'allergene selezionato
 \\\\
 \textcolor{darkBlue}{\textbf{INSERT INTO}} ingredienti (nomePizza, descrizione, nomeAllergene)
 \\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?, ?)
-\\\\
 
 \paragraph{8 - Visualizzazione delle pizze con relativi dettagli}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
-
-TODO: inserire query
+\textcolor{darkBlue}{\textbf{SELECT}} p.nome, p.prezzo, tp.nomeTipo, \textcolor{darkBlue}{\textbf{GROUP\_CONCAT}}(i.nome) \textcolor{darkBlue}{\textbf{AS}} ingredienti, \textcolor{darkBlue}{\textbf{GROUP\_CONCAT}}(\textcolor{darkBlue}{\textbf{DISTINCT}} a.nome) \textcolor{darkBlue}{\textbf{AS}} allergeni
+\\\textcolor{darkBlue}{\textbf{FROM}} pizze p
+\\\textcolor{darkBlue}{\textbf{INNER JOIN}} tipi\_pizza tp \textcolor{darkBlue}{\textbf{ON}} p.nomeTipo = tp.nomeTipo
+\\\textcolor{darkBlue}{\textbf{INNER JOIN}} composizione c \textcolor{darkBlue}{\textbf{ON}} p.nome = c.nomePizza
+\\\textcolor{darkBlue}{\textbf{INNER JOIN}} ingredienti i \textcolor{darkBlue}{\textbf{ON}} c.nomeIngrediente = i.nome
+\\\textcolor{darkBlue}{\textbf{LEFT JOIN}} allergeni a \textcolor{darkBlue}{\textbf{ON}} i.nomeAllergene = a.nome
+\\\textcolor{darkBlue}{\textbf{GROUP BY}} p.nome
 
 \paragraph{9 - Visualizzazione degli ordini dei relativi clienti}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
@@ -894,7 +925,9 @@ TODO: inserire query
 
 \paragraph{10 - Visualizzazione della classifica delle pizze più vendute}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
-TODO: inserire query
+\textcolor{darkBlue}{\textbf{SELECT}} *
+\\\textcolor{darkBlue}{\textbf{FROM}} pizze
+\\\textcolor{darkBlue}{\textbf{ORDER BY}} vendute \textcolor{darkBlue}{\textbf{DESC}}
 
 \paragraph{11 - Visualizzare tutti gli ordini da preparare per una certa fascia oraria e data}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
@@ -903,15 +936,23 @@ Prima l'utente deve scegliere la fascia oraria
 \textcolor{darkBlue}{\textbf{SELECT}} *
 \\\textcolor{darkBlue}{\textbf{FROM}} fascia\_oraria
 \\\\
-\textcolor{darkBlue}{\textbf{SELECT}} *
-\\\textcolor{darkBlue}{\textbf{FROM}} ordini
+\textcolor{darkBlue}{\textbf{SELECT}} u.nome, u.cognome, u.telefono, o.oraInizio, o.dataOrdine, o.note, o.nCivicoDiConsegna, o.viaDiConsegna, \textcolor{darkBlue}{\textbf{GROUP\_CONCAT}}(p.nome)
+\\\textcolor{darkBlue}{\textbf{FROM}} ordini o
+\\\textcolor{darkBlue}{\textbf{INNER JOIN}} comprende c \textcolor{darkBlue}{\textbf{ON}} o.idOrdine = c.idOrdine
+\\\textcolor{darkBlue}{\textbf{INNER JOIN}} pizze p \textcolor{darkBlue}{\textbf{ON}} c.nomePizza = p.nome
+\\\textcolor{darkBlue}{\textbf{INNER JOIN}} utenti u \textcolor{darkBlue}{\textbf{ON}} o.idUtente = u.idUtente
 \\\textcolor{darkBlue}{\textbf{WHERE}} oraInizio = ?
-\\\textcolor{darkBlue}{\textbf{AND}} dataOridne = ?
+\\\textcolor{darkBlue}{\textbf{AND}} dataOrdine = ?
+\\\textcolor{darkBlue}{\textbf{AND}} o.processato = 0
+TODO: controllare questa query che sia giusta
 
 \paragraph{12 - Processare un ordine}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
-TODO: inserire query
+\textcolor{darkBlue}{\textbf{UPDATE}} ordini
+\\\textcolor{darkBlue}{\textbf{SET}} processato = 1
+\\\textcolor{darkBlue}{\textbf{WHERE}} idOrdine = ?
 
+\newpage
 \section{Progettazione dell'applicazione}
 \subsection{Descrizione dell'architettura dell'applicazione realizzata}
 
