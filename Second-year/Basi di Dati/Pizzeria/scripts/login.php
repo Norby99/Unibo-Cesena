@@ -14,21 +14,36 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
 }
 
 $email = $_POST['email'];
 
-$sql = "SELECT * FROM users WHERE email = '$email'";
-$result = $conn->query($sql);
+// Prepare and bind
+$stmt = $conn->prepare("SELECT * FROM utenti WHERE email = ?");
+$stmt->bind_param("s", $email);
+
+$stmt->execute();
+
+$result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
-  // output data of each row
-  while($row = $result->fetch_assoc()) {
-    echo "id: " . $row["id"]. " - Email: " . $row["email"]. "<br>";
-  }
+    // Start the session
+    session_start();
+    $user = $result->fetch_assoc();
+    $_SESSION['email'] = $user['email'];
+    $_SESSION['name'] = $user['nome'];
+    $_SESSION['surname'] = $user['cognome'];
+    $_SESSION['phone'] = $user['telefono'];
+    $_SESSION['isClient'] = $user['cliente'];
+    header('Location: /homepage.php'); // Redirect to your homepage
 } else {
-  echo "0 results";
+    echo "<script>
+            alert('No user with this email exists.');
+            window.location.href='/index.html';
+          </script>";
 }
+
+$stmt->close();
 $conn->close();
 ?>
