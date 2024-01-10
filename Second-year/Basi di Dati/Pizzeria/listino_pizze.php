@@ -39,7 +39,6 @@ $result = $conn->query($sql);
 <body>
     <div class="container">
         <h1>Pizze</h1>
-        <a href="/add_pizza.php" class="btn btn-success mb-3">Add New Pizza</a>
         <ul class="list-group">
             <?php
             if ($result->num_rows > 0) {
@@ -50,7 +49,7 @@ $result = $conn->query($sql);
                     echo '<br>Ingredienti: ' . $row['ingredienti'];
                     echo '<br>Prezzo: ' . $row['prezzo'];
                     echo '<br>Vendute: ' . $row['vendute'];
-                    echo '<a href="/modify_pizza.php?id=' . $row['nome'] . '" class="btn btn-primary float-right">Modify</a>';
+                    echo '<a href="/scripts/add_to_basket.php?id=' . $row['nome'] . '" class="btn btn-primary float-right">Aggiungi al carrello</a>';
                     echo '</li>';
                 }
             } else {
@@ -58,6 +57,7 @@ $result = $conn->query($sql);
             }
             ?>
         </ul>
+        <a href="/carrello.php" class="btn btn-primary">Show Basket</a>
     </div>
     <!-- Bootstrap JS -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

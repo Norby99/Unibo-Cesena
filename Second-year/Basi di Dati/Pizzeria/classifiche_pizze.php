@@ -23,7 +23,8 @@ $sql = "SELECT p.nome, p.prezzo, p.nomeTipo, GROUP_CONCAT(i.nome SEPARATOR ', ')
         FROM pizze p
         INNER JOIN composizione c ON p.nome = c.nomePizza
         INNER JOIN ingredienti i ON c.nomeIngrediente = i.nome
-        GROUP BY p.nome";
+        GROUP BY p.nome
+        ORDER BY p.vendute DESC";
 $result = $conn->query($sql);
 ?>
 
@@ -32,14 +33,13 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pizze</title>
+    <title>Classifiche Pizze</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Pizze</h1>
-        <a href="/add_pizza.php" class="btn btn-success mb-3">Add New Pizza</a>
+        <h1>Classifiche Pizze</h1>
         <ul class="list-group">
             <?php
             if ($result->num_rows > 0) {
@@ -50,7 +50,6 @@ $result = $conn->query($sql);
                     echo '<br>Ingredienti: ' . $row['ingredienti'];
                     echo '<br>Prezzo: ' . $row['prezzo'];
                     echo '<br>Vendute: ' . $row['vendute'];
-                    echo '<a href="/modify_pizza.php?id=' . $row['nome'] . '" class="btn btn-primary float-right">Modify</a>';
                     echo '</li>';
                 }
             } else {

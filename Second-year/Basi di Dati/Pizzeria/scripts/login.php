@@ -36,6 +36,8 @@ if ($result->num_rows > 0) {
     $_SESSION['surname'] = $user['cognome'];
     $_SESSION['phone'] = $user['telefono'];
     $_SESSION['isClient'] = $user['cliente'];
+    $_SESSION['id'] = $user['idUtente'];
+    $_SESSION['basket'] = array();
     header('Location: /homepage.php'); // Redirect to your homepage
 } else {
     echo "<script>

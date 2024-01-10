@@ -1,4 +1,7 @@
 <?php
+include_once "html_snippets/navbar.php";
+create_navbar();
+
 $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/setup.json'), true);
 // Connect to the database
 $conn = new mysqli("localhost", $data['dbUserName'], $data['dbPassword'], $data['dbName']);
@@ -74,7 +77,9 @@ if ($result->num_rows > 0) {
 <?php
     echo "<input type='submit' value='Update Pizza' class='btn btn-primary'>";
     echo "</form>";
-    echo "</div>";
+
+    // Create the button for removing the pizza
+    echo "<a href='scripts/remove_pizza.php?nome=" . $pizza['nome'] . "' class='btn btn-danger'>Rimuovi Pizza</a>";
 } else {
     echo "<div class='alert alert-danger' role='alert'>Pizza not found</div>";
 }

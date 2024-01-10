@@ -1,5 +1,7 @@
 <?php
-// add_pizza.php
+include_once "html_snippets/navbar.php";
+create_navbar();
+
 session_start();
 // Check if session exists and isClient equals 0
 if (!isset($_SESSION['email']) || $_SESSION['isClient'] != 0) {
