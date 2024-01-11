@@ -30,10 +30,11 @@ if (!isset($_SESSION['email'])) {
         <a href="/classifiche_pizze.php" class="btn btn-primary">Classifiche Pizze</a>
         <a href="/all_orders.php" class="btn btn-primary">Tutti gli ordini</a>
         <a href="/orders_to_prepare.php" class="btn btn-primary">Ordini da preparare</a>
-        <!-- Manca la visualizzazione dei tavoli prenotati -->
+        <a href="/reserved_tables_date.php" class="btn btn-primary">Tavoli prenotati</a>
         <?php } else { ?>
         <a href="/listino_pizze.php" class="btn btn-primary">Listino pizze</a>
         <a href="/orders_history.php" class="btn btn-primary">Cronologia ordini</a>
+        <a href="/reserve_table_date.php" class="btn btn-primary">Prenota un tavolo</a>
         <?php } ?>
     </div>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

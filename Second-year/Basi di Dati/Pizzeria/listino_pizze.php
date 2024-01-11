@@ -16,7 +16,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT p.nome, p.prezzo, p.nomeTipo, GROUP_CONCAT(i.nome SEPARATOR ', ') AS ingredienti, p.vendute
+$sql = "SELECT p.nome, p.prezzo, p.nomeTipo, GROUP_CONCAT(i.nome SEPARATOR ', ') AS ingredienti, p.vendute, GROUP_CONCAT(DISTINCT i.nomeAllergene SEPARATOR ', ') AS allergeni
         FROM pizze p
         INNER JOIN composizione c ON p.nome = c.nomePizza
         INNER JOIN ingredienti i ON c.nomeIngrediente = i.nome
@@ -42,6 +42,7 @@ $result = $conn->query($sql);
                     echo '<li class="list-group-item">';
                     echo $row['nome'] . ' - ' . $row['nomeTipo'];
                     echo '<br>Ingredienti: ' . $row['ingredienti'];
+                    echo '<br>Allergeni: ' . $row['allergeni'];
                     echo '<br>Prezzo: ' . $row['prezzo'];
                     echo '<a href="/scripts/add_to_basket.php?id=' . $row['nome'] . '" class="btn btn-primary float-right">Aggiungi al carrello</a>';
                     echo '</li>';
