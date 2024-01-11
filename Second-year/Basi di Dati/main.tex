@@ -130,8 +130,7 @@ Per ogni pizza, è necessario memorizzare il nome come identificatore
 unico, il tipo, gli ingredienti, gli allergeni e il prezzo. Il
 proprietario avrà la capacità di visualizzare e modificare tutte le
 informazioni relative a ciascuna pizza. Infine, avrà la possibilità
-di consultare una classifica contenente le 5 pizze più vendute e
-meno vendute.
+di consultare la classifica delle pizze più vendute.
 
 \end{quote}
 
@@ -150,6 +149,8 @@ Elenco delle principali azioni richieste:
     \item Visualizzare tutti gli ordini da preparare per una certa fascia oraria e data
     \item Processare un ordine
 \end{enumerate}
+
+TODO: è stato aggiunto quantita a comprende. correggere tutte le immagini e testi
 
 \section{Progettazione Concettuale}
 
@@ -773,11 +774,12 @@ venduta.
 \textcolor{darkBlue}{UNIQUE(IdUtente, DataPrenotazione, OraInizio)} \\
 \textbf{FASCE\_ORARIE}(\underline{OraInizio}, OraFine) \\
 \textbf{UTENTI}(\underline{IdUtente}, Nome, Cognome, Email, Telefono*, NumeroCivico*, Via*, Cliente) \\
+\textcolor{darkBlue}{UNIQUE(Email)} \\
 \textbf{ORDINI}(\underline{IdOrdine}, IdUtente, OraInizio, DataOrdine, Note*, NCivicoDiConsegna*, ViaDiConsegna*, processato) \\
 \textcolor{darkBlue}{FK: OraInizio \textit{REFERENCES} FASCE\_ORARIE} \\
 \textcolor{darkBlue}{FK: IdUtente \textit{REFERENCES} UTENTI} \\
 \textcolor{darkBlue}{UNIQUE(IdUtente, OraInizio, DataOrdine)} \\
-\textbf{COMPRENDE}(\underline{IdOrdine}, \underline{NomePizza}) \\
+\textbf{COMPRENDE}(\underline{IdOrdine}, \underline{NomePizza}, quantita) \\
 \textcolor{darkBlue}{FK: NomePizza \textit{REFERENCES} PIZZE} \\
 \textcolor{darkBlue}{FK: IdOrdine \textit{REFERENCES} ORDINI} \\
 \textbf{PIZZE}(\underline{Nome}, Prezzo, NomeTipo, vendute) \\
@@ -823,14 +825,14 @@ Dopo aver ottenuto l'identificatore della fascia oraria, si può procedere crean
 \\\\
 Si inseriscono all'interno dell'ordine tutte le pizze che ha selezionato l'utente
 \\\\
-\textcolor{darkBlue}{\textbf{INSERT INTO}} comprende (\textcolor{lightPink}{LAST\_INSERT\_ID()}, nomePizza)
-\\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?)
+\textcolor{darkBlue}{\textbf{INSERT INTO}} comprende (\textcolor{lightPink}{LAST\_INSERT\_ID()}, nomePizza, quantita)
+\\\textcolor{darkBlue}{\textbf{VALUES}} (?, ?, ?)
 \\\\
 Infine si aggiornano i contatori delle vendite di ogni pizza
 \\\\
 \textcolor{darkBlue}{\textbf{UPDATE}} pizze
-\\\textcolor{darkBlue}{\textbf{SET}} processato = processato + 1
-\\\textcolor{darkBlue}{\textbf{WHERE}} nomePizza = ?
+\\\textcolor{darkBlue}{\textbf{SET}} vendute = vendute + ?
+\\\textcolor{darkBlue}{\textbf{WHERE}} nome = ?
 
 \paragraph{4 - Prenotazione di un tavolo}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
@@ -918,7 +920,6 @@ Si inserisce l'ingrediente con l'allergene selezionato
 
 \paragraph{9 - Visualizzazione degli ordini dei relativi clienti}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
-\\
 \textcolor{darkBlue}{\textbf{SELECT}} *
 \\\textcolor{darkBlue}{\textbf{FROM}} ordini
 \\\textcolor{darkBlue}{\textbf{WHERE}} idUtente = ?
@@ -936,7 +937,9 @@ Prima l'utente deve scegliere la fascia oraria
 \textcolor{darkBlue}{\textbf{SELECT}} *
 \\\textcolor{darkBlue}{\textbf{FROM}} fascia\_oraria
 \\\\
-\textcolor{darkBlue}{\textbf{SELECT}} u.nome, u.cognome, u.telefono, o.oraInizio, o.dataOrdine, o.note, o.nCivicoDiConsegna, o.viaDiConsegna, \textcolor{darkBlue}{\textbf{GROUP\_CONCAT}}(p.nome)
+Dopo di che si procede individuando i dettagli dell'ordine e delle pizze ordine
+\\\\
+\textcolor{darkBlue}{\textbf{SELECT}} u.nome, u.cognome, u.telefono, o.idOrdine, o.oraInizio, o.dataOrdine, o.note, o.nCivicoDiConsegna, o.viaDiConsegna, \textcolor{darkBlue}{\textbf{GROUP\_CONCAT}}(p.nome)
 \\\textcolor{darkBlue}{\textbf{FROM}} ordini o
 \\\textcolor{darkBlue}{\textbf{INNER JOIN}} comprende c \textcolor{darkBlue}{\textbf{ON}} o.idOrdine = c.idOrdine
 \\\textcolor{darkBlue}{\textbf{INNER JOIN}} pizze p \textcolor{darkBlue}{\textbf{ON}} c.nomePizza = p.nome
@@ -944,7 +947,13 @@ Prima l'utente deve scegliere la fascia oraria
 \\\textcolor{darkBlue}{\textbf{WHERE}} oraInizio = ?
 \\\textcolor{darkBlue}{\textbf{AND}} dataOrdine = ?
 \\\textcolor{darkBlue}{\textbf{AND}} o.processato = 0
-TODO: controllare questa query che sia giusta
+\\\\
+Infine si legge la quantità di pizze da preparare per l'ordine desiderato
+\\\\
+\textcolor{darkBlue}{\textbf{SELECT}} quantita
+\\\textcolor{darkBlue}{\textbf{FROM}} comprende
+\\\textcolor{darkBlue}{\textbf{WHERE}} idOrdine = ?
+\\\textcolor{darkBlue}{\textbf{AND}} nomePizza = ?
 
 \paragraph{12 - Processare un ordine}
 \hphantom{A}\\    % se no la tabella si sposta sopra il paragrafo
