@@ -10,19 +10,18 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basket</title>
-    <!-- Bootstrap CSS -->
+    <title>Carrello</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Basket</h1>
+        <h1>Carrello</h1>
         <table class="table">
             <thead>
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Pizza</th>
-                    <th scope="col">Action</th>
+                    <th scope="col">Elimina</th>
                 </tr>
             </thead>
             <tbody>
@@ -41,7 +40,6 @@ session_start();
             </tbody>
         </table>
     </div>
-    <!-- Bootstrap JS -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

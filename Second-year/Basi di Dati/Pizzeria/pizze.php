@@ -2,7 +2,6 @@
 include_once "html_snippets/navbar.php";
 create_navbar();
 
-// Get DB details from setup.json
 $document_root = $_SERVER['DOCUMENT_ROOT'];
 $setup = json_decode(file_get_contents($document_root . '/setup.json'), true);
 
@@ -11,10 +10,8 @@ $username = $setup['dbUserName'];
 $password = $setup['dbPassword'];
 $dbname = $setup['dbName'];
 
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -33,24 +30,22 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizze</title>
-    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <h1>Pizze</h1>
-        <a href="/add_pizza.php" class="btn btn-success mb-3">Add New Pizza</a>
+        <a href="/add_pizza.php" class="btn btn-success mb-3">Aggiungi nuova Pizza</a>
         <ul class="list-group">
             <?php
             if ($result->num_rows > 0) {
-                // Output data of each row
                 while($row = $result->fetch_assoc()) {
                     echo '<li class="list-group-item">';
                     echo $row['nome'] . ' - ' . $row['nomeTipo'];
                     echo '<br>Ingredienti: ' . $row['ingredienti'];
                     echo '<br>Prezzo: ' . $row['prezzo'];
                     echo '<br>Vendute: ' . $row['vendute'];
-                    echo '<a href="/modify_pizza.php?id=' . $row['nome'] . '" class="btn btn-primary float-right">Modify</a>';
+                    echo '<a href="/modify_pizza.php?id=' . $row['nome'] . '" class="btn btn-primary float-right">Modifica</a>';
                     echo '</li>';
                 }
             } else {
@@ -59,7 +54,6 @@ $result = $conn->query($sql);
             ?>
         </ul>
     </div>
-    <!-- Bootstrap JS -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

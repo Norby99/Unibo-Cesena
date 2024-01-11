@@ -2,7 +2,6 @@
 include_once "html_snippets/navbar.php";
 create_navbar();
 
-// Get DB details from setup.json
 $document_root = $_SERVER['DOCUMENT_ROOT'];
 $setup = json_decode(file_get_contents($document_root . '/setup.json'), true);
 
@@ -11,10 +10,8 @@ $username = $setup['dbUserName'];
 $password = $setup['dbPassword'];
 $dbname = $setup['dbName'];
 
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -33,17 +30,15 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classifiche Pizze</title>
-    <!-- Bootstrap CSS -->
+    <title>Classifica Pizze</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Classifiche Pizze</h1>
+        <h1>Classifica Pizze</h1>
         <ul class="list-group">
             <?php
             if ($result->num_rows > 0) {
-                // Output data of each row
                 while($row = $result->fetch_assoc()) {
                     echo '<li class="list-group-item">';
                     echo $row['nome'] . ' - ' . $row['nomeTipo'];
@@ -53,12 +48,11 @@ $result = $conn->query($sql);
                     echo '</li>';
                 }
             } else {
-                echo "No pizzas found";
+                echo "Non ci sono pizze";
             }
             ?>
         </ul>
     </div>
-    <!-- Bootstrap JS -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

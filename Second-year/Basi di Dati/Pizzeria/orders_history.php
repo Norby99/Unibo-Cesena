@@ -9,15 +9,12 @@ $username = $setup['dbUserName'];
 $password = $setup['dbPassword'];
 $dbname = $setup['dbName'];
 
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Prepare the SQL statement
 $sql = "SELECT idOrdine, dataOrdine, oraInizio, viaDiConsegna, nCivicoDiConsegna, note
         FROM ordini
         WHERE idUtente = ?
@@ -25,15 +22,11 @@ $sql = "SELECT idOrdine, dataOrdine, oraInizio, viaDiConsegna, nCivicoDiConsegna
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param('i', $_SESSION['id']);
-// Execute the SQL statement
 $stmt->execute();
-// Get the result
 $result = $stmt->get_result();
 
-// Fetch all rows as an associative array
 $orders = $result->fetch_all(MYSQLI_ASSOC);
 
-// Loop through each order
 foreach ($orders as $key => $order) {
     $pizzas = array();
     
@@ -47,13 +40,10 @@ foreach ($orders as $key => $order) {
     $result = $stmt->get_result();
     $pizzas_ordered = $result->fetch_all(MYSQLI_ASSOC);
 
-    // Loop through each pizza ordered
     foreach ($pizzas_ordered as $pizza_ordered) {
-        // If the pizza is already in the array, add the quantity
         if (array_key_exists($pizza_ordered['nomePizza'], $pizzas)) {
             $pizzas[$pizza_ordered['nomePizza']] += $pizza_ordered['quantita'];
         } else {
-            // Otherwise, add the pizza to the array
             $pizzas[$pizza_ordered['nomePizza']] = $pizza_ordered['quantita'];
         }
     }
@@ -65,7 +55,6 @@ foreach ($orders as $key => $order) {
     $orders[$key]['pizze'] = $pizzaStr;
 }
 
-// Close the connection
 $stmt->close();
 $conn->close();
 ?>
@@ -75,14 +64,13 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order History</title>
-    <!-- Bootstrap CSS -->
+    <title>Cronolia Ordini</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <?php include 'html_snippets/navbar.php'; create_navbar(); ?>
         <div class="container">
-            <h1>Order History</h1>
+            <h1>Cronolia Ordini</h1>
             <table class="table">
                 <thead>
                     <tr>
@@ -110,7 +98,6 @@ $conn->close();
                 </tbody>
             </table>
         </div>
-        <!-- Bootstrap JS -->
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     </body>
     </html>

@@ -3,18 +3,14 @@ include_once "html_snippets/navbar.php";
 create_navbar();
 
 $data = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/setup.json'), true);
-// Connect to the database
 $conn = new mysqli("localhost", $data['dbUserName'], $data['dbPassword'], $data['dbName']);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get the pizza id from the header
 $pizzaName = $_GET['id'];
 
-// Prepare and bind
 $stmt = $conn->prepare("SELECT p.nome, p.prezzo, p.nomeTipo, GROUP_CONCAT(i.nome SEPARATOR ', ') AS ingredienti, p.vendute
                         FROM pizze p
                         LEFT JOIN composizione c ON p.nome = c.nomePizza
@@ -23,45 +19,37 @@ $stmt = $conn->prepare("SELECT p.nome, p.prezzo, p.nomeTipo, GROUP_CONCAT(i.nome
                         GROUP BY p.nome");
 $stmt->bind_param("s", $pizzaName);
 
-// Execute the statement
 $stmt->execute();
 
-// Get the result
 $result = $stmt->get_result();
 
-// Check if the pizza exists
 if ($result->num_rows > 0) {
-    // Fetch the pizza data
     $pizza = $result->fetch_assoc();
 
-    // Display the form for modifying the pizza
     echo "<link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'>"; // Include Bootstrap CSS
     echo "<div class='container'>";
     echo "<form action='scripts/update_pizza.php' method='post' class='form-group'>";
     echo "<div class='form-group'>";
-    echo "<label for='nomePizza'>Nome:</label>";
+    echo "<label for='nomePizza'>Nome pizza:</label>";
     echo "<input type='text' id='nomePizza' name='nomePizza' value='" . $pizza['nome'] . "' class='form-control'>";
     echo "</div>";
     echo "<div class='form-group'>";
-    echo "<label for='prezzo'>Price:</label>";
+    echo "<label for='prezzo'>Prezzo:</label>";
     echo "<input type='text' id='prezzo' name='prezzo' value='" . $pizza['prezzo'] . "' class='form-control'>";
     echo "</div>";
 ?>
     <div class="form-group">
-        <label for="ingredienti">Ingredients:</label>
+        <label for="ingredienti">Ingredietni:</label>
         <?php
         $query = "SELECT * FROM ingredienti";
         $result = $conn->query($query);
 
-        // Get the selected ingredients for the pizza
         $selectedIngredients = explode(", ", $pizza['ingredienti']);
 
-        // Loop through the ingredients and create the checkboxes
         while ($row = $result->fetch_assoc()) {
             echo "<div class='form-check'>";
             echo "<input class='form-check-input' type='checkbox' name='ingredienti[]' value='" . $row['nome'] . "' id='" . $row['nome'] . "'";
             
-            // Check the checkbox if it is in the selected ingredients
             if (in_array($row['nome'], $selectedIngredients)) {
                 echo " checked";
             }
@@ -75,16 +63,14 @@ if ($result->num_rows > 0) {
         ?>
     </div>
 <?php
-    echo "<input type='submit' value='Update Pizza' class='btn btn-primary'>";
+    echo "<input type='submit' value='Aggiorna Pizza' class='btn btn-primary'>";
     echo "</form>";
 
-    // Create the button for removing the pizza
     echo "<a href='scripts/remove_pizza.php?nome=" . $pizza['nome'] . "' class='btn btn-danger'>Rimuovi Pizza</a>";
 } else {
-    echo "<div class='alert alert-danger' role='alert'>Pizza not found</div>";
+    echo "<div class='alert alert-danger' role='alert'>Pizza non trovata</div>";
 }
 
-// Close the database connection
 $stmt->close();
 $conn->close();
 ?>

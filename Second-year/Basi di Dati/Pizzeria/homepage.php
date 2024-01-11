@@ -17,12 +17,11 @@ if (!isset($_SESSION['email'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage</title>
-    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Welcome, <?php echo $_SESSION['name']; ?>!</h1>
+        <h1>Bentornata/o, <?php echo $_SESSION['name']; ?>!</h1>
         <?php
         if($_SESSION['isClient'] == 0) {
         ?>
@@ -31,14 +30,12 @@ if (!isset($_SESSION['email'])) {
         <a href="/classifiche_pizze.php" class="btn btn-primary">Classifiche Pizze</a>
         <a href="/all_orders.php" class="btn btn-primary">Tutti gli ordini</a>
         <a href="/orders_to_prepare.php" class="btn btn-primary">Ordini da preparare</a>
-        <!-- mostra tutti gli ordini in assoluto -->
-        <!-- mostra tutti gli ordini da preparare -->
+        <!-- Manca la visualizzazione dei tavoli prenotati -->
         <?php } else { ?>
         <a href="/listino_pizze.php" class="btn btn-primary">Listino pizze</a>
         <a href="/orders_history.php" class="btn btn-primary">Cronologia ordini</a>
         <?php } ?>
     </div>
-    <!-- Bootstrap JS -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
