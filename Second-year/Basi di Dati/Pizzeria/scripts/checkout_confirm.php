@@ -9,22 +9,18 @@ $username = $setup['dbUserName'];
 $password = $setup['dbPassword'];
 $dbname = $setup['dbName'];
 
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get the order details from the POST request
 $deliveryType = $_POST['delivery'];
 $deliveryDay = $_POST['delivery-day'];
 $deliveryDay = date('Y-m-d', strtotime($deliveryDay));
 $deliveryTime = $_POST['delivery-time'];
 $notes = $_POST['notes'];
 
-// Check if there are more than 4 orders the same day and time
 $sql = "SELECT COUNT(*) AS count
         FROM ordini
         WHERE dataOrdine = ? AND oraInizio = ?";
@@ -37,7 +33,7 @@ $count = $result->fetch_assoc()['count'];
 
 if ($count >= 4) {
     echo "<script>
-            alert('Too many orders at the same time!');
+            alert('Ci sono troppi ordini per questta fascia oraria!');
             window.location.href='/homepage.php';
           </script>";
 }
@@ -55,11 +51,10 @@ $count = $result->fetch_assoc()['count'];
 
 if ($count > 0) {
     echo "<script>
-            alert('You have already ordered at the same time!');
+            alert('Non si può effettuare più di un ordine a fascia oraria!');
             window.location.href='/homepage.php';
           </script>";
 }
-
 
 // Creating the order
 if ($deliveryType == 'delivery') {
@@ -79,14 +74,13 @@ if ($deliveryType == 'delivery') {
     $stmt->bind_param('isss', $_SESSION['id'], $deliveryTime, $deliveryDay, $notes);
 }
 
-// Execute the SQL statement
+
 $stmt->execute();
 
-// Insert each pizza in comprende table
 $orderId = $stmt->insert_id;
 $basket = $_SESSION['basket'];
 
-$pizzaCount = array(); // Associative array to store pizza count
+$pizzaCount = array();
 
 foreach ($basket as $pizza) {
     $pizzaName = $pizza;
@@ -106,7 +100,7 @@ foreach ($pizzaCount as $pizzaName => $count) {
     $stmt->execute();
 }
 
-// Update the "pizza vendute" field in the database for each pizza in the basket
+// Updating the "pizza vendute" field in the database for each pizza in the basket
 foreach ($pizzaCount as $pizzaName => $count) {
     $sql = "UPDATE pizze
             SET vendute = vendute + ?
@@ -116,10 +110,7 @@ foreach ($pizzaCount as $pizzaName => $count) {
     $stmt->execute();
 }
 
-
-// Clear the basket
 $_SESSION['basket'] = array();
 
-// Redirect to the confirmation page
 header("Location: /homepage.php");
 ?>
