@@ -35,7 +35,7 @@ $result = $conn->query($sql);
 <body>
     <div class="container">
         <h1>Pizze</h1>
-        <a href="/add_pizza.php" class="btn btn-success mb-3">Aggiungi nuova Pizza</a>
+        <a href="/add_pizza.php" class="btn btn-success mb-3">Aggiungi Pizza</a>
         <ul class="list-group">
             <?php
             if ($result->num_rows > 0) {

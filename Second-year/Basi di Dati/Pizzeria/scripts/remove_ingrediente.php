@@ -9,13 +9,35 @@ if ($conn->connect_error) {
 
 $nome = $_GET['nome'];
 
-$stmt = $conn->prepare("DELETE FROM ingredienti WHERE nome = ?");
+# check if the ingredient is used in a recipe
+$sql = "SELECT *
+        FROM composizione
+        WHERE nomeIngrediente = ?";
+
+$stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $nome);
 
 $stmt->execute();
 
-$stmt->close();
-$conn->close();
+$result = $stmt->get_result();
 
-header("Location: /ingredienti.php");
+if ($result->num_rows > 0) {
+    $stmt->close();
+    $conn->close();
+
+    echo "<script>
+            alert('Impossibile eliminare l\'ingrediente, è usato in una ricetta!');
+            window.location.href='/ingredienti.php';
+          </script>";
+} else {
+    $stmt = $conn->prepare("DELETE FROM ingredienti WHERE nome = ?");
+    $stmt->bind_param("s", $nome);
+
+    $stmt->execute();
+
+    $stmt->close();
+    $conn->close();
+
+    header("Location: /ingredienti.php");
+}
 ?>
