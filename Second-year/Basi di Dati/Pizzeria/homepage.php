@@ -29,10 +29,13 @@ if (!isset($_SESSION['email'])) {
         <a href="/pizze.php" class="btn btn-primary">Pizze</a>
         <a href="/ingredienti.php" class="btn btn-primary">Ingredienti</a>
         <a href="/classifiche_pizze.php" class="btn btn-primary">Classifiche Pizze</a>
+        <a href="/all_orders.php" class="btn btn-primary">Tutti gli ordini</a>
+        <a href="/orders_to_prepare.php" class="btn btn-primary">Ordini da preparare</a>
         <!-- mostra tutti gli ordini in assoluto -->
         <!-- mostra tutti gli ordini da preparare -->
         <?php } else { ?>
         <a href="/listino_pizze.php" class="btn btn-primary">Listino pizze</a>
+        <a href="/orders_history.php" class="btn btn-primary">Cronologia ordini</a>
         <?php } ?>
     </div>
     <!-- Bootstrap JS -->

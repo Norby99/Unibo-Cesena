@@ -48,7 +48,6 @@ $result = $conn->query($sql);
                     echo $row['nome'] . ' - ' . $row['nomeTipo'];
                     echo '<br>Ingredienti: ' . $row['ingredienti'];
                     echo '<br>Prezzo: ' . $row['prezzo'];
-                    echo '<br>Vendute: ' . $row['vendute'];
                     echo '<a href="/scripts/add_to_basket.php?id=' . $row['nome'] . '" class="btn btn-primary float-right">Aggiungi al carrello</a>';
                     echo '</li>';
                 }

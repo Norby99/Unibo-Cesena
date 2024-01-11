@@ -1,0 +1,5 @@
+{
+    "dbUserName": "username del proprietario del Db",
+    "dbPassword": "la password",
+    "dbName": "il nome del DB"
+}
