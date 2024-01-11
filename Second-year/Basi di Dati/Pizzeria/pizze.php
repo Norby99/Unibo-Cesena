@@ -21,8 +21,8 @@ if ($conn->connect_error) {
 
 $sql = "SELECT p.nome, p.prezzo, p.nomeTipo, GROUP_CONCAT(i.nome SEPARATOR ', ') AS ingredienti, p.vendute
         FROM pizze p
-        INNER JOIN composizione c ON p.nome = c.nomePizza
-        INNER JOIN ingredienti i ON c.nomeIngrediente = i.nome
+        LEFT JOIN composizione c ON p.nome = c.nomePizza
+        LEFT JOIN ingredienti i ON c.nomeIngrediente = i.nome
         GROUP BY p.nome";
 $result = $conn->query($sql);
 ?>

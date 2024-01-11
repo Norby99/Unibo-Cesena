@@ -17,8 +17,8 @@ $pizzaName = $_GET['id'];
 // Prepare and bind
 $stmt = $conn->prepare("SELECT p.nome, p.prezzo, p.nomeTipo, GROUP_CONCAT(i.nome SEPARATOR ', ') AS ingredienti, p.vendute
                         FROM pizze p
-                        INNER JOIN composizione c ON p.nome = c.nomePizza
-                        INNER JOIN ingredienti i ON c.nomeIngrediente = i.nome
+                        LEFT JOIN composizione c ON p.nome = c.nomePizza
+                        LEFT JOIN ingredienti i ON c.nomeIngrediente = i.nome
                         WHERE p.nome = ?
                         GROUP BY p.nome");
 $stmt->bind_param("s", $pizzaName);
