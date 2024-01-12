@@ -18,6 +18,7 @@ if (!isset($_SESSION['email'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style/footer.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -37,6 +38,15 @@ if (!isset($_SESSION['email'])) {
         <a href="/reserve_table_date.php" class="btn btn-primary">Prenota un tavolo</a>
         <?php } ?>
     </div>
+
+    <?php if($_SESSION['isClient'] == 1) { ?>
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+        <form action="/scripts/delete_user.php" method="post">
+            <button type="submit" class="btn btn-dark">Elimina Utente</button>
+        </form>
+    </footer>
+    <?php } ?>
+    
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

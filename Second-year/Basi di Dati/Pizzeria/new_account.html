@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crea nuovo account</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center">Crea nuovo account</h2>
+                <form action="/scripts/create_account.php" method="post">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Nome:</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="surname">Cognome:</label>
+                        <input type="text" class="form-control" id="surname" name="surname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Telefono:</label>
+                        <input type="text" class="form-control" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="street">Via:</label>
+                        <input type="text" class="form-control" id="street" name="street" required>
+                        <label for="street_number">Numero civico:</label>
+                        <input type="text" class="form-control" id="street_number" name="street_number" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crea Account</button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="/index.html">Hai gia un account?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
