@@ -32,7 +32,15 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $_SESSION['id']);
 $stmt->execute();
 
-// Delete the user from the utenti table
+// delete every prenotazioni_tavolo
+$sql = "DELETE FROM prenotazioni_tavolo
+        WHERE idUtente = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $_SESSION['id']);
+$stmt->execute();
+
+// delete the user from the utenti table
 $sql = "DELETE FROM utenti
         WHERE idUtente = ?";
 $stmt = $conn->prepare($sql);
