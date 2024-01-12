@@ -45,9 +45,7 @@ Inoltre, il cliente potrà scegliere se farsi recapitare le pizze a casa
 propria o se desidera ritirarle personalmente. Nel primo caso, è
 necessario richiedere all'utente l'indirizzo di consegna.
 
-I clienti devono essere in grado di prenotare un tavolo per quante
-persone desiderano, ma non è permesso prenotare più di un tavolo ogni
-mezz'ora. Inoltre, non possono esserci più di 10 tavoli prenotati
+I clienti devono essere in grado di prenotare dei tavoli, ma non più di uno a mezz'ora. Inoltre, non possono esserci più di 10 tavoli prenotati
 contemporaneamente per garantire la disponibilità di posti per i
 clienti senza prenotazione.
 
@@ -65,7 +63,7 @@ Ogni pizza deve appartenere a una categoria, tra cui "Pizze classiche",
 da un prezzo, un nome e una lista di ingredienti e allergeni, come
 latticini, noci, uova, ecc.
 
-Infine, è essenziale monitorare le attività dei pizzaioli, che devono
+Infine, che i pizzaioli possano monitorare gli eventi della pizzeria, devono
 poter modificare pizze e ingredienti, eliminare quelli esistenti o
 aggiungerne di nuovi. Possono anche consultare il portale per
 visualizzare la classifica delle pizze più vendute e meno vendute.
@@ -149,8 +147,6 @@ Elenco delle principali azioni richieste:
     \item Visualizzare tutti gli ordini da preparare per una certa fascia oraria e data
     \item Processare un ordine
 \end{enumerate}
-
-TODO: è stato aggiunto quantita a comprende. correggere tutte le immagini e testi
 
 \section{Progettazione Concettuale}
 
@@ -964,5 +960,24 @@ Infine si legge la quantità di pizze da preparare per l'ordine desiderato
 \newpage
 \section{Progettazione dell'applicazione}
 \subsection{Descrizione dell'architettura dell'applicazione realizzata}
+L'applicazione è strutturata come un sito web implementato su Apache, con un database SQL ospitato su MySQL, e fa uso del framework CSS Bootstrap. All'apertura del sito, gli utenti si trovano di fronte a una pagina di accesso, la quale presenta diverse home page a seconda del tipo di utente che si è autenticato.
+
+L'utente standard ha la possibilità di creare il proprio ordine, selezionando le pizze da aggiungere al carrello e successivamente potrà confermare l'ordine inserendo eventualmente i dati di consegna. Inoltre, è in grado di prenotare un tavolo attraverso una specifica pagina e di visualizzare un elenco dettagliato degli ordini effettuati in precedenza.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{images/pagina_conferma_ordine.png}
+    \caption{Pagina di inserimento dei dati per la consegna dell'ordine.}
+    \label{fig:pagina_conferma_ordine}
+\end{figure}
+
+Dall'altra parte, l'utente con privilegi di 'amministratore' ha accesso a una gamma più ampia di funzioni. Questo utente ha la facoltà di modificare le pizze (aggiungendone, apportando modifiche o eliminandole), gestire gli ingredienti e consultare la classifica delle pizze più vendute. Inoltre, può accedere alla cronologia completa di tutti gli ordini effettuati, visualizzando sia quelli già elaborati che quelli in attesa di preparazione. L'amministratore ha anche la possibilità di monitorare i tavoli prenotati per una specifica data e fascia oraria.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{images/pagina_pizze.png}
+    \caption{Pagina principale dove poter visualizzare/modificare/aggiungere nuove pizze.}
+    \label{fig:pagina_pizze}
+\end{figure}
+L'applicazione soddisfa ogni funzionalità descritta nella fase di progettazione.
 
 \end{document}
