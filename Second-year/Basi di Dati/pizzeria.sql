@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Gen 05, 2024 alle 18:25
--- Versione del server: 10.4.28-MariaDB
--- Versione PHP: 8.2.4
+-- Creato il: Gen 12, 2024 alle 10:24
+-- Versione del server: 10.4.27-MariaDB
+-- Versione PHP: 8.2.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -86,8 +86,21 @@ INSERT INTO `composizione` (`nomePizza`, `nomeIngrediente`) VALUES
 
 CREATE TABLE `comprende` (
   `idOrdine` int(11) NOT NULL,
-  `nomePizza` varchar(45) NOT NULL
+  `nomePizza` varchar(45) NOT NULL,
+  `quantita` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `comprende`
+--
+
+INSERT INTO `comprende` (`idOrdine`, `nomePizza`, `quantita`) VALUES
+(14, 'capricciosa', 2),
+(14, 'funghi', 1),
+(16, 'capricciosa', 2),
+(16, 'funghi', 1),
+(19, 'margherita', 2),
+(20, 'prosciutto crudo', 1);
 
 -- --------------------------------------------------------
 
@@ -166,6 +179,16 @@ CREATE TABLE `ordini` (
   `processato` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dump dei dati per la tabella `ordini`
+--
+
+INSERT INTO `ordini` (`idOrdine`, `idUtente`, `oraInizio`, `dataOrdine`, `note`, `nCivicoDiConsegna`, `viaDiConsegna`, `processato`) VALUES
+(14, 2, '08:00:00', '2024-01-11', '', NULL, NULL, 0),
+(16, 2, '12:30:00', '2024-01-11', '', NULL, NULL, 0),
+(19, 2, '08:00:00', '2024-01-19', '', NULL, NULL, 0),
+(20, 1, '08:00:00', '2024-01-11', '', NULL, NULL, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -184,11 +207,11 @@ CREATE TABLE `pizze` (
 --
 
 INSERT INTO `pizze` (`nome`, `prezzo`, `nomeTipo`, `vendute`) VALUES
-('capricciosa', 6.70, 'pizze classiche', 1),
-('funghi', 5.50, 'pizze classiche', 0),
-('margherita', 4.50, 'pizze classiche', 0),
-('misto funghi', 8.00, 'pizze classiche', 0),
-('prosciutto crudo', 6.50, 'pizze classiche', 0);
+('capricciosa', '6.70', 'pizze classiche', 5),
+('funghi', '5.50', 'pizze classiche', 3),
+('margherita', '4.50', 'pizze classiche', 4),
+('misto funghi', '8.00', 'pizze classiche', 1),
+('prosciutto crudo', '6.50', 'pizze classiche', 2);
 
 -- --------------------------------------------------------
 
@@ -203,6 +226,13 @@ CREATE TABLE `prenotazioni_tavolo` (
   `oraInizio` time NOT NULL,
   `idUtente` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `prenotazioni_tavolo`
+--
+
+INSERT INTO `prenotazioni_tavolo` (`idPrenotazioneTavolo`, `idTavolo`, `dataPrenotazione`, `oraInizio`, `idUtente`) VALUES
+(1, 1, '2024-01-11', '08:00:00', 2);
 
 -- --------------------------------------------------------
 
@@ -360,13 +390,13 @@ ALTER TABLE `utenti`
 -- AUTO_INCREMENT per la tabella `ordini`
 --
 ALTER TABLE `ordini`
-  MODIFY `idOrdine` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idOrdine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT per la tabella `prenotazioni_tavolo`
 --
 ALTER TABLE `prenotazioni_tavolo`
-  MODIFY `idPrenotazioneTavolo` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idPrenotazioneTavolo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT per la tabella `tavoli`
@@ -378,7 +408,7 @@ ALTER TABLE `tavoli`
 -- AUTO_INCREMENT per la tabella `utenti`
 --
 ALTER TABLE `utenti`
-  MODIFY `idUtente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `idUtente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Limiti per le tabelle scaricate
