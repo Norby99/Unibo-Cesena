@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Gen 12, 2024 alle 10:24
+-- Creato il: Gen 13, 2024 alle 13:40
 -- Versione del server: 10.4.27-MariaDB
 -- Versione PHP: 8.2.0
 
@@ -100,7 +100,15 @@ INSERT INTO `comprende` (`idOrdine`, `nomePizza`, `quantita`) VALUES
 (16, 'capricciosa', 2),
 (16, 'funghi', 1),
 (19, 'margherita', 2),
-(20, 'prosciutto crudo', 1);
+(20, 'prosciutto crudo', 1),
+(23, 'capricciosa', 1),
+(23, 'funghi', 1),
+(23, 'margherita', 1),
+(23, 'misto funghi', 1),
+(23, 'prosciutto crudo', 2),
+(24, 'margherita', 1),
+(24, 'prosciutto crudo', 5),
+(25, 'capricciosa', 2);
 
 -- --------------------------------------------------------
 
@@ -187,7 +195,10 @@ INSERT INTO `ordini` (`idOrdine`, `idUtente`, `oraInizio`, `dataOrdine`, `note`,
 (14, 2, '08:00:00', '2024-01-11', '', NULL, NULL, 0),
 (16, 2, '12:30:00', '2024-01-11', '', NULL, NULL, 0),
 (19, 2, '08:00:00', '2024-01-19', '', NULL, NULL, 0),
-(20, 1, '08:00:00', '2024-01-11', '', NULL, NULL, 1);
+(20, 1, '08:00:00', '2024-01-11', '', NULL, NULL, 1),
+(23, 2, '14:30:00', '2024-01-14', '', 17, 'via roma', 0),
+(24, 2, '14:30:00', '2024-01-31', '', 17, 'via roma', 0),
+(25, 2, '08:00:00', '2024-02-09', '', NULL, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -207,11 +218,11 @@ CREATE TABLE `pizze` (
 --
 
 INSERT INTO `pizze` (`nome`, `prezzo`, `nomeTipo`, `vendute`) VALUES
-('capricciosa', '6.70', 'pizze classiche', 5),
-('funghi', '5.50', 'pizze classiche', 3),
-('margherita', '4.50', 'pizze classiche', 4),
-('misto funghi', '8.00', 'pizze classiche', 1),
-('prosciutto crudo', '6.50', 'pizze classiche', 2);
+('capricciosa', '6.70', 'pizze classiche', 8),
+('funghi', '5.50', 'pizze classiche', 4),
+('margherita', '4.50', 'pizze classiche', 6),
+('misto funghi', '8.00', 'pizze classiche', 2),
+('prosciutto crudo', '6.50', 'pizze classiche', 9);
 
 -- --------------------------------------------------------
 
@@ -390,7 +401,7 @@ ALTER TABLE `utenti`
 -- AUTO_INCREMENT per la tabella `ordini`
 --
 ALTER TABLE `ordini`
-  MODIFY `idOrdine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `idOrdine` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT per la tabella `prenotazioni_tavolo`
