@@ -28,8 +28,29 @@
 
 \section{Introduzione}
 
+\subsection{Prime idee}
+\textbf{Intraframe}: L'intraframe compression, o compressione intra-frame, si riferisce alla
+compressione dei dati all'interno di un singolo fotogramma. Questo metodo sfrutta le ridondanze
+spaziali all'interno di un singolo frame.
+\\\\\textbf{Interframe}: L'interframe compression, o compressione inter-frame, lavora sulla
+ridondanza temporale tra i frame adiacenti. Invece di codificare ogni frame singolarmente,
+vengono identificate e codificate solo le differenze tra i frame successivi o precedenti.
+Questo consente di ridurre ulteriormente le dimensioni del file video, poiché molte
+informazioni rimangono costanti tra i fotogrammi vicini.
+\\\\
+TODO: Magari si potrebbero spiegare meglio queste due tecniche più avanti nell'articolo, quindi sarebbe meglio scrivere in questo
+TODO: punto che questi due algoritmi verranno spiegati meglio nei paragrafi successivi
+
+\subsection{H.261}
+Nel 1988 nasce il codec H261 che è stato il primo algoritmo di compressione video ad utilizzare
+in modo efficiente degli algoritmo di \textbf{intraframe} e \textbf{interframe} ed è
+responsabile dell'introduzione della codifica video ibrida basata su blocchi, che è ancora
+utilizzata oggi in molti standard video.
+
 \section{Tecnologie attuali}
-\subsection{H.264}
+\subsection{H.264 e H.265}
+TODO: L'h264 essendo una tecnica che racchiude molti algoritmi complessi per la compressione video, necessita di accelleratori hardware
+TODO: per poter decodificare i fotogrammi in tempo reale.
 \subsection{VP9}    % forse non serve descriverlo
 \subsection{AV1}
 \subsection{Comparazione delle prestazioni}
@@ -42,5 +63,10 @@ Non dimenticare di discutere anche delle sfide e delle considerazioni pratiche l
 \section{Conclusioni}
 
 \section{Bibliografia}
+sito ufficiale di h.265 https://hevc.hhi.fraunhofer.de/
+repository di h.265 https://vcgit.hhi.fraunhofer.de/jvet/HM
+sito che parla della storia degli encorder https://api.video/blog/video-trends/the-history-of-video-compression-starts-in-1929/
+utile! parla dei tecnicismi del h.264 nella sezione di Implementing h.264 https://www.embedded.com/implementing-h-264-video-compression-algorithms-on-a-software-configurable-processor/
+utile! parla dei tecnicismi del h.265 nella sezione di Coding tools https://en.wikipedia.org/wiki/High_Efficiency_Video_Coding
 
 \end{document}
