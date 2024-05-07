@@ -71,18 +71,8 @@ impatti e le potenzialità di tali innovazioni nell'industria multimediale moder
 \subsection{H.261}
 Nel 1988 nasce il codec H261 che è stato il primo algoritmo di compressione video ad utilizzare
 in modo efficiente degli algoritmo di \textbf{intraframe} e \textbf{interframe}, che sono
-spiegati nel paragrafo successivo, ed è responsabile dell'introduzione della codifica video
+spiegati nel capitolo successivo, ed è responsabile dell'introduzione della codifica video
 ibrida basata su blocchi, che è ancora utilizzata oggi in molti standard video.
-\noindent
-\\\\\textbf{Intraframe}: La compressione intraframe, si riferisce alla
-compressione dei dati all'interno di un singolo fotogramma. Questo metodo sfrutta le ridondanze
-spaziali all'interno di un singolo frame.
-\\\\\textbf{Interframe}: La compressione interframe, lavora sulla
-ridondanza temporale tra i frame adiacenti. Invece di codificare ogni frame singolarmente,
-vengono identificate e codificate solo le differenze tra i frame successivi o precedenti.
-Questo consente di ridurre ulteriormente le dimensioni del file video, poiché molte
-informazioni rimangono costanti tra i fotogrammi vicini.
-\noindent
 \\\\Prima di proseguire, visto che non parliamo più dei video come una matrice di pixel, ma più di
 un flusso di dati, bisogna introdurre il concetto di bitrate.
 Il \textbf{bitrate} è una misura della velocità di trasmissione dei dati in un file multimediale,
@@ -98,16 +88,16 @@ sarà maggiore al costo di un peso più elevato. Vedi Figura~\ref{fig:confronto_
     \label{fig:confronto_bitrate}
 \end{figure}
 
+\noindent
+Un aspetto sorprendente di questo algoritmo è che per rilevare una diminuzione nella qualità del
+video, è necessario ridurre significativamente il bitrate.
 Per fare un confronto con l'esempio di prima del video da 10 minuti, utilizzando questo codec potremmo
 ridurre nettamente la dimensione del file anche di 300 volte. Usando un bitrate che varia dai 5-10 Mb/s,
 quindi un bit rate elevato per questa risoluzione che ci permette di mantenere un'ottima qualità,
 il file compresso avrebbe una dimensione dai 375 ai 750 MB.
 
-TODO: Magari si potrebbero spiegare meglio queste due tecniche più avanti nell'articolo, quindi sarebbe meglio scrivere in questo
-punto che questi due algoritmi verranno spiegati meglio nei paragrafi successivi
-
 \section{Tecnologie attuali}
-\subsection{H.264}
+\subsection{H.264/AVC}
 Il formato H.264 è stato introdotto nel 2003 e appartiene alla serie H.26X. Il suo obiettivo principale
 è quello di comprimere ulteriormente i file video senza compromettere la qualità visiva. Questa
 tecnologia consente di ottenere file video più leggeri mantenendo comunque un'elevata qualità
@@ -123,11 +113,40 @@ raggiunto un notevole 91\% di adozione tra gli sviluppatori nel settore video, c
 un pilastro fondamentale della tecnologia di compressione video. Inoltre, alcune delle tecnologie
 adottate da questo codec saranno cruciali per comprendere meglio il funzionamento dei codec successivi.
 
-\paragraph{Predizione dei frame}
-\paragraph{Trasformazione e quantizzazione}
-\paragraph{Compensazione del moto}
-\paragraph{Codifica entropica}
-\paragraph{Controllo del flusso}
+\paragraph{Macroblock}\hphantom{A}\\
+TODO
+
+\paragraph{Intraframe/intra prediciton}\hphantom{A}\\
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/intraframe-algo.png}
+    \caption{Rappresentazione dei 3 metodi più utilizzati per la predizione intraframe}
+    \label{fig:intraframe_algo}
+\end{figure}
+La compressione intraframe, si riferisce alla compressione dei dati all'interno di un singolo
+fotogramma. Questo metodo si divide più passaggi:
+\begin{enumerate}
+  \item Per ogni macroblock, viene utilizzato un modello di predizione per stimare i valori dei pixel
+  all'interno del blocco basandosi sui valori dei pixel circostanti. Questo modello di predizione può
+  essere semplice (come la predizione dei pixel adiacenti) o più complesso (come la predizione basata
+  su modelli statistici o algoritmi di machine learning). I 3 metodi più utilizzati sono (Vedi
+  Figura~\ref{fig:intraframe_algo}) : traslandolo i pixel adiacenti già noti in orizzontale/verticale
+  oppure facendo una media dei pixel adiacenti.
+  Nel caso del formato H.264 ci sono in totale 9 algoritmi di intraframe.
+  \item Successivamente viene calcolata la residua, ovvero la differenza tra i pixel predetti e i
+  pixel dell'immagine non compressa
+  \item Infine viene scelta la matrice residua, che si è avvicinata di più al gruppo di pixel originale,
+  comprimendo così la dimensione del frame.
+\end{enumerate}
+
+TODO: non so se inserire l'esempio (nel caso le immagini sono gia salvate)
+
+\paragraph{Interframe}\hphantom{A}\\
+La compressione interframe, lavora sulla
+ridondanza temporale tra i frame adiacenti. Invece di codificare ogni frame singolarmente,
+vengono identificate e codificate solo le differenze tra i frame successivi o precedenti.
+Questo consente di ridurre ulteriormente le dimensioni del file video, poiché molte
+informazioni rimangono costanti tra i fotogrammi vicini.
 
 Il formato H.264 è stato anche il primo formato che necessitava di specifici acceleratori hardware per
 poter decodificare i video in tempo reale in quanto i calcoli da eseguire iniziavano ad essere molto
@@ -143,6 +162,8 @@ TODO: L'h264 essendo una tecnica che racchiude molti algoritmi complessi per la 
 Fino a 8K
 \subsection{VP9}    % forse non serve descriverlo
 \subsection{AV1}
+TODO: il codec AV1 è molto lento nel codificare/decodificare video, ma con un accelleratore apposito è nettamente più volece del H.265
+
 \subsection{Comparazione delle prestazioni}
 
 \section{Vantaggi per le aziende}
@@ -154,15 +175,18 @@ Non dimenticare di discutere anche delle sfide e delle considerazioni pratiche l
 TODO: si potrbbe parlare dell'approccio di NVIDIA per le video chat.
 
 \section{Bibliografia}
-\\-sito che parla della storia degli encorder https://api.video/blog/video-trends/the-history-of-video-compression-starts-in-1929/
-\\-parla dei tecnicismi del h.261 https://users.ece.utexas.edu/~ryerraballi/MSB/pdfs/M4L2.pdf
-\\-bitrate https://it.wikipedia.org/wiki/Velocit%C3%A0_di_trasmissione
+\\+sito che parla della storia degli encorder https://api.video/blog/video-trends/the-history-of-video-compression-starts-in-1929/
+\\+parla dei tecnicismi del h.261 https://users.ece.utexas.edu/~ryerraballi/MSB/pdfs/M4L2.pdf
+\\+bitrate https://it.wikipedia.org/wiki/Velocit%C3%A0_di_trasmissione
 \\-utile! parla dei tecnicismi del h.264 nella sezione di Implementing h.264 https://www.embedded.com/implementing-h-264-video-compression-\\algorithms-on-a-software-configurable-processor/
-\\ sito di International Telecommunication Union che parla dello standard h.264 https://www.itu.int/rec/T-REC-H.264-202108-I/en
-\\-repository di un'implementazione dell'h.264 https://github.com/cisco/openh264
+\\+utile! intra prediction https://www.sciencedirect.com/topics/computer-science/intra-prediction
+\\-utile! sito di International Telecommunication Union che parla dello standard h.264 https://www.itu.int/rec/T-REC-H.264-202108-I/en
+\\+repository di un'implementazione dell'h.264 https://github.com/cisco/openh264
 \\-sito ufficiale di h.265 https://hevc.hhi.fraunhofer.de/
-\\-repository di h.265 https://vcgit.hhi.fraunhofer.de/jvet/HM
+\\+repository di h.265 https://vcgit.hhi.fraunhofer.de/jvet/HM
 \\-utile! parla dei tecnicismi del h.265 nella sezione di Coding tools https://en.wikipedia.org/wiki/High_Efficiency_Video_Coding
+\\-utile! paragona AV1 a h.265 https://subclassy.github.io/compression#:~:text=265%20takes%202.83s%20on,so%20much%20time%20to%20process.
 \\-utile! paragona le performance dei vari codec su hw nvidia https://developer.nvidia.com/video-codec-sdk
+\\-utile! https://support.google.com/youtube/answer/2853702?hl=it
 
 \end{document}
