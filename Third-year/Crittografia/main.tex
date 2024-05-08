@@ -97,6 +97,7 @@ quindi un bit rate elevato per questa risoluzione che ci permette di mantenere u
 il file compresso avrebbe una dimensione dai 375 ai 750 MB.
 
 \section{Tecnologie attuali}
+TODO: Da qualche parte descrivere che cos'è Luma e Chroma
 \subsection{H.264/AVC}
 Il formato H.264 è stato introdotto nel 2003 e appartiene alla serie H.26X. Il suo obiettivo principale
 è quello di comprimere ulteriormente i file video senza compromettere la qualità visiva. Questa
@@ -113,8 +114,42 @@ raggiunto un notevole 91\% di adozione tra gli sviluppatori nel settore video, c
 un pilastro fondamentale della tecnologia di compressione video. Inoltre, alcune delle tecnologie
 adottate da questo codec saranno cruciali per comprendere meglio il funzionamento dei codec successivi.
 
+\paragraph{Slices}\hphantom{A}\\
+Una slice è una porzione sequenziale di dati all'interno di un frame video. Questa porzione è suddivisa
+in unità più piccole chiamate macroblock. La divisione del frame in slice viene fatta per organizzare e
+processare i dati video in modo efficiente durante la codifica e la decodifica. Un esempio di come
+questo approccio potrebbe aumentare l'efficienza è quello di processare ogni slice con un thread diverso.
+
 \paragraph{Macroblock}\hphantom{A}\\
-TODO
+Un immagine viene divisa in dei blocchi quadrati di pixel chiamati macroblock e possono avere una
+dimensione variabile in base allo codec utilizzato, nel caso del H.264 è sempre 16x16 pixel. Il
+macroblock non raggruppa al suo interno l'immagine originale, bensì 3 matrici più semplici, la
+Luma e le matrici Cb e Cr della Chroma. Le dimensioni di queste sotto-matrici può variare da
+formato a formato, ma nel caso del H.264 la Luma mantiene un la stessa dimensione dell'immagine
+originale, ovvero 16x16, mentre le due matrici Cb e Cr, possono essere una campione 4x4, 8x4, 4x8.
+Di solito il livello di campionamento delle matrici Chroma è inferiore a quella della Lume, in quanto
+l'occhio umano è più attente ad osservare la luminosità e i bordi degli oggetti rispetto al colore.
+Solo con questa piccola ottimizzazione si può risparmiare fino al 50\% sullo spazio occupato su disco.
+Infine i macroblock possono essere suddivisi in blocchi più piccoli, chiamati
+\textbf{prediction-blocks}, di vari dimensioni e forme, ad esempio il codec H.264 può suddividerli in
+4 prediction-blocks da 8x8, oppure 16 da 1x1, ma esistono altri codec che possono suddividere i
+macroblock in matrici rettangolari, oppure triangolari. Questa suddivisione in prediction-blocks
+viene fatta in quanto un prediction-block più è piccolo e meglio riuscirà a rappresentare frammenti
+di immagine che contengono molto dettaglio a discapito della potenza di calcolo necessaria a
+decodificare l'immagine durante la fase di Intraframe. Si noti come nella
+Figura~\ref{fig:macroblocks_sub_division}le regioni del cielo e della montagna, caratterizzate da
+pixel simili, generino macroblocks più ampi. Al contrario, in zone in cui coesistono sia la montagna
+che il cielo, i macroblocks sono più piccoli per gestire le variazioni nei dettagli di entrambe le
+zone.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/macroblocks_sub-division.png}
+    \caption{Suddivisione di un'immagine in macroblocks e prediction-blocks.}
+    \label{fig:macroblocks_sub_division}
+\end{figure}
+
+TODO: volendo si possono inserire delle immagini per le slice e i macroblock
 
 \paragraph{Intraframe/intra prediciton}\hphantom{A}\\
 \begin{figure}[h]
@@ -126,31 +161,88 @@ TODO
 La compressione intraframe, si riferisce alla compressione dei dati all'interno di un singolo
 fotogramma. Questo metodo si divide più passaggi:
 \begin{enumerate}
-  \item Per ogni macroblock, viene utilizzato un modello di predizione per stimare i valori dei pixel
-  all'interno del blocco basandosi sui valori dei pixel circostanti. Questo modello di predizione può
-  essere semplice (come la predizione dei pixel adiacenti) o più complesso (come la predizione basata
-  su modelli statistici o algoritmi di machine learning). I 3 metodi più utilizzati sono (Vedi
-  Figura~\ref{fig:intraframe_algo}) : traslandolo i pixel adiacenti già noti in orizzontale/verticale
-  oppure facendo una media dei pixel adiacenti.
+  \item Per ogni macroblock o prediction-block, viene utilizzato un modello di predizione per stimare
+  i valori delle matrici al suo interno basandosi sui valori delle celle adiacenti. Questo modello di
+  predizione può essere semplice (es. facendo la media dei pixel adiacenti) o più complesso (come la
+  predizione basata su modelli statistici o algoritmi di machine learning). I 3 metodi più utilizzati
+  sono (Vedi Figura~\ref{fig:intraframe_algo}) : traslandolo i pixel adiacenti già noti in
+  orizzontale/verticale oppure facendo una media dei pixel adiacenti.
   Nel caso del formato H.264 ci sono in totale 9 algoritmi di intraframe.
   \item Successivamente viene calcolata la residua, ovvero la differenza tra i pixel predetti e i
   pixel dell'immagine non compressa
   \item Infine viene scelta la matrice residua, che si è avvicinata di più al gruppo di pixel originale,
   comprimendo così la dimensione del frame.
 \end{enumerate}
+È nella fase di intraframe che viene fatta la suddivisione dei macroblock in prediction-block.
+L'algoritmo sceglie la suddivisione migliore semplicemente provando tutti i tipi di divisioni dei
+blocchi fino a trovare quello con la residua migliore.
 
-TODO: non so se inserire l'esempio (nel caso le immagini sono gia salvate)
+TODO: non so se inserire l'esempio (nel caso le immagini sono gia salvate) (per rendere le idee piu chiare...)
 
-\paragraph{Interframe}\hphantom{A}\\
-La compressione interframe, lavora sulla
-ridondanza temporale tra i frame adiacenti. Invece di codificare ogni frame singolarmente,
-vengono identificate e codificate solo le differenze tra i frame successivi o precedenti.
-Questo consente di ridurre ulteriormente le dimensioni del file video, poiché molte
-informazioni rimangono costanti tra i fotogrammi vicini.
+\paragraph{Interframe/Motion compensation}\hphantom{A}\\
+Quando si parla di compressione, l'obiettivo è ridurre al minimo le ridondanze. Nel contesto dei video,
+si nota subito che frame adiacenti temporalmente condividono una considerevole quantità di pixel.
+L'algoritmo di interframe si occupa proprio di questo aspetto. Invece di analizzare i singoli frame uno
+dopo l'altro, prende in considerazione più frame contemporaneamente per individuare le similitudini tra
+di essi. Naturalmente, ci sono situazioni in cui ciò non è fattibile, come durante un cambio di scena,
+dove la maggior parte o addirittura tutti i pixel possono cambiare da un frame all'altro.
 
-Il formato H.264 è stato anche il primo formato che necessitava di specifici acceleratori hardware per
-poter decodificare i video in tempo reale in quanto i calcoli da eseguire iniziavano ad essere molto
-complessi. Questo portò alla luce che con l'avanzare delle nuove tecnologie per la compressione dei
+Per prima cosa se devono classificare ogni frame di un video, per fare ciò il video viene
+ridimensionato ad una risoluzione inferiore e per ogni frame si applicano sia l'algoritmo di intraframe,
+che di  interframe e si comparano i due risultati. Se il costo del intraframe è inferiore, questo
+significa che il frame che si sta analizzando non ha elementi in comune con i frame precedenti,
+suggerendo così un cambio di scena. Ci sono in totale 3 tipi di frame (vedi Figura~\ref{fig:frame_type}):
+
+\begin{itemize}
+  \item Il tipo \textbf{I frame} di solito indica un cambio di scena, pertanto si applica l'algoritmo
+  di intraframe, poiché non ci sono altri frame di riferimento. Di conseguenza, questo è il frame meno
+  compresso. 
+  \item Il tipo \textbf{P frame} contiene solo la parte dell'immagine che è cambiata rispetto al fotogramma
+  precedente o successivo, quindi si può applicare esclusivamente l'algoritmo di Interframe. Questo tipo di
+  frame occupa circa il 50\% in meno di spazio rispetto al tipo I.
+  \item Il tipo \textbf{B frame} è un ibrido tra i due precedenti, in quanto il frame corrente è un misto
+  tra frame precedenti e successivi, ma che contiene elementi nuovi. Questo è il tipo di frame più
+  efficiente in quanto occupa il 25\% dello spazio rispetto al tipo I.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/frame-type.png}
+    \caption{Classificazione del tipo di frame.
+    I macroblock viola indicano che quel frame è stato ricostruito da un frame precedente,
+    mentre quello verde che è stato codificato grazie ai pixel interni al frame.}
+    \label{fig:frame_type}
+\end{figure}
+
+Nel dettaglio, per comprendere quali elementi di un frame vengono ripetuti all'interno di altri frame,
+vengono nuovamente sfruttati i macroblock. Inoltre, i frame non vengono codificati in ordine cronologico,
+ma in modo sparso, in modo che quando si analizza un frame che utilizza l'algoritmo di interframe, possa
+attingere informazioni sia dai frame precedenti che da quelli successivi, come mostrato nella
+Figura~\ref{fig:interframe}. Ci sono due modi per popolare un macroblock grazie al intraframe:
+
+\begin{itemize}
+  \item La \textbf{Uni-directional Motion Compensation} consiste nell'individuare il macroblock identico
+  tra i frame precedenti o successivi e salvandolo come un \textbf{motion vector}, ovvero un vettore che
+  identifica lo spostamento del macroblock tra i due frame.
+  \item La \textbf{Bi-directional Motion Compensation} implica invece l'individuazione di due macroblock,
+  uno nel frame successivo e uno in quello precedente, che più si avvicinano a quello in esame.
+  Successivamente, si salvano i loro due motion vector e si combinano utilizzando una funzione matematica.
+  Ad esempio, il codec H.264 calcola la media tra le due matrici, sottrae i pixel originali generando una
+  matrice "residuo" e viene anch'essa memorizzata.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/interframe.png}
+    \caption{Nella figura viene mostrato un esempio di come l'algoritmo di interframe
+    attinge a frame diversi per ricostruire il macroblock interessato.}
+    \label{fig:interframe}
+\end{figure}
+
+La compressione e, soprattutto, la decodifica in tempo reale di un video richiedono considerevole potenza
+di calcolo. Il formato H.264 è stato pioniere nell'utilizzo di acceleratori hardware dedicati per la
+decodifica dei video, poiché le operazioni computazionali richieste diventavano sempre più complesse.
+Questo portò alla luce che con l'avanzare delle nuove tecnologie per la compressione dei
 video, che riducevano le dimensioni dei file, aumentava anche la potenza di calcolo necessaria per
 la codifica e decodifica dei video.
 
