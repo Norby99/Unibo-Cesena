@@ -228,7 +228,8 @@ Figura~\ref{fig:interframe}. Ci sono due modi per popolare un macroblock grazie 
   uno nel frame successivo e uno in quello precedente, che più si avvicinano a quello in esame.
   Successivamente, si salvano i loro due motion vector e si combinano utilizzando una funzione matematica.
   Ad esempio, il codec H.264 calcola la media tra le due matrici, sottrae i pixel originali generando una
-  matrice "residuo" e viene anch'essa memorizzata.
+  matrice "residuo" e viene anch'essa memorizzata. Questo permette non solo di di memorizzare i
+  macroblocks identici tra frame, ma anche di poter tracciare quelli che vengono ruotati, stirati o inclinati.
 \end{itemize}
 
 \begin{figure}[h]
@@ -239,12 +240,54 @@ Figura~\ref{fig:interframe}. Ci sono due modi per popolare un macroblock grazie 
     \label{fig:interframe}
 \end{figure}
 
+\paragraph{Transformation}\hphantom{A}\\
+Ora che tutti i macroblocks sono stati in qualche modo codificati, si prendono solo quelli che contengono
+dei residui e vengono divisi in blocchi 8x8 e viene applicata la trasformata discreta del coseno
+(\textbf{DCT} - Discrete Cosine Transform).
+
+La trasformata DCT consiste nel applicare un filtro di dimensioni costante (il codec H.264 utilizza un
+filtro di dimensioni 16x16 per le matrici Luma e 4x4 per le matrici Chroma) alle matrici presenti
+all'interno di un macroblock, così facendo trasforma i valori dei pixel dal dominio spaziale al
+dominio delle frequenze individuando così i blocchi che contengono più informazioni, ovvero quelli
+con frequenza bassa.
+
+Cosi facendo, si avranno i blocchi 8x8 ordinati in base al livello della loro frequenza.
+
+\paragraph{Quantization}\hphantom{A}\\
+La quantizzazione coinvolge la divisione dei blocchi 8x8 precedentemente calcolati per una costante,
+seguita dall'arrotondamento al numero intero più vicino. Questo processo comporta una perdita di
+dettaglio, soprattutto nelle aree ad alta frequenza (quindi meno evidenti), ma porta a una riduzione
+delle dimensioni del file video. In pratica, maggiore è la costante con cui dividiamo la matrice,
+maggiore è il risparmio di memoria, ma al contempo peggiora la qualità dell'immagine.
+
+Organizzare i blocchi in base alla loro frequenza è vantaggioso in quanto facilita una codifica e
+decodifica più efficiente. Questa strategia consente di identificare i blocchi più complessi da
+elaborare in anticipo.
+
+TODO: potrei mettere un immagine di come si quantizza una matrice
+
+\paragraph{Loop filter}\hphantom{A}\\
+
+\paragraph{Ricapitolando}\hphantom{A}\\
+
 La compressione e, soprattutto, la decodifica in tempo reale di un video richiedono considerevole potenza
-di calcolo. Il formato H.264 è stato pioniere nell'utilizzo di acceleratori hardware dedicati per la
-decodifica dei video, poiché le operazioni computazionali richieste diventavano sempre più complesse.
-Questo portò alla luce che con l'avanzare delle nuove tecnologie per la compressione dei
-video, che riducevano le dimensioni dei file, aumentava anche la potenza di calcolo necessaria per
-la codifica e decodifica dei video.
+di calcolo. Il formato H.264 è stato uno dei primi codec a necessitare di un acceleratori hardware
+dedicati per la decodifica dei video, poiché le operazioni computazionali richieste diventavano sempre
+più complesse. Questo portò alla luce che con l'avanzare delle nuove tecnologie per la compressione dei
+video, che riducevano le dimensioni dei file, aumentava anche la potenza di calcolo necessaria per la
+codifica e decodifica dei video.
+
+Le differenze principali con il codec H.261 sono
+
+- supporto di più dimensioni per la chroma subsampling
+- slice di dimensioni variabili, quanto nel vecchio codec ogni slice aveva una dimensione prefissata
+- supporto a DVD, ATV, HDTV
+- i motion vector non sono più limitati a spostare i macroblocks all'interno della loro griglia
+(ovvero che un macroblock deve per forza stare al posto di un altro), ma possono anche indicare una
+posizione con una precisione di 1/4 di macroblock.
+- predizione dei movimenti  (da controllare)
+- la trasformazione discreta del coseno (DCT)
+- la compensazione del movimento (da controllare)
 
 Introduce la possibilità di codificare fino a 4k, poi più avanti arriva fino all'8k.
 Youtube lo ha usato fino al 2010 per poi abbandonarlo in favore del proprio VP8.
@@ -254,7 +297,7 @@ TODO: L'h264 essendo una tecnica che racchiude molti algoritmi complessi per la 
 Fino a 8K
 \subsection{VP9}    % forse non serve descriverlo
 \subsection{AV1}
-TODO: il codec AV1 è molto lento nel codificare/decodificare video, ma con un accelleratore apposito è nettamente più volece del H.265
+TODO: il codec AV1 è molto lento nel codificare/decodificare video, ma con un acceleratore apposito è nettamente più veloce del H.265
 
 \subsection{Comparazione delle prestazioni}
 
@@ -270,10 +313,11 @@ TODO: si potrbbe parlare dell'approccio di NVIDIA per le video chat.
 \\+sito che parla della storia degli encorder https://api.video/blog/video-trends/the-history-of-video-compression-starts-in-1929/
 \\+parla dei tecnicismi del h.261 https://users.ece.utexas.edu/~ryerraballi/MSB/pdfs/M4L2.pdf
 \\+bitrate https://it.wikipedia.org/wiki/Velocit%C3%A0_di_trasmissione
-\\-utile! parla dei tecnicismi del h.264 nella sezione di Implementing h.264 https://www.embedded.com/implementing-h-264-video-compression-\\algorithms-on-a-software-configurable-processor/
+\\+utile! parla dei tecnicismi del h.264 nella sezione di Implementing h.264 https://www.embedded.com/implementing-h-264-video-compression-\\algorithms-on-a-software-configurable-processor/
 \\+utile! intra prediction https://www.sciencedirect.com/topics/computer-science/intra-prediction
-\\-utile! sito di International Telecommunication Union che parla dello standard h.264 https://www.itu.int/rec/T-REC-H.264-202108-I/en
+\\+utile! sito di International Telecommunication Union che parla dello standard h.264 https://www.itu.int/rec/T-REC-H.264-202108-I/en
 \\+repository di un'implementazione dell'h.264 https://github.com/cisco/openh264
+\\+parla di molte cose... vechi codec, tranformation, quantizzazione https://www.researchgate.net/publication/334546287_Data_Reduction_in_MMBD_Computing#pf17
 \\-sito ufficiale di h.265 https://hevc.hhi.fraunhofer.de/
 \\+repository di h.265 https://vcgit.hhi.fraunhofer.de/jvet/HM
 \\-utile! parla dei tecnicismi del h.265 nella sezione di Coding tools https://en.wikipedia.org/wiki/High_Efficiency_Video_Coding
