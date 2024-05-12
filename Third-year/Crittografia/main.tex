@@ -242,29 +242,60 @@ Figura~\ref{fig:interframe}. Ci sono due modi per popolare un macroblock grazie 
 
 \paragraph{Transformation}\hphantom{A}\\
 Ora che tutti i macroblocks sono stati in qualche modo codificati, si prendono solo quelli che contengono
-dei residui e vengono divisi in blocchi 8x8 e viene applicata la trasformata discreta del coseno
+dei residui e vengono divisi in blocchi rettangolari 8x8 e viene applicata la trasformata discreta del coseno
 (\textbf{DCT} - Discrete Cosine Transform).
 
-La trasformata DCT consiste nel applicare un filtro di dimensioni costante (il codec H.264 utilizza un
-filtro di dimensioni 16x16 per le matrici Luma e 4x4 per le matrici Chroma) alle matrici presenti
-all'interno di un macroblock, così facendo trasforma i valori dei pixel dal dominio spaziale al
-dominio delle frequenze individuando così i blocchi che contengono più informazioni, ovvero quelli
-con frequenza bassa.
+La trasformata discreta del coseno permette di rilevare variazioni di informazioni (come il colore per
+i blocchi Chroma o la luminosità per i blocchi Lumen) trasformando i valori dei pixel dal dominio
+spaziale al dominio delle frequenze individuando così i blocchi con con più dettagli, ovvero i blocchi
+con frequenza maggiore.
 
-Cosi facendo, si avranno i blocchi 8x8 ordinati in base al livello della loro frequenza.
+Per applicare la trasformata discreta del coseno bisogna:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/DCT-table.png}
+    \caption{Tabella DCT. In particolare si noti come partendo dall'angolo in alto a sinistra,
+    più si va verso destra e più la frequenza della matrice aumenta in orizzontale e più si va
+    verso il basso e più la frequenza della matrice aumenta in verticale.}
+    \label{fig:DCT_table}
+\end{figure}
+
+\begin{enumerate}
+    \item Dividere l'immagine (ovvero le 3 matrici dei residui) in piccoli blocchi quadrati 8x8
+    \item Si normalizzano i valori delle matrici sottraendo a ciascun valore 128, cosi facendo
+    ogni cella sarà compresa tra 128 e -127. Se prendiamo ad esempio la matrice Lumen il valore
+    128 corrisponderà al bianco, mentre il valore -127 al nero e i valori centrali saranno tutte
+    le tonalità di grigio
+    \item Successivamente si cerca di ricostruire la matrice 8x8 ottenuta come somma di matrici
+    prese da una matrice DCT precalcolata (vedi figura Figura~\ref{fig:DCT_table}. Nella 
+    Figura~\ref{fig:DCT_example} si può notare come partendo da un immagine, come si possa risalire
+    ad essa mediante una somma mi matrici prese dalla tabella DCT.
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/DCT-example.png}
+    \caption{Esempio di come una matrice (in alto a sinistra) mediante somma di matrici DCT
+    più essere ricostruita.}
+    \label{fig:DCT_example}
+\end{figure}
 
 \paragraph{Quantization}\hphantom{A}\\
 La quantizzazione coinvolge la divisione dei blocchi 8x8 precedentemente calcolati per una costante,
 seguita dall'arrotondamento al numero intero più vicino. Questo processo comporta una perdita di
 dettaglio, soprattutto nelle aree ad alta frequenza (quindi meno evidenti), ma porta a una riduzione
 delle dimensioni del file video. In pratica, maggiore è la costante con cui dividiamo la matrice,
-maggiore è il risparmio di memoria, ma al contempo peggiora la qualità dell'immagine.
+maggiore è il risparmio di memoria, ma al contempo peggiora la qualità dell'immagine. Così facendo
+alla fine si otterrà una matrice di quantizzazione che tiene conto di ogni valore di divisione di
+ogni blocco.
 
-Organizzare i blocchi in base alla loro frequenza è vantaggioso in quanto facilita una codifica e
+Organizzare i blocchi in base alla loro frequenza inoltre, è vantaggioso in quanto facilita una codifica e
 decodifica più efficiente. Questa strategia consente di identificare i blocchi più complessi da
 elaborare in anticipo.
 
 TODO: potrei mettere un immagine di come si quantizza una matrice
+TODO: si potrebbe aggiungere che molti passaggi come gli ultimi due avvengono anche nella compressione delle immagini, come nella jpeg
 
 \paragraph{Loop filter}\hphantom{A}\\
 
