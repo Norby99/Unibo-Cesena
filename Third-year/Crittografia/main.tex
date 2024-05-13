@@ -9,6 +9,15 @@
 \usepackage[italian]{babel}
 \pagestyle{plain}
 \usepackage{graphicx}
+\usepackage{hyperref}   % serve per i link
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+}   % serve per i link
 \usepackage[table,xcdraw]{xcolor}
 \usepackage{tabularx}
 \usepackage{ragged2e}               % migliora la formattazione del testo all'interno delle celle
@@ -242,8 +251,8 @@ Figura~\ref{fig:interframe}. Ci sono due modi per popolare un macroblock grazie 
 
 \paragraph{Transformation}\hphantom{A}\\
 Ora che tutti i macroblocks sono stati in qualche modo codificati, si prendono solo quelli che contengono
-dei residui e vengono divisi in blocchi rettangolari 8x8 e viene applicata la trasformata discreta del coseno
-(\textbf{DCT} - Discrete Cosine Transform).
+dei residui e vengono divisi in blocchi rettangolari 8x8 e viene applicata la trasformata discreta del
+coseno (\textbf{DCT} - Discrete Cosine Transform).
 
 La trasformata discreta del coseno permette di rilevare variazioni di informazioni (come il colore per
 i blocchi Chroma o la luminosità per i blocchi Lumen) trasformando i valori dei pixel dal dominio
@@ -269,8 +278,8 @@ Per applicare la trasformata discreta del coseno bisogna:
     le tonalità di grigio
     \item Successivamente si cerca di ricostruire la matrice 8x8 ottenuta come somma di matrici
     prese da una matrice DCT precalcolata (vedi figura Figura~\ref{fig:DCT_table}. Nella 
-    Figura~\ref{fig:DCT_example} si può notare come partendo da un immagine, come si possa risalire
-    ad essa mediante una somma mi matrici prese dalla tabella DCT.
+    Figura~\ref{fig:DCT_example} si può notare come partendo da un immagine, come si possa
+    risalire ad essa mediante una somma mi matrici prese dalla tabella DCT.
 \end{enumerate}
 
 \begin{figure}[h]
@@ -282,20 +291,91 @@ Per applicare la trasformata discreta del coseno bisogna:
 \end{figure}
 
 \paragraph{Quantization}\hphantom{A}\\
-La quantizzazione coinvolge la divisione dei blocchi 8x8 precedentemente calcolati per una costante,
-seguita dall'arrotondamento al numero intero più vicino. Questo processo comporta una perdita di
-dettaglio, soprattutto nelle aree ad alta frequenza (quindi meno evidenti), ma porta a una riduzione
-delle dimensioni del file video. In pratica, maggiore è la costante con cui dividiamo la matrice,
-maggiore è il risparmio di memoria, ma al contempo peggiora la qualità dell'immagine. Così facendo
-alla fine si otterrà una matrice di quantizzazione che tiene conto di ogni valore di divisione di
-ogni blocco.
+La quantizzazione implica la creazione di due matrici, chiamate tabelle di quantizzazione, per
+suddividere i valori delle matrici ottenute tramite la trasformazione. Queste due matrici, una
+per le Luma e una per le Chroma, sono identiche per l'intera immagine e sono strutturate in
+modo che i valori più elevati si trovino nella parte inferiore destra, corrispondente alle
+frequenze più alte nell'immagine DCT. Questo schema favorisce una migliore compressione nelle
+aree in cui le frequenze dell'immagine sono più elevate.
 
-Organizzare i blocchi in base alla loro frequenza inoltre, è vantaggioso in quanto facilita una codifica e
-decodifica più efficiente. Questa strategia consente di identificare i blocchi più complessi da
-elaborare in anticipo.
+Per quantizzare un blocco, ogni valore DCT viene diviso per il valore corrispondente nella
+tabella di quantizzazione e successivamente arrotondato al numero intero più vicino (vedi
+l'esempio della Figura~\ref{fig:quantization_example}). Questo processo riduce leggermente la
+qualità dell'immagine, ma lo fa in modo intelligente, rimuovendo dettagli dalle aree ad alta
+frequenza, impercettibili per l'occhio umano.
 
-TODO: potrei mettere un immagine di come si quantizza una matrice
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/quantization-example.png}
+    \caption{Esempio di quantizzazione della matrice DCT.}
+    \label{fig:quantization_example}
+\end{figure}
+
 TODO: si potrebbe aggiungere che molti passaggi come gli ultimi due avvengono anche nella compressione delle immagini, come nella jpeg
+
+\paragraph{Entropy Coding}\hphantom{A}\\
+Nella fase di Entropy Coding, si mira a comprimere ulteriormente i dati, facendo riferimento non
+all'immagine come tale, ma come ad una stringa di bit o simboli. Esistono diversi tipi di
+algoritmi di Entropy Coding che possono variare da codec a codec e da implementazione a implementazione.
+Tra i più importanti vi è l'\textbf{Arithmetic codec}, il quale cerca di predire i prossimi
+simboli o bit in base a una serie data di simboli e una tabella di probabilità. Durante ogni fase
+della codifica di un video, viene applicato un algoritmo di codifica diverso o leggermente
+modificato. Un altro algoritmo di codifica degno di nota è il \textbf{codifica di Huffman}, o
+Huffman encoding, rinomato per la sua flessibilità. Oltre ad essere utilizzato nella codifica video,
+trova impiego anche nella codifica delle immagini (come nella JPEG), nella codifica audio
+(come nella MP3) e nella compressione dei file (come nei formati PKZIP, ZIP e WinRar).
+
+Nella codifica video, la \textbf{codifica di Huffman} subisce leggere modifiche e viene impiegata
+in combinazione con l'algoritmo \textbf{Run Length}. Quest'ultimo viene viene applicato alle matrici
+quantizzate, come discusso nel paragrafo precedente. In questo contesto, i valori delle matrici vengono
+letti in modo zig-zag, partendo dall'angolo in alto a sinistra e procedendo verso il basso a destra.
+Questo schema di lettura organizza i valori in modo tale che quelli con frequenza più alta, spesso 
+rappresentati da sequenze di zeri consecutive, si trovino verso la fine della sequenza. Una volta ottenuta
+la lista di numeri, quando si incontrano due o più numeri ripetuti si tiene conto di quante volte un certo
+numero si è ripetuto invece di riscrivere ogni volta lo stesso numero (vedi l'esempio della
+Figura~\ref{fig:huffman_example})).
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/huffman-example.png}
+    \caption{Esempio della codifica di Huffman e Run Length.}
+    \label{fig:huffman_example}
+\end{figure}
+
+Una volta ottenuta una lista con tutti i numeri e la loro frequenza, possiamo procedere applicando
+la \textbf{codifica di Huffman} (nota come in questo paragrafo verrà spiegato come l'algoritmo
+viene applicato alla codifica video, se interessati ad una visione più ampia,
+\href{https://www.youtube.com/watch?v=JsTptu56GM8}{questo video} lo spiega nel dettaglio con tanto
+di illustrazioni). L'algoritmo è diviso in diversi passaggi:
+
+\begin{enumerate}
+    \item Si ordinare la lista precedentemente ottenuta in base alla frequenza dei simboli.
+    \item Si prendono gli ultimi due elementi e si inizia a costruire un piccolo albero con a base i due
+    elementi selezionati e come padre la somma di tutti i figli.
+    \item Si prende l'oggetto albero appena creato e lo si reinserisce nella lista nella posizione dettata
+    della propria frequenza.
+    \item Si procede in questo modo fino a quando la lista sarà composta da un solo elemento.
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/huffman-tree.png}
+    \caption{Esempio di un albero di Huffman costruito con i valori ottenuti grazie all'algoritmo
+    Run Length.}
+    \label{fig:huffman_tree}
+\end{figure}
+
+A questo punto, si dispone di un vasto albero che contiene tutti i numeri della lista insieme alle
+rispettive frequenze (consultare la Figura~\ref{fig:huffman_tree}). Ora, per codificare ciascun numero,
+che ricordiamo variare da -127 a 128, non è più necessario utilizzare 8 bit, ma in molti casi molto
+meno. Abbiamo trasformato il processo di codifica da una rappresentazione binaria diretta di ciascun
+numero a un'indicazione degli indici dell'albero, dove ogni sequenza di 0 e 1 determina la direzione
+da seguire nell'albero per raggiungere il simbolo desiderato.
+
+Prendendo in considerazione l'esempio illustrato nella Figura~\ref{fig:huffman_example}, inizialmente
+la matrice occupava uno spazio di 8x8x8, equivalenti a 512 bit. Dopo l'applicazione degli algoritmi
+Run Length e Huffman, il consumo di spazio si riduce drasticamente a soli 239 bit, permettendo un
+risparmio di circa il 46\% dello spazio.
 
 \paragraph{Loop filter}\hphantom{A}\\
 
@@ -349,6 +429,8 @@ TODO: si potrbbe parlare dell'approccio di NVIDIA per le video chat.
 \\+utile! sito di International Telecommunication Union che parla dello standard h.264 https://www.itu.int/rec/T-REC-H.264-202108-I/en
 \\+repository di un'implementazione dell'h.264 https://github.com/cisco/openh264
 \\+parla di molte cose... vechi codec, tranformation, quantizzazione https://www.researchgate.net/publication/334546287_Data_Reduction_in_MMBD_Computing#pf17
+\\+codifica di huffman https://en.wikipedia.org/wiki/Huffman_coding
+\\+sito utilizzato per costruire l'albero di huffman https://suhaan-bhandary.github.io/Huffman-Coding/
 \\-sito ufficiale di h.265 https://hevc.hhi.fraunhofer.de/
 \\+repository di h.265 https://vcgit.hhi.fraunhofer.de/jvet/HM
 \\-utile! parla dei tecnicismi del h.265 nella sezione di Coding tools https://en.wikipedia.org/wiki/High_Efficiency_Video_Coding
