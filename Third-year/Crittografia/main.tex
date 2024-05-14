@@ -359,7 +359,7 @@ di illustrazioni). L'algoritmo è diviso in diversi passaggi:
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/huffman-tree.png}
+    \includegraphics[width=0.75\textwidth]{images/huffman-tree.png}
     \caption{Esempio di un albero di Huffman costruito con i valori ottenuti grazie all'algoritmo
     Run Length.}
     \label{fig:huffman_tree}
@@ -375,19 +375,62 @@ da seguire nell'albero per raggiungere il simbolo desiderato.
 Prendendo in considerazione l'esempio illustrato nella Figura~\ref{fig:huffman_example}, inizialmente
 la matrice occupava uno spazio di 8x8x8, equivalenti a 512 bit. Dopo l'applicazione degli algoritmi
 Run Length e Huffman, il consumo di spazio si riduce drasticamente a soli 239 bit, permettendo un
-risparmio di circa il 46\% dello spazio.
+risparmio di circa il 46\% dello spazio. L'esempio riportato non è ottimale in quanto alcuni simboli
+sono superflui (come lo spazio e le due parentesi quadre), ma sono stati lasciati per rendere
+l'esempio più esplicativo. Consultando l'albero si può notare come il passaggio di normalizzazione
+dei valori, ovvero sottrarre 128, abbia incrementato la compressione dei dati, in quanto ha aumentato
+la probabilità di avere due numeri identici. Per esempio i numeri 98 e 158 avrebbero richiesto due
+rami differenti all'interno dell'albero di Huffman, ma grazie alla normalizzazione si avranno -30 e
+30, che occuperanno solo un ramo in quanto il simbolo '-' sarà quasi sicuramente utilizzato per altri
+numeri.
 
-\paragraph{Loop filter}\hphantom{A}\\
+\paragraph{Loop filtering}\hphantom{A}\\
+Il \textbf{Loop filtering} è una tecnica che viene utilizzata solo nella ricostruzione delle immagini,
+non alla codifica e consiste nell'applicare un o più filtri all'immagine portando i seguenti benefici:
+
+\begin{itemize}
+    \item \textbf{Deblocking filter}: L'artefatto di blocco è un effetto causato dalla divisione del frame
+    in blocchi più piccoli durante la compressione creando delle linee di separazione tra di esse.
+    Per questo problema viene utilizzato il deblocking filter, che aiuta a ridurre l'effetto di questo
+    artefatto, migliorando l'aspetto generale del video (vedi Figura~\ref{fig:deblocking_filter}).
+    Questo è il filtro più importante in quanto è presente in quasi tutti i formati di compressione video.
+    \item \textbf{Riduzione del rumore}: Il rumore video può essere introdotto durante la compressione
+    o a causa delle condizioni di trasmissione. Il loop filtering può ridurre questo rumore,
+    migliorando la chiarezza complessiva dell'immagine.
+    \item \textbf{Smoothing dei contorni}: Per migliorare la qualità visiva, il loop filtering può
+    applicare un effetto di smoothing ai contorni dell'oggetto, rendendo l'immagine più gradevole e
+    meno soggetta a artefatti visivi.
+    \item \textbf{Miglioramento della compressione}: Una filtrazione efficace può ridurre la quantità
+    di dati richiesti per rappresentare un video, migliorando quindi l'efficienza della compressione
+    senza compromettere eccessivamente la qualità visiva.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/deblocking-filter.png}
+    \caption{Esempio di come il deblocking filter riduce gli artefatti tra i blocchi. Nell'immagine di
+    sinistra si può chiaramente vedere la linea di separazione tra i due blocchi.}
+    \label{fig:deblocking_filter}
+\end{figure}
 
 \paragraph{Ricapitolando}\hphantom{A}\\
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/h264-coding-loop.png}
+    \caption{Ciclo di codifica di un frame all'interno del formato H.264.}
+    \label{fig:h264_coding_loop}
+\end{figure}
+TODO: Spiegare molto in breve come funziona.
 
-La compressione e, soprattutto, la decodifica in tempo reale di un video richiedono considerevole potenza
-di calcolo. Il formato H.264 è stato uno dei primi codec a necessitare di un acceleratori hardware
-dedicati per la decodifica dei video, poiché le operazioni computazionali richieste diventavano sempre
-più complesse. Questo portò alla luce che con l'avanzare delle nuove tecnologie per la compressione dei
-video, che riducevano le dimensioni dei file, aumentava anche la potenza di calcolo necessaria per la
-codifica e decodifica dei video.
+Come abbiamo visto, a compressione e soprattutto la decodifica in tempo reale di un video richiedono
+considerevole potenza di calcolo. Il formato H.264 è stato uno dei primi codec a necessitare di un
+acceleratori hardware dedicati per la decodifica dei video, poiché le operazioni computazionali richieste
+diventavano sempre più complesse. Questo portò alla luce che con l'avanzare delle nuove tecnologie per
+la compressione dei video, che riducevano le dimensioni dei file, aumentava anche la potenza di calcolo
+necessaria per la codifica e decodifica dei video.
 
+---
+TODO: parte da rivedere e da posizionare meglio
 Le differenze principali con il codec H.261 sono
 
 - supporto di più dimensioni per la chroma subsampling
@@ -402,7 +445,7 @@ posizione con una precisione di 1/4 di macroblock.
 
 Introduce la possibilità di codificare fino a 4k, poi più avanti arriva fino all'8k.
 Youtube lo ha usato fino al 2010 per poi abbandonarlo in favore del proprio VP8.
-TODO: L'h264 essendo una tecnica che racchiude molti algoritmi complessi per la compressione video, necessita di accelleratori hardware per poter decodificare i fotogrammi in tempo reale.
+---
 
 \subsection{H.265}
 Fino a 8K
@@ -431,6 +474,7 @@ TODO: si potrbbe parlare dell'approccio di NVIDIA per le video chat.
 \\+parla di molte cose... vechi codec, tranformation, quantizzazione https://www.researchgate.net/publication/334546287_Data_Reduction_in_MMBD_Computing#pf17
 \\+codifica di huffman https://en.wikipedia.org/wiki/Huffman_coding
 \\+sito utilizzato per costruire l'albero di huffman https://suhaan-bhandary.github.io/Huffman-Coding/
+\\+h.264 loop filtering https://www.vcodex.com/h264avc-loop-filter
 \\-sito ufficiale di h.265 https://hevc.hhi.fraunhofer.de/
 \\+repository di h.265 https://vcgit.hhi.fraunhofer.de/jvet/HM
 \\-utile! parla dei tecnicismi del h.265 nella sezione di Coding tools https://en.wikipedia.org/wiki/High_Efficiency_Video_Coding
