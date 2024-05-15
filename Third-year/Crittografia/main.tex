@@ -97,13 +97,12 @@ sarà maggiore al costo di un peso più elevato. Vedi Figura~\ref{fig:confronto_
     \label{fig:confronto_bitrate}
 \end{figure}
 
-\noindent
-Un aspetto sorprendente di questo algoritmo è che per rilevare una diminuzione nella qualità del
-video, è necessario ridurre significativamente il bitrate.
-Per fare un confronto con l'esempio di prima del video da 10 minuti, utilizzando questo codec potremmo
-ridurre nettamente la dimensione del file anche di 300 volte. Usando un bitrate che varia dai 5-10 Mb/s,
-quindi un bit rate elevato per questa risoluzione che ci permette di mantenere un'ottima qualità,
-il file compresso avrebbe una dimensione dai 375 ai 750 MB.
+\noindent Un aspetto sorprendente di questo algoritmo è che per rilevare una diminuzione nella qualità
+del video, è necessario ridurre significativamente il bitrate. Per fare un confronto con l'esempio di
+prima del video da 10 minuti, utilizzando questo codec potremmo ridurre nettamente la dimensione del
+file anche di 300 volte. Usando un bitrate che varia dai 5-10 Mb/s, quindi un bit rate elevato per
+questa risoluzione che ci permette di mantenere un'ottima qualità, il file compresso avrebbe una
+dimensione dai 375 ai 750 MB.
 
 \section{Tecnologie attuali}
 TODO: Da qualche parte descrivere che cos'è Luma e Chroma
@@ -160,15 +159,16 @@ zone.
 
 TODO: volendo si possono inserire delle immagini per le slice e i macroblock
 
-\paragraph{Intraframe/intra prediciton}\hphantom{A}\\
+\paragraph{Intraframe/intra prediction}\hphantom{A}\\
 \begin{figure}[h]
     \centering
     \includegraphics[width=1\textwidth]{images/intraframe-algo.png}
     \caption{Rappresentazione dei 3 metodi più utilizzati per la predizione intraframe}
     \label{fig:intraframe_algo}
 \end{figure}
-La compressione intraframe, si riferisce alla compressione dei dati all'interno di un singolo
-fotogramma. Questo metodo si divide più passaggi:
+
+\noindent La compressione intraframe, si riferisce alla compressione dei dati all'interno di
+un singolo fotogramma. Questo metodo si divide più passaggi:
 \begin{enumerate}
   \item Per ogni macroblock o prediction-block, viene utilizzato un modello di predizione per stimare
   i valori delle matrici al suo interno basandosi sui valori delle celle adiacenti. Questo modello di
@@ -420,7 +420,13 @@ non alla codifica e consiste nell'applicare un o più filtri all'immagine portan
     \caption{Ciclo di codifica di un frame all'interno del formato H.264.}
     \label{fig:h264_coding_loop}
 \end{figure}
-TODO: Spiegare molto in breve come funziona.
+
+\noindent Per riassumere, il processo di compressione inizia con la lettura del file video e la
+suddivisione in frame. Ogni frame subisce una conversione dal formato RGB a YCrCb, e viene
+selezionato il tipo di frame. Successivamente, vengono applicati algoritmi di intra e inter prediction
+ai macroblocks dei residui, seguiti dalla trasformazione e quantizzazione. Infine, si utilizza la
+codifica di entropia per comprimere l'immagine a livello di bit, seguita dall'applicazione di vari
+filtri per migliorare la naturalezza dell'immagine.
 
 Come abbiamo visto, a compressione e soprattutto la decodifica in tempo reale di un video richiedono
 considerevole potenza di calcolo. Il formato H.264 è stato uno dei primi codec a necessitare di un
@@ -447,9 +453,71 @@ Introduce la possibilità di codificare fino a 4k, poi più avanti arriva fino a
 Youtube lo ha usato fino al 2010 per poi abbandonarlo in favore del proprio VP8.
 ---
 
-\subsection{H.265}
-Fino a 8K
+\subsection{H.265/HEVC}
+Con l'avanzare delle tecnologie e del crescente informatizzazione di un pubblico sempre più vasto
+è nato il problema di come rappresentare i nuovi formati video e di come poter comprimere ulteriormente
+questi file. Per questo motivo nel 2013 la \textbf{International Telecommunication Unit} ha creato il
+nuovo codec H.265, che non solo è in grado di comprimere meglio i filmati (considerando che il 4k sta
+prendendo sempre più piede in questo periodo), ma riesce a codificare filmati 3D, in HDR e anche
+video in 360°. Nei paragrafi successivi si vedremo quali cambiamenti sono stati apportati al predecessore
+H.264 per creare questo nuovo codec.
+
+\subsection{Coding Tree Unit (CTU)}
+La prima differenza con il formato H.264 è la gestione dei blocchi. Il codec H.265 non utilizza
+i classici macroblocks che sono stati usati fino a questo periodo dalla maggioranza dei codec, ma
+utilizza i \textbf{Coding Tree Unit}, che d'ora in poi verrà abbreviato con CTU. A differenza
+dei macroblocks che sono di dimensione variabili 16x16, i CTU hanno tutte dimensioni identiche
+64x64, 32x32 o 16x16 all'interno di un frame (questo parametro dipende dal bitrate selezionato al inizio
+della codifica,inoltre CTU di dimensioni più grandi permettono una codifica più efficiente e una resa
+grafica più alta, a discapito del tempo di codifica, che più crescere esponenzialmente). Le CTU, come i
+macroblocks sono divisi nei tre sotto blocchi 1x Luma e 2x Chroma chiamati \textbf{Coding Tree Block} o CTU.
+Un grosso problema delle CTU è che sono troppo grandi per poter eseguire gli algoritmi di inter e intra
+prediction e per ciò ogni CTU viene ulteriormente divisa in \textbf{Coding Block} (CB), che possono avere
+dimensioni variabili da 32x32 fino a 8x8.
+Le Coding Block sono l'unità più piccola su cui lavorare e si possono distinguere in due tipi:
+
+\begin{itemize}
+    \item \textbf{Prediction Block} (PB) se si sta usando un algoritmo di Interframe. Questi sono
+    gli unici tipi di blocchi che possono essere suddivisi in 2, creando dei rettangoli.
+    \item \textbf{Transform Block} (TB) se si sta usando un algoritmo di Intraframe, quindi contiene
+    dati sulle residue delle immagini.
+\end{itemize}
+
+Come detto precedentemente le CTU, sono divise in 3 CTB per ogni matrice di Luma/Chroma; la stessa
+cosa vale per le componenti sottostanti, quindi esiste una \textbf{Prediction Unit} (PU) che contiene
+a sua volta tre Prediction Block e così via. Non solo gli oggetti "Unit" oltre ai blocchi di matrici
+contengono un relativo \textbf{Syntax Element} che tiene traccia di come un determinato blocco è
+stato codificato, ad esempio la Syntax Element di una Coding Unit contiene le informazioni circa
+ il tipo di algoritmo (Intraframe o Interframe) che è stato utilizzato (vedi Figura~\ref{fig:coding_unit}).
+ 
+ \begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/coding-unit.png}
+    \caption{Rappresentazione di come viene suddivisa una Coding Unit.}
+    \label{fig:coding_unit}
+\end{figure}
+
+ \noindent Ogni CTB è suddiviso al suo interno come un albero che naviga mediante un algoritmo
+chiamato Z-Scan rappresentando un pattern a zig-zag (come si può intuire dalla
+Figura~\ref{fig:CTU_CTB}).
+Una caratteristica che i CTU hanno in comune con i macroblocks è la gestione dei "blocchi"
+in quanto anche i CTU vengono gestiti e processati in gruppi chiamati \textbf{slice}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/chroma-CTB.png}
+    \caption{Rappresentazione di una Luma CTB e di come i sotto blocchi vengono letti e inseriti
+    all'interno dell'albero.}
+    \label{fig:chroma_CTB}
+\end{figure}
+
+---
+-35.4\% di compressione a parità di resa grafica rispetto al H.264
+---
+
 \subsection{VP9}    % forse non serve descriverlo
+Valutare se descriverlo nel dettaglio, oppure se accennarlo e basta.
+
 \subsection{AV1}
 TODO: il codec AV1 è molto lento nel codificare/decodificare video, ma con un acceleratore apposito è nettamente più veloce del H.265
 
@@ -461,7 +529,7 @@ TODO: il codec AV1 è molto lento nel codificare/decodificare video, ma con un a
 Non dimenticare di discutere anche delle sfide e delle considerazioni pratiche legate all'adozione di nuovi codec, come il supporto hardware/software, la compatibilità con dispositivi esistenti e la gestione dei diritti d'autore.
 
 \section{Conclusioni}
-TODO: si potrbbe parlare dell'approccio di NVIDIA per le video chat.
+TODO: si potrebbe parlare dell'approccio di NVIDIA per le video chat.
 
 \section{Bibliografia}
 \\+sito che parla della storia degli encorder https://api.video/blog/video-trends/the-history-of-video-compression-starts-in-1929/
@@ -475,8 +543,10 @@ TODO: si potrbbe parlare dell'approccio di NVIDIA per le video chat.
 \\+codifica di huffman https://en.wikipedia.org/wiki/Huffman_coding
 \\+sito utilizzato per costruire l'albero di huffman https://suhaan-bhandary.github.io/Huffman-Coding/
 \\+h.264 loop filtering https://www.vcodex.com/h264avc-loop-filter
-\\-sito ufficiale di h.265 https://hevc.hhi.fraunhofer.de/
 \\+repository di h.265 https://vcgit.hhi.fraunhofer.de/jvet/HM
+\\+pdf di h.265 dal sito ufficiale https://www.itu.int/rec/T-REC-H.265-202309-I/en
+\\+CTU per H.265 https://codesequoia.wordpress.com/2012/10/28/hevc-ctu-cu-ctb-cb-pb-and-tb/
+\\-utile! parla dei tecnicismi del h.265 https://zhuanlan.zhihu.com/p/519752821
 \\-utile! parla dei tecnicismi del h.265 nella sezione di Coding tools https://en.wikipedia.org/wiki/High_Efficiency_Video_Coding
 \\-utile! paragona AV1 a h.265 https://subclassy.github.io/compression#:~:text=265%20takes%202.83s%20on,so%20much%20time%20to%20process.
 \\-utile! paragona le performance dei vari codec su hw nvidia https://developer.nvidia.com/video-codec-sdk
