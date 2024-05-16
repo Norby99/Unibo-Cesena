@@ -12,11 +12,9 @@
 \usepackage{hyperref}   % serve per i link
 \hypersetup{
     colorlinks=true,
-    linkcolor=blue,
+    linkcolor=black,
     filecolor=magenta,      
     urlcolor=cyan,
-    pdftitle={Overleaf Example},
-    pdfpagemode=FullScreen,
 }   % serve per i link
 \usepackage[table,xcdraw]{xcolor}
 \usepackage{tabularx}
@@ -173,10 +171,10 @@ un singolo fotogramma. Questo metodo si divide più passaggi:
   \item Per ogni macroblock o prediction-block, viene utilizzato un modello di predizione per stimare
   i valori delle matrici al suo interno basandosi sui valori delle celle adiacenti. Questo modello di
   predizione può essere semplice (es. facendo la media dei pixel adiacenti) o più complesso (come la
-  predizione basata su modelli statistici o algoritmi di machine learning). I 3 metodi più utilizzati
-  sono (Vedi Figura~\ref{fig:intraframe_algo}) : traslandolo i pixel adiacenti già noti in
-  orizzontale/verticale oppure facendo una media dei pixel adiacenti.
-  Nel caso del formato H.264 ci sono in totale 9 algoritmi di intraframe.
+  predizione basata su modelli statistici o algoritmi di machine learning). Esistono in totale 9 metodi
+  di previsione, ma i 3 metodi più frequenti sono (Vedi Figura~\ref{fig:intraframe_algo}) : traslandolo
+  i pixel adiacenti già noti in orizzontale/verticale oppure facendo una media dei pixel adiacenti. Nel
+  caso del formato H.264 ci sono in totale 9 algoritmi di intraframe.
   \item Successivamente viene calcolata la residua, ovvero la differenza tra i pixel predetti e i
   pixel dell'immagine non compressa
   \item Infine viene scelta la matrice residua, che si è avvicinata di più al gruppo di pixel originale,
@@ -462,7 +460,7 @@ prendendo sempre più piede in questo periodo), ma riesce a codificare filmati 3
 video in 360°. Nei paragrafi successivi si vedremo quali cambiamenti sono stati apportati al predecessore
 H.264 per creare questo nuovo codec.
 
-\subsection{Coding Tree Unit (CTU)}
+\paragraph{Coding Tree Unit (CTU)}\hphantom{A}\\
 La prima differenza con il formato H.264 è la gestione dei blocchi. Il codec H.265 non utilizza
 i classici macroblocks che sono stati usati fino a questo periodo dalla maggioranza dei codec, ma
 utilizza i \textbf{Coding Tree Unit}, che d'ora in poi verrà abbreviato con CTU. A differenza
@@ -511,6 +509,38 @@ in quanto anche i CTU vengono gestiti e processati in gruppi chiamati \textbf{sl
     \label{fig:chroma_CTB}
 \end{figure}
 
+
+
+
+- ogni PB all'interno di una CB usa la stessa prediction mode
+- per la motion compensation, i blocchi possono avere molte più dimensioni rispetto al h264 con lati da 8, 16, 32, 64
+e tutte le combinazioni di quadrato o rettangoli che si possono comporre, garantendo una compressione migliore
+- nell'inter pred. le modalita di previsione non sono più solo 9, che all'epoca quando la risoluzione più diffusa
+era il 720p erano più che sufficienti, bensi 35 (magari inserire immagine di queste modalità) di cui una modalità di previsione
+planare, una previsione DC e 33 previsioni di angolo
+- nella inter pred. la DCT non è più limitata ad una dimensione di 8x8, ma più arrivare anche a dimensioni di 32x32
+aumentando la compressione
+- nella inter pred. venogno aggiunte altr 2 tecnologie per aumentare la compressione:
+        - Merge che utilizza la correlazione del dominio spaziale e la correlazione temporale per ridurre la ridondanza dei parametri di movimento tra blocchi adiacenti. In poche parole una PU prende i parametri di movimento delle PU adiacenti, per massimizzare l'efficienza.
+        - Advanced Motion Vector Predictor (AMVP) simile alla Merge, ma invece di copiare i Motion Vector dalle PU adiacenti,
+        la AMVP le prende tutte e fa una predizione su quale sarà il Motion Vector della PU in analisi e se si avvicina
+        abbastanza, allora invece di memorizzare un vettore nuovo, utilizza quello che predice.
+- Nella trasformazione viene aggiunta la tecnolgia Residual Quad-tree Transform (RQT) che viene utilizzata all'interno delle TU e permette
+di codificare applicare una traformata diversa per blocchi di grandi dimensioni rispetto a quelle piccole permettendo di mantenere più dettaglio
+nei blocchi, mentre per i blocchi grandi, che vengono utilizzati su aree uniformi con pochi dettagli permettendo un'elevata compressione a discapito
+di un mantenimento mediocre del dettaglio, cosa poco importante in quanto vengono applicate su aree prive di dettagli. L'utilizzo di RQT su blocchi di dimensioni differenti permette di ottenere un'ottima compressione video e allo stesso tempo di mantenere una qualità alta dell'immagine, al contraro
+nel codec h.264 si doveva trovare un giusto compromesso tra le due in quanto i blocchi erano di dimensione prefissata. La tecnologia RQT prende il suo nome
+da fatto che per memorizzare le TB vengono utilizzate delle quad tree, vedi rami rossi (penso) della figura-X.
+- Nella trasformazione viene cambiato anche il metodo della DCT, dove non viene più utilizzata una scansione fissa predefinita per convertire i blocchi di pixel in coefficienti di frequenza, ma l'ACS determina una sequenza di scansione ottimale per ciascun blocco di pixel, tenendo conto delle caratteristiche spaziali e delle frequenze del contenuto. 
+La ACS viene eseguita in sotto-blocchi 4×4 per tutte le dimensioni di blocco (TB), utilizzando una sola regione di coefficienti per la dimensione del blocco 4×4 e più regioni di coefficienti 4×4 all'interno di blocchi di trasformazione più grandi. Vengono selezionati tre metodi di scansione dei coefficienti, diagonale verso l'alto-destra, orizzontale e verticale, implicitamente per la codifica dei coefficienti di trasformazione delle dimensioni TB 4×4 e 8×8 nelle regioni predette all'interno dell'immagine. La selezione dell'ordine di scansione dei coefficienti dipende dalle direzionalità della intraprediction. La scansione verticale viene utilizzata quando la direzione di predizione è vicina all'orizzontale e la scansione orizzontale viene utilizzata quando la direzione di predizione è vicina alla verticale. Per altre direzioni di predizione, viene utilizzata la scansione diagonale verso l'alto-destra. Per i coefficienti di trasformazione nelle modalità di predizione interframe di tutte le dimensioni di blocco e per i coefficienti di trasformazione di predizione intraprediction di 16×16 o 32×32, viene applicata esclusivamente la scansione diagonale verso l'alto-destra 4×4 a sotto-blocchi di coefficienti di trasformazione.
+- per quanto riguarda i filtri, il filtro di deblocking rimane lo stesso, ma dopo questo filtro viene anche applicato il Sample Adaptive Offset (SAO), che mira a ridurre gli artefatti di compressione, come i bordi sfocati o irregolari.
+La tecnica SAO interviene dopo la quantizzazione dei coefficienti di frequenza nel processo di compressione. Analizza il contenuto dell'immagine e applica offset ai pixel in base ai valori dei pixel circostanti. L'obiettivo è quello di correggere gli errori introdotti dalla quantizzazione e di migliorare la qualità dell'immagine compressa, in particolare nei bordi dell'immagine.
+Ci sono due tipi principali di SAO utilizzati in HEVC:
+        -SAO Edge Offset: Questo tipo di SAO si concentra sui bordi dell'immagine e applica offset ai pixel lungo i bordi per correggere gli artefatti visivi introdotti dalla compressione. Ad esempio, può correggere la sfocatura o il ringing intorno ai bordi degli oggetti nell'immagine.
+        -SAO Band Offset: Questo tipo di SAO si concentra su aree specifiche dell'immagine, come le regioni uniformi, e applica offset ai pixel all'interno di queste aree per ridurre gli artefatti di compressione. Questo può aiutare a migliorare la uniformità dei toni di colore all'interno di regioni omogenee dell'immagine.
+TODO: vedere se aggiungere nel dettaglio come funziona questo algoritmo SAO, nel caso si trova su chatgpt
+- manca anche la cabac che fa parte della entrophy encoding, si trova anch'essa su chatgpt
+
 ---
 -35.4\% di compressione a parità di resa grafica rispetto al H.264
 ---
@@ -547,7 +577,7 @@ TODO: si potrebbe parlare dell'approccio di NVIDIA per le video chat.
 \\+pdf di h.265 dal sito ufficiale https://www.itu.int/rec/T-REC-H.265-202309-I/en
 \\+CTU per H.265 https://codesequoia.wordpress.com/2012/10/28/hevc-ctu-cu-ctb-cb-pb-and-tb/
 \\-utile! parla dei tecnicismi del h.265 https://zhuanlan.zhihu.com/p/519752821
-\\-utile! parla dei tecnicismi del h.265 nella sezione di Coding tools https://en.wikipedia.org/wiki/High_Efficiency_Video_Coding
+\\-utile! parla dei tecnicismi del h.265 https://iphome.hhi.de/wiegand/assets/pdfs/2012_12_IEEE-HEVC-Overview.pdf
 \\-utile! paragona AV1 a h.265 https://subclassy.github.io/compression#:~:text=265%20takes%202.83s%20on,so%20much%20time%20to%20process.
 \\-utile! paragona le performance dei vari codec su hw nvidia https://developer.nvidia.com/video-codec-sdk
 \\-utile! https://support.google.com/youtube/answer/2853702?hl=it
