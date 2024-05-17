@@ -497,7 +497,7 @@ stato codificato, ad esempio la Syntax Element di una Coding Unit contiene le in
 
  \noindent Ogni CTB è suddiviso al suo interno come un albero che naviga mediante un algoritmo
 chiamato Z-Scan rappresentando un pattern a zig-zag (come si può intuire dalla
-Figura~\ref{fig:CTU_CTB}).
+Figura~\ref{fig:chroma_CTB}).
 Una caratteristica che i CTU hanno in comune con i macroblocks è la gestione dei "blocchi"
 in quanto anche i CTU vengono gestiti e processati in gruppi chiamati \textbf{slice}.
 
@@ -509,37 +509,54 @@ in quanto anche i CTU vengono gestiti e processati in gruppi chiamati \textbf{sl
     \label{fig:chroma_CTB}
 \end{figure}
 
+\paragraph{Intraframe/intra prediction}\hphantom{A}\\
+Quello che cambia nell'applicazione della intra prediction sono i blocchi, che possono avere molte più
+dimensioni rispetto all'H.264, con lati da 8, 16, 32, 64 e tutte le combinazioni di quadrati o rettangoli
+possibili, garantendo una compressione migliore.
 
+Inoltre, le modalità di previsione non sono più solo 9, che all'epoca della risoluzione più diffusa di 720p
+erano più che sufficienti, ma ben 35 (potrebbe essere utile inserire un'immagine di queste modalità). Tra
+queste, vi sono una modalità di previsione planare, una previsione DC e 33 previsioni angolari.
+TODO: spiegare matematicamente come vengono applicate queste due nuove modalità (vedi video ~ 13:20)
 
+Infine, la DCT non è più limitata a una dimensione di 8x8, ma può arrivare anche a dimensioni di 32x32,
+aumentando ulteriormente la compressione.
 
-- ogni PB all'interno di una CB usa la stessa prediction mode
-- per la motion compensation, i blocchi possono avere molte più dimensioni rispetto al h264 con lati da 8, 16, 32, 64
-e tutte le combinazioni di quadrato o rettangoli che si possono comporre, garantendo una compressione migliore
-- nell'inter pred. le modalita di previsione non sono più solo 9, che all'epoca quando la risoluzione più diffusa
-era il 720p erano più che sufficienti, bensi 35 (magari inserire immagine di queste modalità) di cui una modalità di previsione
-planare, una previsione DC e 33 previsioni di angolo
-- nella inter pred. la DCT non è più limitata ad una dimensione di 8x8, ma più arrivare anche a dimensioni di 32x32
-aumentando la compressione
+\paragraph{Interframe/Motion compensation}\hphantom{A}\\
 - nella inter pred. venogno aggiunte altr 2 tecnologie per aumentare la compressione:
         - Merge che utilizza la correlazione del dominio spaziale e la correlazione temporale per ridurre la ridondanza dei parametri di movimento tra blocchi adiacenti. In poche parole una PU prende i parametri di movimento delle PU adiacenti, per massimizzare l'efficienza.
         - Advanced Motion Vector Predictor (AMVP) simile alla Merge, ma invece di copiare i Motion Vector dalle PU adiacenti,
         la AMVP le prende tutte e fa una predizione su quale sarà il Motion Vector della PU in analisi e se si avvicina
         abbastanza, allora invece di memorizzare un vettore nuovo, utilizza quello che predice.
-- Nella trasformazione viene aggiunta la tecnolgia Residual Quad-tree Transform (RQT) che viene utilizzata all'interno delle TU e permette
-di codificare applicare una traformata diversa per blocchi di grandi dimensioni rispetto a quelle piccole permettendo di mantenere più dettaglio
-nei blocchi, mentre per i blocchi grandi, che vengono utilizzati su aree uniformi con pochi dettagli permettendo un'elevata compressione a discapito
-di un mantenimento mediocre del dettaglio, cosa poco importante in quanto vengono applicate su aree prive di dettagli. L'utilizzo di RQT su blocchi di dimensioni differenti permette di ottenere un'ottima compressione video e allo stesso tempo di mantenere una qualità alta dell'immagine, al contraro
-nel codec h.264 si doveva trovare un giusto compromesso tra le due in quanto i blocchi erano di dimensione prefissata. La tecnologia RQT prende il suo nome
-da fatto che per memorizzare le TB vengono utilizzate delle quad tree, vedi rami rossi (penso) della figura-X.
+
+\paragraph{Transformation e Quantization}\hphantom{A}\\
+Nella trasformazione viene introdotta la tecnologia Residual Quad-tree Transform (RQT), utilizzata
+all'interno delle TU, che possono avere dimensioni variabili. Questa tecnologia consente di applicare
+una trasformata diversa a blocchi di grandi dimensioni rispetto a quelli piccoli, permettendo di mantenere
+più dettagli nei blocchi piccoli. Nei blocchi grandi, utilizzati su aree uniformi con pochi dettagli, si
+ottiene un'elevata compressione a scapito di una qualità mediocre del dettaglio, un compromesso accettabile
+poiché queste aree sono prive di dettagli significativi. La regolazione del dettaglio avviene semplicemente
+grazie alla creazione delle TU, che possono avere dimensioni variabili da 4x4 a 32x32, permettendo di regolare
+il livello di dettaglio mantenuto in base all'area analizzata.
+La tecnologia RQT deve il suo nome al fatto che, per memorizzare le TB, vengono utilizzate delle quad tree, come illustrato dai rami rossi nella Figura~\ref{fig:chroma_CTB}.
+
 - Nella trasformazione viene cambiato anche il metodo della DCT, dove non viene più utilizzata una scansione fissa predefinita per convertire i blocchi di pixel in coefficienti di frequenza, ma l'ACS determina una sequenza di scansione ottimale per ciascun blocco di pixel, tenendo conto delle caratteristiche spaziali e delle frequenze del contenuto. 
 La ACS viene eseguita in sotto-blocchi 4×4 per tutte le dimensioni di blocco (TB), utilizzando una sola regione di coefficienti per la dimensione del blocco 4×4 e più regioni di coefficienti 4×4 all'interno di blocchi di trasformazione più grandi. Vengono selezionati tre metodi di scansione dei coefficienti, diagonale verso l'alto-destra, orizzontale e verticale, implicitamente per la codifica dei coefficienti di trasformazione delle dimensioni TB 4×4 e 8×8 nelle regioni predette all'interno dell'immagine. La selezione dell'ordine di scansione dei coefficienti dipende dalle direzionalità della intraprediction. La scansione verticale viene utilizzata quando la direzione di predizione è vicina all'orizzontale e la scansione orizzontale viene utilizzata quando la direzione di predizione è vicina alla verticale. Per altre direzioni di predizione, viene utilizzata la scansione diagonale verso l'alto-destra. Per i coefficienti di trasformazione nelle modalità di predizione interframe di tutte le dimensioni di blocco e per i coefficienti di trasformazione di predizione intraprediction di 16×16 o 32×32, viene applicata esclusivamente la scansione diagonale verso l'alto-destra 4×4 a sotto-blocchi di coefficienti di trasformazione.
+
+\paragraph{Entropy Coding}\hphantom{A}\\
+- manca anche la cabac che fa parte della entrophy encoding, si trova anch'essa su chatgpt
+
+\paragraph{Loop filtering}\hphantom{A}\\
 - per quanto riguarda i filtri, il filtro di deblocking rimane lo stesso, ma dopo questo filtro viene anche applicato il Sample Adaptive Offset (SAO), che mira a ridurre gli artefatti di compressione, come i bordi sfocati o irregolari.
 La tecnica SAO interviene dopo la quantizzazione dei coefficienti di frequenza nel processo di compressione. Analizza il contenuto dell'immagine e applica offset ai pixel in base ai valori dei pixel circostanti. L'obiettivo è quello di correggere gli errori introdotti dalla quantizzazione e di migliorare la qualità dell'immagine compressa, in particolare nei bordi dell'immagine.
 Ci sono due tipi principali di SAO utilizzati in HEVC:
         -SAO Edge Offset: Questo tipo di SAO si concentra sui bordi dell'immagine e applica offset ai pixel lungo i bordi per correggere gli artefatti visivi introdotti dalla compressione. Ad esempio, può correggere la sfocatura o il ringing intorno ai bordi degli oggetti nell'immagine.
         -SAO Band Offset: Questo tipo di SAO si concentra su aree specifiche dell'immagine, come le regioni uniformi, e applica offset ai pixel all'interno di queste aree per ridurre gli artefatti di compressione. Questo può aiutare a migliorare la uniformità dei toni di colore all'interno di regioni omogenee dell'immagine.
 TODO: vedere se aggiungere nel dettaglio come funziona questo algoritmo SAO, nel caso si trova su chatgpt
-- manca anche la cabac che fa parte della entrophy encoding, si trova anch'essa su chatgpt
+
+- ogni PB all'interno di una CB usa la stessa prediction mode
+
+
 
 ---
 -35.4\% di compressione a parità di resa grafica rispetto al H.264
@@ -576,7 +593,7 @@ TODO: si potrebbe parlare dell'approccio di NVIDIA per le video chat.
 \\+repository di h.265 https://vcgit.hhi.fraunhofer.de/jvet/HM
 \\+pdf di h.265 dal sito ufficiale https://www.itu.int/rec/T-REC-H.265-202309-I/en
 \\+CTU per H.265 https://codesequoia.wordpress.com/2012/10/28/hevc-ctu-cu-ctb-cb-pb-and-tb/
-\\-utile! parla dei tecnicismi del h.265 https://zhuanlan.zhihu.com/p/519752821
+\\+utile! parla dei tecnicismi del h.265 https://zhuanlan.zhihu.com/p/519752821
 \\-utile! parla dei tecnicismi del h.265 https://iphome.hhi.de/wiegand/assets/pdfs/2012_12_IEEE-HEVC-Overview.pdf
 \\-utile! paragona AV1 a h.265 https://subclassy.github.io/compression#:~:text=265%20takes%202.83s%20on,so%20much%20time%20to%20process.
 \\-utile! paragona le performance dei vari codec su hw nvidia https://developer.nvidia.com/video-codec-sdk
