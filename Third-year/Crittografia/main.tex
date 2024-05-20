@@ -516,35 +516,118 @@ possibili, garantendo una compressione migliore.
 
 Inoltre, le modalità di previsione non sono più solo 9, che all'epoca della risoluzione più diffusa di 720p
 erano più che sufficienti, ma ben 35 (potrebbe essere utile inserire un'immagine di queste modalità). Tra
-queste, vi sono una modalità di previsione planare, una previsione DC e 33 previsioni angolari.
-TODO: spiegare matematicamente come vengono applicate queste due nuove modalità (vedi video ~ 13:20)
+queste, vi sono una modalità di previsione planare, una previsione DC e 33 previsioni angolari (vedi
+Figura~\ref{fig:HEVC_intra}).
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/HEVC-intra.png}
+    \caption{A sinistra, una rappresentazione di tutte le direzioni in cui si può applicare la Intraframe,
+    mentre a destra un esempio di come ciascun algoritmo viene applicato su ciascun blocco.}
+    \label{fig:HEVC_intra}
+\end{figure}
+
+TODO: spiegare matematicamente come vengono applicate queste due nuove modalità (vedi video ~ 13:20). Lo devo fare?
+
+Inoltre, dopo la ricostruzione di un blocco, viene applicato un filtro di smoothing per rendere
+l'immagine più gradevole. Questo viene fatto solo sui blocchi Luma in quanto hanno un impatto visivo più
+importante dei Chroma perché si risparmia sulla potenza computazionale.
 Infine, la DCT non è più limitata a una dimensione di 8x8, ma può arrivare anche a dimensioni di 32x32,
 aumentando ulteriormente la compressione.
 
 \paragraph{Interframe/Motion compensation}\hphantom{A}\\
-- nella inter pred. venogno aggiunte altr 2 tecnologie per aumentare la compressione:
-        - Merge che utilizza la correlazione del dominio spaziale e la correlazione temporale per ridurre la ridondanza dei parametri di movimento tra blocchi adiacenti. In poche parole una PU prende i parametri di movimento delle PU adiacenti, per massimizzare l'efficienza.
-        - Advanced Motion Vector Predictor (AMVP) simile alla Merge, ma invece di copiare i Motion Vector dalle PU adiacenti,
-        la AMVP le prende tutte e fa una predizione su quale sarà il Motion Vector della PU in analisi e se si avvicina
-        abbastanza, allora invece di memorizzare un vettore nuovo, utilizza quello che predice.
+Anche il codec H.265 utilizza la Interframe, esattamente come il suo predecessore, ma i motion vector che
+utilizza non sono più limitati a spostare un blocco sulla posizione esatta di un altro blocco di un frame,
+ma possono traslare un Coding Block (CB) in qualsiasi posizione del frame desiderata.
+
+Nella Interframe, vengono aggiunte altre tre tecnologie per aumentare la compressione:
+
+\begin{itemize}
+    \item \textbf{Merge Mode}: Questo metodo utilizza la correlazione spaziale e temporale per ridurre la
+    ridondanza dei parametri di movimento tra i blocchi adiacenti. In poche parole, una Prediction Unit
+    (PU) prende i parametri di movimento (motion vector) dalle PU adiacenti per massimizzare l'efficienza.
+    Questo risultato può essere ottenuto copiando il motion vector di una PU vicina, oppure facendo una
+    media di più PU vicine (si noti che con PU vicine non si intendono solo le PU adiacenti fisicamente, ma
+    anche temporalmente).
+    
+    \item \textbf{Advanced Motion Vector Prediction} (AMVP): Simile al Merge Mode, ma invece di copiare i
+    motion vector dalle PU adiacenti, l'AMVP li analizza tutti e fa una predizione su quale sarà il motion
+    vector della PU in analisi. Se la predizione è sufficientemente precisa, utilizza il vettore predetto
+    invece di memorizzarne uno nuovo.
+    
+    \item \textbf{Weighted Prediction}: In casi dove un video presenta una scena con un'animazione di fade
+    (l'immagine diventa progressivamente più scuro fino a diventare nero, per poi tornare lentamente alla
+    luminosità naturale), il codec H.264 creerebbe due scene distinte con due I-frame. Al contrario, il
+    nuovo codec H.265 riconosce questi pattern e genera una Weighted Prediction, creando un solo I-frame
+    all'inizio della scena e, durante l'animazione di fade, riduce semplicemente l'intensità della matrice
+    Luma.
+\end{itemize}
+
+TODO: valutare se inserire immagine (perche sfuocata) min 43:02
 
 \paragraph{Transformation e Quantization}\hphantom{A}\\
-Nella trasformazione viene introdotta la tecnologia Residual Quad-tree Transform (RQT), utilizzata
-all'interno delle TU, che possono avere dimensioni variabili. Questa tecnologia consente di applicare
-una trasformata diversa a blocchi di grandi dimensioni rispetto a quelli piccoli, permettendo di mantenere
-più dettagli nei blocchi piccoli. Nei blocchi grandi, utilizzati su aree uniformi con pochi dettagli, si
-ottiene un'elevata compressione a scapito di una qualità mediocre del dettaglio, un compromesso accettabile
-poiché queste aree sono prive di dettagli significativi. La regolazione del dettaglio avviene semplicemente
-grazie alla creazione delle TU, che possono avere dimensioni variabili da 4x4 a 32x32, permettendo di regolare
-il livello di dettaglio mantenuto in base all'area analizzata.
-La tecnologia RQT deve il suo nome al fatto che, per memorizzare le TB, vengono utilizzate delle quad tree, come illustrato dai rami rossi nella Figura~\ref{fig:chroma_CTB}.
+Nella trasformazione, il codec H.265 introduce la tecnologia Residual Quad-tree Transform (RQT), utilizzata
+all'interno delle TB, che possono avere dimensioni variabili. Questa innovazione consente l'applicazione di
+trasformate diverse a blocchi di grandi dimensioni rispetto a quelli piccoli, permettendo così di mantenere
+più dettagli nei blocchi più piccoli. Nei blocchi grandi, impiegati per rappresentare aree uniformi con
+pochi dettagli, si ottiene un'elevata compressione a scapito di una qualità mediocre del dettaglio. Tale
+deficit è accettabile poiché le suddette aree sono solitamente prive di dettagli significativi. La
+regolazione del dettaglio avviene attraverso la creazione delle TB, che possono variare in dimensione
+da 4x4 a 32x32, permettendo così di regolare il livello di dettaglio mantenuto in base all'area analizzata.
+La tecnologia RQT prende il nome dal fatto che vengono utilizzate delle \textbf{Quadtree} per memorizzare
+le TB, come illustrato dai rami rossi nella Figura~\ref{fig:chroma_CTB}.
 
-- Nella trasformazione viene cambiato anche il metodo della DCT, dove non viene più utilizzata una scansione fissa predefinita per convertire i blocchi di pixel in coefficienti di frequenza, ma l'ACS determina una sequenza di scansione ottimale per ciascun blocco di pixel, tenendo conto delle caratteristiche spaziali e delle frequenze del contenuto. 
-La ACS viene eseguita in sotto-blocchi 4×4 per tutte le dimensioni di blocco (TB), utilizzando una sola regione di coefficienti per la dimensione del blocco 4×4 e più regioni di coefficienti 4×4 all'interno di blocchi di trasformazione più grandi. Vengono selezionati tre metodi di scansione dei coefficienti, diagonale verso l'alto-destra, orizzontale e verticale, implicitamente per la codifica dei coefficienti di trasformazione delle dimensioni TB 4×4 e 8×8 nelle regioni predette all'interno dell'immagine. La selezione dell'ordine di scansione dei coefficienti dipende dalle direzionalità della intraprediction. La scansione verticale viene utilizzata quando la direzione di predizione è vicina all'orizzontale e la scansione orizzontale viene utilizzata quando la direzione di predizione è vicina alla verticale. Per altre direzioni di predizione, viene utilizzata la scansione diagonale verso l'alto-destra. Per i coefficienti di trasformazione nelle modalità di predizione interframe di tutte le dimensioni di blocco e per i coefficienti di trasformazione di predizione intraprediction di 16×16 o 32×32, viene applicata esclusivamente la scansione diagonale verso l'alto-destra 4×4 a sotto-blocchi di coefficienti di trasformazione.
+Nella Quantizzazione, viene modificato anche il metodo della Discrete Cosine Transform (DCT), dove non viene
+più utilizzata una scansione fissa predefinita per convertire i blocchi di pixel in coefficienti di frequenza
+dove la tabella DCT viene costruita cambiando i parametri verticali e orizzontali per un totale di 64 (8x8)
+combinazioni.
+L'Adaptive Scan Order (ACS) determina invece una sequenza di scansione ottimale per ciascun blocco di pixel,
+considerando le caratteristiche spaziali e di frequenza del contenuto. ACS viene eseguita in sotto-blocchi
+4×4 per tutte le dimensioni di blocco (TB), utilizzando una sola regione di coefficienti per la dimensione
+del blocco 4×4 e più regioni di coefficienti 4×4 all'interno di blocchi di trasformazione più grandi. Vengono
+selezionati tre metodi di scansione dei coefficienti: diagonale verso l'alto-destra, orizzontale e verticale
+(vedi Figura~\ref{fig:HEVC_ACS}) implicitamente per la codifica dei coefficienti di trasformazione delle
+dimensioni TB 4×4 e 8×8 nelle regioni predette all'interno dell'immagine. La selezione dell'ordine di
+scansione dei coefficienti dipende dalle direzionalità della Intraframe. La scansione verticale viene
+utilizzata quando la direzione di predizione è vicina all'orizzontale e la scansione orizzontale viene
+utilizzata quando la direzione di predizione è vicina alla verticale. Per altre direzioni di predizione,
+viene utilizzata la scansione diagonale verso l'alto-destra. Per i coefficienti di trasformazione nelle
+modalità di predizione interframe di tutte le dimensioni di blocco e per i coefficienti di trasformazione
+di predizione Interframe di 16×16 o 32×32, viene applicata esclusivamente la scansione diagonale verso
+l'alto-destra 4×4 a sotto-blocchi di coefficienti di trasformazione.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/HEVC-ACS.png}
+    \caption{Rappresentazione dei tre approcci dell'algoritmo ACS.}
+    \label{fig:HEVC_ACS}
+\end{figure}
 
 \paragraph{Entropy Coding}\hphantom{A}\\
-- manca anche la cabac che fa parte della entrophy encoding, si trova anch'essa su chatgpt
+TODO: aggiungere che i residui vengono elaborati allo stesso modo del h264, quiondi con le quad tree. inoltre controllare cosa ho scritot sotto e che la cabac viene usata solo per codificare le syntax data (o come si chiamano) e i dati di movimento
+La principale tecnica per la Entropy Coding è la \textbf{Contesto Adaptive Binary Arithmetic Coding (CABAC)} che si divide in più fasi:
+
+\begin{enumerate}
+    \item \textbf{Binarization}: Il primo passo nella codifica CABAC è convertire i simboli
+    non binari (come i coefficienti di trasformata o i valori di movimento) in una serie di simboli binari.
+    Questa rappresentazione binaria è necessaria perché CABAC opera a livello di bit. Infine i questo enorme
+    flusso di bit viene suddiviso in tanti piccoli flussi chiamati \textbf{Binary String}, che uniti formano
+    il flusso originale.
+    
+    \item \textbf{Context Modeling}: In questa fase si crea una mappa dove ogni Binary String viene
+    aggiunta ad una tabella che contiene la stringa stessa e la \textbf{Binary Index}, che non solo
+    tiene traccia della posizione in cui si trova la Binary String, ma indica anche il numero di "1"
+    present.
+    TODO: aggiungere che questo è la regular mode, poi c'è la bypass mode dove i dati vengono processati cosi come sono
+    TODO: magari si potrebbe mettere anceh un'immagine della regular  49:17
+    
+    \item \textbf{Binary Arithmetic Codec (BAC)}: Il CABAC utilizza la codifica aritmetica, che è una forma avanzata di codifica di entropia. La codifica aritmetica rappresenta intere sequenze di simboli come intervalli frazionari su una linea numerica tra 0 e 1, adattando dinamicamente la lunghezza dei codici in base alle probabilità dei simboli. Ecco i passi principali della codifica aritmetica binaria:
+    
+    Inizializzazione: Inizialmente, l'intervallo di codifica è [0, 1).
+    Suddivisione dell'Intervallo: Per ogni bit da codificare, l'intervallo corrente viene suddiviso in due parti basate sulla probabilità stimata del bit essere 0 o 1.
+    Aggiornamento dell'Intervallo: L'intervallo viene aggiornato per riflettere la porzione associata al bit effettivamente codificato.
+    Output dei Bit: Quando l'intervallo diventa sufficientemente piccolo, vengono emessi bit del codice.
+\end{enumerate}
 
 \paragraph{Loop filtering}\hphantom{A}\\
 - per quanto riguarda i filtri, il filtro di deblocking rimane lo stesso, ma dopo questo filtro viene anche applicato il Sample Adaptive Offset (SAO), che mira a ridurre gli artefatti di compressione, come i bordi sfocati o irregolari.
