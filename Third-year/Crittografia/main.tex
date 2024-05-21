@@ -390,7 +390,8 @@ non alla codifica e consiste nell'applicare un o più filtri all'immagine portan
     \item \textbf{Deblocking filter}: L'artefatto di blocco è un effetto causato dalla divisione del frame
     in blocchi più piccoli durante la compressione creando delle linee di separazione tra di esse.
     Per questo problema viene utilizzato il deblocking filter, che aiuta a ridurre l'effetto di questo
-    artefatto, migliorando l'aspetto generale del video (vedi Figura~\ref{fig:deblocking_filter}).
+    artefatto, migliorando l'aspetto generale del video (vedi Figura~\ref{fig:deblocking_filter}). La
+    tecnica consiste nell'applicare tanti piccoli filtri 4x4 lungo i bordi dei blocchi.
     Questo è il filtro più importante in quanto è presente in quasi tutti i formati di compressione video.
     \item \textbf{Riduzione del rumore}: Il rumore video può essere introdotto durante la compressione
     o a causa delle condizioni di trasmissione. Il loop filtering può ridurre questo rumore,
@@ -509,6 +510,9 @@ in quanto anche i CTU vengono gestiti e processati in gruppi chiamati \textbf{sl
     \label{fig:chroma_CTB}
 \end{figure}
 
+Una dettaglio molto importante è che all'interno di un Coding Block, ogni Prediction Block utilizza lo
+stesso modalità di predizione (intra o inter).
+
 \paragraph{Intraframe/intra prediction}\hphantom{A}\\
 Quello che cambia nell'applicazione della intra prediction sono i blocchi, che possono avere molte più
 dimensioni rispetto all'H.264, con lati da 8, 16, 32, 64 e tutte le combinazioni di quadrati o rettangoli
@@ -604,8 +608,11 @@ l'alto-destra 4×4 a sotto-blocchi di coefficienti di trasformazione.
 \end{figure}
 
 \paragraph{Entropy Coding}\hphantom{A}\\
-TODO: aggiungere che i residui vengono elaborati allo stesso modo del h264, quiondi con le quad tree. inoltre controllare cosa ho scritot sotto e che la cabac viene usata solo per codificare le syntax data (o come si chiamano) e i dati di movimento
-La principale tecnica per la Entropy Coding è la \textbf{Contesto Adaptive Binary Arithmetic Coding (CABAC)} che si divide in più fasi:
+La Entropy Coding del codec H.265 è rimasta invariata rispetto al suo predecessore per quanto riguarda
+la codifica delle matrici residue, continuando a utilizzare la codifica di Huffman. Tuttavia, è stato
+introdotto un nuovo metodo per la codifica degli Syntax Element di ogni blocco e dei vettori di movimento.
+Questo nuovo metodo è chiamato \textbf{Context Adaptive Binary Arithmetic Coding (CABAC)}, che si divide
+in diverse fasi:
 
 \begin{enumerate}
     \item \textbf{Binarization}: Il primo passo nella codifica CABAC è convertire i simboli
@@ -617,39 +624,76 @@ La principale tecnica per la Entropy Coding è la \textbf{Contesto Adaptive Bina
     \item \textbf{Context Modeling}: In questa fase si crea una mappa dove ogni Binary String viene
     aggiunta ad una tabella che contiene la stringa stessa e la \textbf{Binary Index}, che non solo
     tiene traccia della posizione in cui si trova la Binary String, ma indica anche il numero di "1"
-    present.
-    TODO: aggiungere che questo è la regular mode, poi c'è la bypass mode dove i dati vengono processati cosi come sono
-    TODO: magari si potrebbe mettere anceh un'immagine della regular  49:17
+    present (vedi Figura~\ref{fig:CABAC_regular}). Il Context Modeling ha due modalità di esecuzione,
+    quella appena descritta è la \textbf{regular mode}, mentre esiste anche la \textbf{bypass mode}
+    che non comprime per nulla il flusso di bit, ma li codifica così come sono.
     
-    \item \textbf{Binary Arithmetic Codec (BAC)}: Il CABAC utilizza la codifica aritmetica, che è una forma avanzata di codifica di entropia. La codifica aritmetica rappresenta intere sequenze di simboli come intervalli frazionari su una linea numerica tra 0 e 1, adattando dinamicamente la lunghezza dei codici in base alle probabilità dei simboli. Ecco i passi principali della codifica aritmetica binaria:
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.5\textwidth]{images/CABAC-regular.png}
+        \caption{Rappresentazione della fase di Context Modeling in regular mode della CABAC.}
+        \label{fig:CABAC_regular}
+    \end{figure}
     
-    Inizializzazione: Inizialmente, l'intervallo di codifica è [0, 1).
-    Suddivisione dell'Intervallo: Per ogni bit da codificare, l'intervallo corrente viene suddiviso in due parti basate sulla probabilità stimata del bit essere 0 o 1.
-    Aggiornamento dell'Intervallo: L'intervallo viene aggiornato per riflettere la porzione associata al bit effettivamente codificato.
-    Output dei Bit: Quando l'intervallo diventa sufficientemente piccolo, vengono emessi bit del codice.
+    \item \textbf{Binary Arithmetic Codec (BAC)}: Il CABAC utilizza la codifica aritmetica, che è una forma
+    avanzata di codifica di entropia senza perdita. Questa tecnica sfrutta la probabilità che un certo simbolo
+    ("0" o "1") appaia, basandosi sul contesto fornito dalla sequenza di simboli precedenti. CABAC adatta
+    dinamicamente il modello di probabilità in base ai simboli già codificati, migliorando così l'efficienza
+    della compressione.
 \end{enumerate}
 
 \paragraph{Loop filtering}\hphantom{A}\\
-- per quanto riguarda i filtri, il filtro di deblocking rimane lo stesso, ma dopo questo filtro viene anche applicato il Sample Adaptive Offset (SAO), che mira a ridurre gli artefatti di compressione, come i bordi sfocati o irregolari.
-La tecnica SAO interviene dopo la quantizzazione dei coefficienti di frequenza nel processo di compressione. Analizza il contenuto dell'immagine e applica offset ai pixel in base ai valori dei pixel circostanti. L'obiettivo è quello di correggere gli errori introdotti dalla quantizzazione e di migliorare la qualità dell'immagine compressa, in particolare nei bordi dell'immagine.
-Ci sono due tipi principali di SAO utilizzati in HEVC:
-        -SAO Edge Offset: Questo tipo di SAO si concentra sui bordi dell'immagine e applica offset ai pixel lungo i bordi per correggere gli artefatti visivi introdotti dalla compressione. Ad esempio, può correggere la sfocatura o il ringing intorno ai bordi degli oggetti nell'immagine.
-        -SAO Band Offset: Questo tipo di SAO si concentra su aree specifiche dell'immagine, come le regioni uniformi, e applica offset ai pixel all'interno di queste aree per ridurre gli artefatti di compressione. Questo può aiutare a migliorare la uniformità dei toni di colore all'interno di regioni omogenee dell'immagine.
-TODO: vedere se aggiungere nel dettaglio come funziona questo algoritmo SAO, nel caso si trova su chatgpt
+Come il codec H.264 anche questo applica molti filtri per migliorare la qualità dell'immagine, ma i principali
+sono due, ovvero il \textbf{Deblocking Filter} e il \textbf{Sample Adaptive Offset (SAO)}.
 
-- ogni PB all'interno di una CB usa la stessa prediction mode
+L'algoritmo del Deblocking Filter rimane quasi invariato rispetto al predecessore, l'unico cambiamento è invece
+di applicare un filtro 4x4 per ogni pixel lungo i bordi dei blocchi, applica dei filtri più grandi 8x8 più
+leggeri affiancati uno all'altro. Questo viene fatto in quanto gli artefatti dovuti alla divisione in blocchi
+sono meno evidenti, inoltre dato che i filtri sono affiancati e non sovrapposti, questo permette di calcolarli
+in parallelo.
 
+Per quanto riguarda la tecnica SAO, questo interviene dopo aver applicato la quantizzazione inversa durante
+la decodifica. Analizza il contenuto dell'immagine e applica offset ai pixel in base ai valori dei pixel
+circostanti. Con il termine offset si intende che ai valori delle matrici di Luma o Chroma vene aggiunto un
+numero (ovvero l'offset).
+In particolare:
 
+\begin{enumerate}
+    \item \textbf{Classificazione dei Pixel}: Il SAO divide i pixel dell'immagine in diverse categorie basate
+    sulle loro caratteristiche locali. Queste categorie possono essere determinate in base al valore del pixel
+    rispetto ai pixel vicini. In particolare possono essere catalogate in due modalità:
+    
+    \begin{itemize}
+        \item \textbf{Edge Offset}: Considera la differenza tra il pixel corrente e i suoi pixel adiacenti.
+        A seconda delle differenze rilevate, i pixel vengono classificati in diverse categorie di offset (ad
+        esempio, orizzontale, verticale, diagonale). Questa modalità viene applicata nelle zone in cui è
+        presente molto dettaglio, come ad esempio lungo i bordi di un oggetto.
+        
+        \item \textbf{Band Offset}: I pixel sono classificati in bande in base ai loro valori di intensità.
+        Ogni banda corrisponde a un intervallo specifico di valori di pixel. Questa modalità viene applicata
+        nelle zone uniformi, prive di dettaglio, come ad esempio il cielo.
+    \end{itemize}
+    
+    \item \textbf{Calcolo degli Offset}: Per ciascuna modalità, viene calcolato un offset che rappresenta la
+    correzione da applicare. Questi offset sono determinati durante la fase di codifica e trasmessi insieme
+    ai dati video compressi.
+    
+    \item \textbf{Applicazione degli Offset}: Durante la decodifica, gli offset calcolati vengono applicati
+    ai pixel classificati. Questo passaggio corregge gli errori di quantizzazione, migliorando la qualità
+    visiva dell'immagine.
+\end{enumerate}
 
 ---
 -35.4\% di compressione a parità di resa grafica rispetto al H.264
 ---
 
-\subsection{VP9}    % forse non serve descriverlo
-Valutare se descriverlo nel dettaglio, oppure se accennarlo e basta.
-
 \subsection{AV1}
+TODO: accennare la VP9
 TODO: il codec AV1 è molto lento nel codificare/decodificare video, ma con un acceleratore apposito è nettamente più veloce del H.265
+TODO: blocchi da 128x128 invece dei 64x64 del H.265
+TODO: i chroma possono arrivare a 2x2 per una massima precisione
+TODO: immagine a destra 14:36
+TODO: differenze a min 15:03
 
 \subsection{Comparazione delle prestazioni}
 
@@ -678,7 +722,8 @@ TODO: si potrebbe parlare dell'approccio di NVIDIA per le video chat.
 \\+CTU per H.265 https://codesequoia.wordpress.com/2012/10/28/hevc-ctu-cu-ctb-cb-pb-and-tb/
 \\+utile! parla dei tecnicismi del h.265 https://zhuanlan.zhihu.com/p/519752821
 \\-utile! parla dei tecnicismi del h.265 https://iphome.hhi.de/wiegand/assets/pdfs/2012_12_IEEE-HEVC-Overview.pdf
-\\-utile! paragona AV1 a h.265 https://subclassy.github.io/compression#:~:text=265%20takes%202.83s%20on,so%20much%20time%20to%20process.
+\\-utile! paragona AV1 (togliere la parte dopo l'hashtag) a h.265 https://subclassy.github.io/compression#:~:text=265%20takes%202.83s%20on,so%20much%20time%20to%20process.
+\\-utile! paragona performance di h264, h265 e vp9 https://www.red5.net/blog/6-points-of-comparison-for-vp9-or-h265/
 \\-utile! paragona le performance dei vari codec su hw nvidia https://developer.nvidia.com/video-codec-sdk
 \\-utile! https://support.google.com/youtube/answer/2853702?hl=it
 
