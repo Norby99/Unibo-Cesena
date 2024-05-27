@@ -102,8 +102,67 @@ file anche di 300 volte. Usando un bitrate che varia dai 5-10 Mb/s, quindi un bi
 questa risoluzione che ci permette di mantenere un'ottima qualità, il file compresso avrebbe una
 dimensione dai 375 ai 750 MB.
 
+\subsection{Luma \& Chroma}
+Quando si rappresenta un video o un'immagine in generale, la prima idea che viene in mente è quella di
+rappresentare ogni pixel come una terna di informazioni, in cui ciascun componente indica l'intensità
+di uno dei tre colori primari (R - rosso, G - verde, B - blu), come si può notare dalla
+figura~\ref{fig:n_rgb}. In questo modo, è possibile riprodurre quasi tutti i colori esistenti (o
+comunque percepibili dall'occhio umano). Inoltre, questa tecnica consente di visualizzare direttamente
+le immagini sui monitor senza necessità di conversione, poiché questi dispositivi utilizzano già questo
+metodo per proiettare le immagini sullo schermo.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/n-rgb.png}
+    \caption{Rappresentazione di come un'immagine viene divisa nelle sue 3 componenti di colore rosso-verde-blu.}
+    \label{fig:n_rgb}
+\end{figure}
+
+Questo approccio, sebbene semplice e intuitivo, non è la scelta migliore per la codifica poiché non
+offre particolari vantaggi in questo contesto. Pertanto, è stato sviluppato un nuovo metodo che
+suddivide l'immagine in componenti in modo tale che alcune contengano informazioni cruciali, mentre
+altre contengano dettagli meno importanti. Questo permette di mantenere la qualità visiva anche se
+alcune informazioni vengono compresse o scartate completamente, poiché la perdita di dettaglio non
+risulta percepibile.
+
+Quindi è stato sviluppato un nuovo spazio di colori chiamato YCbCr, chiamato così dalla combinazione
+delle sue componenti. Esso, come lo spazio RGB si divide in 3 componenti (vedi Figura~\ref{fig:n_YCbCr}):
+
+\begin{itemize}
+    \item \textbf{Luma (Y)}: La luminanza rappresenta la componente di luminosità del segnale video.
+    È responsabile della rappresentazione del livello di luminosità dell'immagine senza tener conto
+    del colore. In pratica, la Luma è ciò che determina la nitidezza e la luminosità dell'immagine.
+    \item \textbf{Chroma (Cb e Cr)}: La crominanza, o Chroma, rappresenta la componente del colore
+    del segnale video. Contrariamente alla Luma, la crominanza descrive le informazioni sul colore
+    senza influire sulla luminosità. È composta da due componenti, Cb (blu) e Cr (rosso), che
+    rappresentano la differenza tra la componente di colore e la luminanza.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/n-YCbCr.png}
+    \caption{Rappresentazione di come un'immagine viene divisa nelle sue 3 componenti Luma e le due
+    Chroma.}
+    \label{fig:n_YCbCr}
+\end{figure}
+
+Rappresentando un'immagine mediante questo spazio di colore, si è notato che la componente Luma è
+nettamente più importante rispetto alle componenti Chroma. Anche alterando significativamente le
+Chroma, infatti, le differenze risultano quasi impercettibili, mentre anche piccole variazioni
+della componente Luma producono cambiamenti sensibilmente visibili.
+Grazie a questo accorgimento si è deciso di comprimere le due componenti Chroma riducendo di molto
+la dimensione dell'immagine. Ad esempio riducendo la loro dimensione di due volte, si ottiene già
+una compressione del 50\% dell'immagine e dal punto di vista visivo non ci sono quasi differenze.
+
 \section{Tecnologie attuali}
-TODO: Da qualche parte descrivere che cos'è Luma e Chroma
+Dopo l'introduzione dell'H.261, che rappresenta uno dei primi codec video utilizzati per la compressione
+digitale, l'evoluzione tecnologica ha portato allo sviluppo di codec sempre più efficienti e sofisticati.
+Tra questi, l'H.264 creato nel 2003 e l'H.265 creato nel 2013 hanno segnato tappe fondamentali nel campo
+della compressione video. Ovviamente questi non sono gli unici codec efficienti che sono stati creati nel
+trentennio successivo all'H261, ma in questo report si parlerà principalmente di questi in quanto non
+solo sono i due codec che hanno rivoluzionato maggiormente l'industria, ma sono anche i due codec più
+usati ad oggi.
+
 \subsection{H.264/AVC}
 Il formato H.264 è stato introdotto nel 2003 e appartiene alla serie H.26X. Il suo obiettivo principale
 è quello di comprimere ulteriormente i file video senza compromettere la qualità visiva. Questa
@@ -127,7 +186,7 @@ processare i dati video in modo efficiente durante la codifica e la decodifica. 
 questo approccio potrebbe aumentare l'efficienza è quello di processare ogni slice con un thread diverso.
 
 \paragraph{Macroblock}\hphantom{A}\\
-Un immagine viene divisa in dei blocchi quadrati di pixel chiamati macroblock e possono avere una
+Un'immagine viene divisa in dei blocchi quadrati di pixel chiamati macroblock e possono avere una
 dimensione variabile in base allo codec utilizzato, nel caso del H.264 è sempre 16x16 pixel. Il
 macroblock non raggruppa al suo interno l'immagine originale, bensì 3 matrici più semplici, la
 Luma e le matrici Cb e Cr della Chroma. Le dimensioni di queste sotto-matrici può variare da
@@ -136,7 +195,8 @@ originale, ovvero 16x16, mentre le due matrici Cb e Cr, possono essere una campi
 Di solito il livello di campionamento delle matrici Chroma è inferiore a quella della Lume, in quanto
 l'occhio umano è più attente ad osservare la luminosità e i bordi degli oggetti rispetto al colore.
 Solo con questa piccola ottimizzazione si può risparmiare fino al 50\% sullo spazio occupato su disco.
-Infine i macroblock possono essere suddivisi in blocchi più piccoli, chiamati
+
+Infine, i macroblock possono essere suddivisi in blocchi più piccoli, chiamati
 \textbf{prediction-blocks}, di vari dimensioni e forme, ad esempio il codec H.264 può suddividerli in
 4 prediction-blocks da 8x8, oppure 16 da 1x1, ma esistono altri codec che possono suddividere i
 macroblock in matrici rettangolari, oppure triangolari. Questa suddivisione in prediction-blocks
@@ -165,26 +225,24 @@ TODO: volendo si possono inserire delle immagini per le slice e i macroblock
     \label{fig:intraframe_algo}
 \end{figure}
 
-\noindent La compressione intraframe, si riferisce alla compressione dei dati all'interno di
-un singolo fotogramma. Questo metodo si divide più passaggi:
+\noindent La compressione intraframe si riferisce alla compressione dei dati all'interno di
+un singolo fotogramma. Questo metodo si divide in più passaggi:
 \begin{enumerate}
   \item Per ogni macroblock o prediction-block, viene utilizzato un modello di predizione per stimare
   i valori delle matrici al suo interno basandosi sui valori delle celle adiacenti. Questo modello di
   predizione può essere semplice (es. facendo la media dei pixel adiacenti) o più complesso (come la
   predizione basata su modelli statistici o algoritmi di machine learning). Esistono in totale 9 metodi
-  di previsione, ma i 3 metodi più frequenti sono (Vedi Figura~\ref{fig:intraframe_algo}) : traslandolo
-  i pixel adiacenti già noti in orizzontale/verticale oppure facendo una media dei pixel adiacenti. Nel
+  di previsione, ma i 3 metodi più frequenti sono (Vedi Figura~\ref{fig:intraframe_algo}) : traslando
+  i pixel adiacenti già noti in orizzontale o in verticale, oppure facendo una media dei pixel adiacenti. Nel
   caso del formato H.264 ci sono in totale 9 algoritmi di intraframe.
-  \item Successivamente viene calcolata la residua, ovvero la differenza tra i pixel predetti e i
+  \item Successivamente, viene calcolata la residua, ovvero la differenza tra i pixel predetti e i
   pixel dell'immagine non compressa
-  \item Infine viene scelta la matrice residua, che si è avvicinata di più al gruppo di pixel originale,
+  \item Infine, viene scelta la matrice residua, che si è avvicinata di più al gruppo di pixel originale,
   comprimendo così la dimensione del frame.
 \end{enumerate}
-È nella fase di intraframe che viene fatta la suddivisione dei macroblock in prediction-block.
-L'algoritmo sceglie la suddivisione migliore semplicemente provando tutti i tipi di divisioni dei
+È poi nella fase di intraframe che viene fatta la suddivisione dei macroblock in prediction-block.
+L'algoritmo sceglie la suddivisione migliore provando tutti i tipi di divisioni dei
 blocchi fino a trovare quello con la residua migliore.
-
-TODO: non so se inserire l'esempio (nel caso le immagini sono gia salvate) (per rendere le idee piu chiare...)
 
 \paragraph{Interframe/Motion compensation}\hphantom{A}\\
 Quando si parla di compressione, l'obiettivo è ridurre al minimo le ridondanze. Nel contesto dei video,
@@ -194,9 +252,11 @@ dopo l'altro, prende in considerazione più frame contemporaneamente per individ
 di essi. Naturalmente, ci sono situazioni in cui ciò non è fattibile, come durante un cambio di scena,
 dove la maggior parte o addirittura tutti i pixel possono cambiare da un frame all'altro.
 
-Per prima cosa se devono classificare ogni frame di un video, per fare ciò il video viene
+Per prima cosa, qualora debba essere classificato ogni frame di un video, quest'ultimo viene
 ridimensionato ad una risoluzione inferiore e per ogni frame si applicano sia l'algoritmo di intraframe,
-che di  interframe e si comparano i due risultati. Se il costo del intraframe è inferiore, questo
+che di interframe, e si comparano i due risultati. Se il costo\footnote{con costo si intende il peso
+in termini di memoria calcolato attraverso un processo di comparazione tra i due metodi intraframe e interframe}
+dell'intraframe è inferiore, questo
 significa che il frame che si sta analizzando non ha elementi in comune con i frame precedenti,
 suggerendo così un cambio di scena. Ci sono in totale 3 tipi di frame (vedi Figura~\ref{fig:frame_type}):
 
@@ -248,13 +308,13 @@ Figura~\ref{fig:interframe}. Ci sono due modi per popolare un macroblock grazie 
 \end{figure}
 
 \paragraph{Transformation}\hphantom{A}\\
-Ora che tutti i macroblocks sono stati in qualche modo codificati, si prendono solo quelli che contengono
-dei residui e vengono divisi in blocchi rettangolari 8x8 e viene applicata la trasformata discreta del
-coseno (\textbf{DCT} - Discrete Cosine Transform).
+Ora che tutti i macroblocks sono stati codificati secondo il metodo più conveniente, si prendono solo quelli che contengono
+la matrice dei residui, ovvero quelli codificati mediante interframe, e vengono divisi in blocchi quadrati 8x8
+e viene applicata la trasformata discreta del coseno (\textbf{DCT} - Discrete Cosine Transform).
 
 La trasformata discreta del coseno permette di rilevare variazioni di informazioni (come il colore per
-i blocchi Chroma o la luminosità per i blocchi Lumen) trasformando i valori dei pixel dal dominio
-spaziale al dominio delle frequenze individuando così i blocchi con con più dettagli, ovvero i blocchi
+i blocchi Chroma o la luminosità per i blocchi Luma) trasformando i valori dei pixel dal dominio
+spaziale al dominio delle frequenze e individuando così i blocchi con più dettagli, ovvero i blocchi
 con frequenza maggiore.
 
 Per applicare la trasformata discreta del coseno bisogna:
@@ -270,14 +330,14 @@ Per applicare la trasformata discreta del coseno bisogna:
 
 \begin{enumerate}
     \item Dividere l'immagine (ovvero le 3 matrici dei residui) in piccoli blocchi quadrati 8x8
-    \item Si normalizzano i valori delle matrici sottraendo a ciascun valore 128, cosi facendo
+    \item Normalizzare i valori delle matrici sottraendo a ciascun valore 128; così facendo
     ogni cella sarà compresa tra 128 e -127. Se prendiamo ad esempio la matrice Lumen il valore
     128 corrisponderà al bianco, mentre il valore -127 al nero e i valori centrali saranno tutte
     le tonalità di grigio
-    \item Successivamente si cerca di ricostruire la matrice 8x8 ottenuta come somma di matrici
+    \item Successivamente, ricostruire la matrice 8x8 ottenuta come somma di matrici
     prese da una matrice DCT precalcolata (vedi figura Figura~\ref{fig:DCT_table}. Nella 
-    Figura~\ref{fig:DCT_example} si può notare come partendo da un immagine, come si possa
-    risalire ad essa mediante una somma mi matrici prese dalla tabella DCT.
+    Figura~\ref{fig:DCT_example} si può notare come partendo da un'immagine, si possa
+    risalire ad essa mediante una somma di matrici prese dalla tabella DCT.
 \end{enumerate}
 
 \begin{figure}[h]
@@ -289,9 +349,9 @@ Per applicare la trasformata discreta del coseno bisogna:
 \end{figure}
 
 \paragraph{Quantization}\hphantom{A}\\
-La quantizzazione implica la creazione di due matrici, chiamate tabelle di quantizzazione, per
-suddividere i valori delle matrici ottenute tramite la trasformazione. Queste due matrici, una
-per le Luma e una per le Chroma, sono identiche per l'intera immagine e sono strutturate in
+La quantizzazione implica la creazione di tre matrici, chiamate tabelle di quantizzazione, per
+suddividere i valori delle matrici ottenute tramite la trasformazione. Queste tre matrici, una
+per le Luma e due per le Chroma, sono identiche per l'intera immagine e sono strutturate in
 modo che i valori più elevati si trovino nella parte inferiore destra, corrispondente alle
 frequenze più alte nell'immagine DCT. Questo schema favorisce una migliore compressione nelle
 aree in cui le frequenze dell'immagine sono più elevate.
@@ -309,24 +369,22 @@ frequenza, impercettibili per l'occhio umano.
     \label{fig:quantization_example}
 \end{figure}
 
-TODO: si potrebbe aggiungere che molti passaggi come gli ultimi due avvengono anche nella compressione delle immagini, come nella jpeg
-
 \paragraph{Entropy Coding}\hphantom{A}\\
 Nella fase di Entropy Coding, si mira a comprimere ulteriormente i dati, facendo riferimento non
-all'immagine come tale, ma come ad una stringa di bit o simboli. Esistono diversi tipi di
-algoritmi di Entropy Coding che possono variare da codec a codec e da implementazione a implementazione.
+all'immagine come tale, ma interpretandola come una stringa di bit o simboli. Esistono diversi tipi di
+algoritmi di Entropy Coding che possono variare in base al codec e all'implementazione.
 Tra i più importanti vi è l'\textbf{Arithmetic codec}, il quale cerca di predire i prossimi
-simboli o bit in base a una serie data di simboli e una tabella di probabilità. Durante ogni fase
+simboli o bit in base a una serie data di simboli e a una tabella di probabilità. Durante ogni fase
 della codifica di un video, viene applicato un algoritmo di codifica diverso o leggermente
-modificato. Un altro algoritmo di codifica degno di nota è il \textbf{codifica di Huffman}, o
+modificato. Un altro algoritmo di codifica degno di nota è la \textbf{codifica di Huffman}, o
 Huffman encoding, rinomato per la sua flessibilità. Oltre ad essere utilizzato nella codifica video,
-trova impiego anche nella codifica delle immagini (come nella JPEG), nella codifica audio
+trova infatti impiego anche nella codifica delle immagini (come nella JPEG), nella codifica audio
 (come nella MP3) e nella compressione dei file (come nei formati PKZIP, ZIP e WinRar).
 
 Nella codifica video, la \textbf{codifica di Huffman} subisce leggere modifiche e viene impiegata
-in combinazione con l'algoritmo \textbf{Run Length}. Quest'ultimo viene viene applicato alle matrici
+in combinazione con l'algoritmo \textbf{Run Length}. Quest'ultimo viene applicato alle matrici
 quantizzate, come discusso nel paragrafo precedente. In questo contesto, i valori delle matrici vengono
-letti in modo zig-zag, partendo dall'angolo in alto a sinistra e procedendo verso il basso a destra.
+letti "a zig-zag", partendo dall'angolo in alto a sinistra e procedendo verso il basso a destra.
 Questo schema di lettura organizza i valori in modo tale che quelli con frequenza più alta, spesso 
 rappresentati da sequenze di zeri consecutive, si trovino verso la fine della sequenza. Una volta ottenuta
 la lista di numeri, quando si incontrano due o più numeri ripetuti si tiene conto di quante volte un certo
@@ -341,17 +399,17 @@ Figura~\ref{fig:huffman_example})).
 \end{figure}
 
 Una volta ottenuta una lista con tutti i numeri e la loro frequenza, possiamo procedere applicando
-la \textbf{codifica di Huffman} (nota come in questo paragrafo verrà spiegato come l'algoritmo
+la \textbf{codifica di Huffman} \footnote{Nota come in questo paragrafo verrà spiegato come l'algoritmo
 viene applicato alla codifica video, se interessati ad una visione più ampia,
 \href{https://www.youtube.com/watch?v=JsTptu56GM8}{questo video} lo spiega nel dettaglio con tanto
-di illustrazioni). L'algoritmo è diviso in diversi passaggi:
+di illustrazioni}. L'algoritmo è diviso in diversi passaggi:
 
 \begin{enumerate}
-    \item Si ordinare la lista precedentemente ottenuta in base alla frequenza dei simboli.
-    \item Si prendono gli ultimi due elementi e si inizia a costruire un piccolo albero con a base i due
-    elementi selezionati e come padre la somma di tutti i figli.
+    \item Si ordina la lista precedentemente ottenuta in base alla frequenza dei simboli.
+    \item Si prendono gli ultimi due elementi e si inizia a costruire un piccolo albero con alla base i due
+    elementi selezionati e come "padre" la somma di tutti i "figli".
     \item Si prende l'oggetto albero appena creato e lo si reinserisce nella lista nella posizione dettata
-    della propria frequenza.
+    della sua frequenza.
     \item Si procede in questo modo fino a quando la lista sarà composta da un solo elemento.
 \end{enumerate}
 
@@ -384,16 +442,16 @@ numeri.
 
 \paragraph{Loop filtering}\hphantom{A}\\
 Il \textbf{Loop filtering} è una tecnica che viene utilizzata solo nella ricostruzione delle immagini,
-non alla codifica e consiste nell'applicare un o più filtri all'immagine portando i seguenti benefici:
+non nella codifica, e consiste nell'applicare un o più filtri all'immagine apportando i seguenti benefici:
 
 \begin{itemize}
     \item \textbf{Deblocking filter}: L'artefatto di blocco è un effetto causato dalla divisione del frame
-    in blocchi più piccoli durante la compressione creando delle linee di separazione tra di esse.
+    in blocchi più piccoli durante la compressione, creando delle linee di separazione tra di esse.
     Per questo problema viene utilizzato il deblocking filter, che aiuta a ridurre l'effetto di questo
     artefatto, migliorando l'aspetto generale del video (vedi Figura~\ref{fig:deblocking_filter}). La
     tecnica consiste nell'applicare tanti piccoli filtri 4x4 lungo i bordi dei blocchi.
     Questo è il filtro più importante in quanto è presente in quasi tutti i formati di compressione video.
-    \item \textbf{Riduzione del rumore}: Il rumore video può essere introdotto durante la compressione
+    \item \textbf{Riduzione del rumore}: Il rumore video può manifestarsi durante la compressione
     o a causa delle condizioni di trasmissione. Il loop filtering può ridurre questo rumore,
     migliorando la chiarezza complessiva dell'immagine.
     \item \textbf{Smoothing dei contorni}: Per migliorare la qualità visiva, il loop filtering può
@@ -427,9 +485,9 @@ ai macroblocks dei residui, seguiti dalla trasformazione e quantizzazione. Infin
 codifica di entropia per comprimere l'immagine a livello di bit, seguita dall'applicazione di vari
 filtri per migliorare la naturalezza dell'immagine.
 
-Come abbiamo visto, a compressione e soprattutto la decodifica in tempo reale di un video richiedono
+Come abbiamo visto, la compressione e soprattutto la decodifica in tempo reale di un video richiedono
 considerevole potenza di calcolo. Il formato H.264 è stato uno dei primi codec a necessitare di un
-acceleratori hardware dedicati per la decodifica dei video, poiché le operazioni computazionali richieste
+acceleratore hardware dedicato per la decodifica dei video, poiché le operazioni computazionali richieste
 diventavano sempre più complesse. Questo portò alla luce che con l'avanzare delle nuove tecnologie per
 la compressione dei video, che riducevano le dimensioni dei file, aumentava anche la potenza di calcolo
 necessaria per la codifica e decodifica dei video.
@@ -453,27 +511,27 @@ Youtube lo ha usato fino al 2010 per poi abbandonarlo in favore del proprio VP8.
 ---
 
 \subsection{H.265/HEVC}
-Con l'avanzare delle tecnologie e del crescente informatizzazione di un pubblico sempre più vasto
+Con l'avanzare delle tecnologie e dell'informatizzazione di un pubblico sempre più vasto
 è nato il problema di come rappresentare i nuovi formati video e di come poter comprimere ulteriormente
 questi file. Per questo motivo nel 2013 la \textbf{International Telecommunication Unit} ha creato il
 nuovo codec H.265, che non solo è in grado di comprimere meglio i filmati (considerando che il 4k sta
-prendendo sempre più piede in questo periodo), ma riesce a codificare filmati 3D, in HDR e anche
-video in 360°. Nei paragrafi successivi si vedremo quali cambiamenti sono stati apportati al predecessore
-H.264 per creare questo nuovo codec.
+prendendo sempre più piede in questo periodo) ottenendo una compressione migliore del 50\% rispetto all'H264, ma
+riesce a codificare filmati 3D, in HDR e anche video girati in 360°. Nei paragrafi successivi si vedremo quali
+cambiamenti sono stati apportati al predecessore H.264 per creare questo nuovo codec.
 
 \paragraph{Coding Tree Unit (CTU)}\hphantom{A}\\
 La prima differenza con il formato H.264 è la gestione dei blocchi. Il codec H.265 non utilizza
 i classici macroblocks che sono stati usati fino a questo periodo dalla maggioranza dei codec, ma
-utilizza i \textbf{Coding Tree Unit}, che d'ora in poi verrà abbreviato con CTU. A differenza
+utilizza il sistema \textbf{Coding Tree Unit} (d'ora in poi verrà abbreviato con CTU). A differenza
 dei macroblocks che sono di dimensione variabili 16x16, i CTU hanno tutte dimensioni identiche
-64x64, 32x32 o 16x16 all'interno di un frame (questo parametro dipende dal bitrate selezionato al inizio
+64x64, 32x32 o 16x16 all'interno di un frame (questo parametro dipende dal bitrate selezionato all'inizio
 della codifica,inoltre CTU di dimensioni più grandi permettono una codifica più efficiente e una resa
-grafica più alta, a discapito del tempo di codifica, che più crescere esponenzialmente). Le CTU, come i
-macroblocks sono divisi nei tre sotto blocchi 1x Luma e 2x Chroma chiamati \textbf{Coding Tree Block} o CTU.
+grafica più alta, a discapito del tempo di codifica, che cresce esponenzialmente). Le CTU, come i
+macroblocks, sono divisi nei tre sotto blocchi, uno per la Luma e 2 per le Chroma, chiamati \textbf{Coding Tree Block} o CTU.
 Un grosso problema delle CTU è che sono troppo grandi per poter eseguire gli algoritmi di inter e intra
 prediction e per ciò ogni CTU viene ulteriormente divisa in \textbf{Coding Block} (CB), che possono avere
 dimensioni variabili da 32x32 fino a 8x8.
-Le Coding Block sono l'unità più piccola su cui lavorare e si possono distinguere in due tipi:
+Le Coding Block sono le unità più piccole su cui lavorare e si possono distinguere in due tipi:
 
 \begin{itemize}
     \item \textbf{Prediction Block} (PB) se si sta usando un algoritmo di Interframe. Questi sono
@@ -482,7 +540,7 @@ Le Coding Block sono l'unità più piccola su cui lavorare e si possono distingu
     dati sulle residue delle immagini.
 \end{itemize}
 
-Come detto precedentemente le CTU, sono divise in 3 CTB per ogni matrice di Luma/Chroma; la stessa
+Come detto precedentemente, le CTU sono divise in 3 CTB per ogni matrice di Luma/Chroma; la stessa
 cosa vale per le componenti sottostanti, quindi esiste una \textbf{Prediction Unit} (PU) che contiene
 a sua volta tre Prediction Block e così via. Non solo gli oggetti "Unit" oltre ai blocchi di matrici
 contengono un relativo \textbf{Syntax Element} che tiene traccia di come un determinato blocco è
@@ -496,10 +554,10 @@ stato codificato, ad esempio la Syntax Element di una Coding Unit contiene le in
     \label{fig:coding_unit}
 \end{figure}
 
- \noindent Ogni CTB è suddiviso al suo interno come un albero che naviga mediante un algoritmo
-chiamato Z-Scan rappresentando un pattern a zig-zag (come si può intuire dalla
+ \noindent Ogni CTB è suddiviso al suo interno come un albero che memorizza le informazioni mediante un algoritmo
+chiamato Z-Scan, rappresentando un pattern "a zig-zag" (come si può intuire dalla
 Figura~\ref{fig:chroma_CTB}).
-Una caratteristica che i CTU hanno in comune con i macroblocks è la gestione dei "blocchi"
+Una caratteristica che i CTU hanno in comune con i macroblocks è la gestione dei "blocchi",
 in quanto anche i CTU vengono gestiti e processati in gruppi chiamati \textbf{slice}.
 
 \begin{figure}[h]
@@ -510,18 +568,17 @@ in quanto anche i CTU vengono gestiti e processati in gruppi chiamati \textbf{sl
     \label{fig:chroma_CTB}
 \end{figure}
 
-Una dettaglio molto importante è che all'interno di un Coding Block, ogni Prediction Block utilizza lo
-stesso modalità di predizione (intra o inter).
+Una dettaglio molto importante è che all'interno di un Coding Block, ogni Prediction Block utilizza la
+stessa modalità di predizione (intra o inter).
 
 \paragraph{Intraframe/intra prediction}\hphantom{A}\\
-Quello che cambia nell'applicazione della intra prediction sono i blocchi, che possono avere molte più
+A cambiare nell'applicazione della intra prediction sono i blocchi, che possono avere molte più
 dimensioni rispetto all'H.264, con lati da 8, 16, 32, 64 e tutte le combinazioni di quadrati o rettangoli
 possibili, garantendo una compressione migliore.
 
 Inoltre, le modalità di previsione non sono più solo 9, che all'epoca della risoluzione più diffusa di 720p
-erano più che sufficienti, ma ben 35 (potrebbe essere utile inserire un'immagine di queste modalità). Tra
-queste, vi sono una modalità di previsione planare, una previsione DC e 33 previsioni angolari (vedi
-Figura~\ref{fig:HEVC_intra}).
+erano più che sufficienti, ma ben 35. Tra queste, vi sono una modalità di previsione planare, una previsione DC 
+e 33 previsioni angolari (vedi Figura~\ref{fig:HEVC_intra}).
 
 \begin{figure}[h]
     \centering
@@ -553,14 +610,12 @@ Nella Interframe, vengono aggiunte altre tre tecnologie per aumentare la compres
     Questo risultato può essere ottenuto copiando il motion vector di una PU vicina, oppure facendo una
     media di più PU vicine (si noti che con PU vicine non si intendono solo le PU adiacenti fisicamente, ma
     anche temporalmente).
-    
     \item \textbf{Advanced Motion Vector Prediction} (AMVP): Simile al Merge Mode, ma invece di copiare i
     motion vector dalle PU adiacenti, l'AMVP li analizza tutti e fa una predizione su quale sarà il motion
     vector della PU in analisi. Se la predizione è sufficientemente precisa, utilizza il vettore predetto
     invece di memorizzarne uno nuovo.
-    
     \item \textbf{Weighted Prediction}: In casi dove un video presenta una scena con un'animazione di fade
-    (l'immagine diventa progressivamente più scuro fino a diventare nero, per poi tornare lentamente alla
+    (l'immagine diventa progressivamente più scura fino a diventare nera, per poi tornare lentamente alla
     luminosità naturale), il codec H.264 creerebbe due scene distinte con due I-frame. Al contrario, il
     nuovo codec H.265 riconosce questi pattern e genera una Weighted Prediction, creando un solo I-frame
     all'inizio della scena e, durante l'animazione di fade, riduce semplicemente l'intensità della matrice
@@ -581,9 +636,9 @@ da 4x4 a 32x32, permettendo così di regolare il livello di dettaglio mantenuto 
 La tecnologia RQT prende il nome dal fatto che vengono utilizzate delle \textbf{Quadtree} per memorizzare
 le TB, come illustrato dai rami rossi nella Figura~\ref{fig:chroma_CTB}.
 
-Nella Quantizzazione, viene modificato anche il metodo della Discrete Cosine Transform (DCT), dove non viene
-più utilizzata una scansione fissa predefinita per convertire i blocchi di pixel in coefficienti di frequenza
-dove la tabella DCT viene costruita cambiando i parametri verticali e orizzontali per un totale di 64 (8x8)
+Nella Quantizzazione, viene modificato anche il metodo della Discrete Cosine Transform (DCT), non viene
+più utilizzata una scansione fissa predefinita per convertire i blocchi di pixel in coefficienti di frequenza, come accadeva in precedenza,
+quando la tabella DCT veniva costruita cambiando i parametri verticali e orizzontali per un totale di 64 (8x8)
 combinazioni.
 L'Adaptive Scan Order (ACS) determina invece una sequenza di scansione ottimale per ciascun blocco di pixel,
 considerando le caratteristiche spaziali e di frequenza del contenuto. ACS viene eseguita in sotto-blocchi
@@ -610,21 +665,20 @@ l'alto-destra 4×4 a sotto-blocchi di coefficienti di trasformazione.
 \paragraph{Entropy Coding}\hphantom{A}\\
 La Entropy Coding del codec H.265 è rimasta invariata rispetto al suo predecessore per quanto riguarda
 la codifica delle matrici residue, continuando a utilizzare la codifica di Huffman. Tuttavia, è stato
-introdotto un nuovo metodo per la codifica degli Syntax Element di ogni blocco e dei vettori di movimento.
+introdotto un nuovo metodo per la codifica dei Syntax Element di ogni blocco e dei vettori di movimento.
 Questo nuovo metodo è chiamato \textbf{Context Adaptive Binary Arithmetic Coding (CABAC)}, che si divide
 in diverse fasi:
 
 \begin{enumerate}
     \item \textbf{Binarization}: Il primo passo nella codifica CABAC è convertire i simboli
     non binari (come i coefficienti di trasformata o i valori di movimento) in una serie di simboli binari.
-    Questa rappresentazione binaria è necessaria perché CABAC opera a livello di bit. Infine i questo enorme
+    Questa rappresentazione binaria è necessaria perché CABAC opera a livello di bit. Infine, questo enorme
     flusso di bit viene suddiviso in tanti piccoli flussi chiamati \textbf{Binary String}, che uniti formano
     il flusso originale.
-    
     \item \textbf{Context Modeling}: In questa fase si crea una mappa dove ogni Binary String viene
-    aggiunta ad una tabella che contiene la stringa stessa e la \textbf{Binary Index}, che non solo
+    aggiunta ad una tabella che contiene la stringa stessa e il \textbf{Binary Index}, che non solo
     tiene traccia della posizione in cui si trova la Binary String, ma indica anche il numero di "1"
-    present (vedi Figura~\ref{fig:CABAC_regular}). Il Context Modeling ha due modalità di esecuzione,
+    presenti (vedi Figura~\ref{fig:CABAC_regular}). Il Context Modeling ha due modalità di esecuzione,
     quella appena descritta è la \textbf{regular mode}, mentre esiste anche la \textbf{bypass mode}
     che non comprime per nulla il flusso di bit, ma li codifica così come sono.
     
@@ -643,10 +697,10 @@ in diverse fasi:
 \end{enumerate}
 
 \paragraph{Loop filtering}\hphantom{A}\\
-Come il codec H.264 anche questo applica molti filtri per migliorare la qualità dell'immagine, ma i principali
+Come il codec H.264, anche questo applica molti filtri per migliorare la qualità dell'immagine, ma i principali
 sono due, ovvero il \textbf{Deblocking Filter} e il \textbf{Sample Adaptive Offset (SAO)}.
 
-L'algoritmo del Deblocking Filter rimane quasi invariato rispetto al predecessore, l'unico cambiamento è invece
+L'algoritmo del Deblocking Filter rimane quasi invariato rispetto al predecessore, l'unico cambiamento che sussiste è che invece
 di applicare un filtro 4x4 per ogni pixel lungo i bordi dei blocchi, applica dei filtri più grandi 8x8 più
 leggeri affiancati uno all'altro. Questo viene fatto in quanto gli artefatti dovuti alla divisione in blocchi
 sono meno evidenti, inoltre dato che i filtri sono affiancati e non sovrapposti, questo permette di calcolarli
@@ -668,7 +722,6 @@ In particolare:
         A seconda delle differenze rilevate, i pixel vengono classificati in diverse categorie di offset (ad
         esempio, orizzontale, verticale, diagonale). Questa modalità viene applicata nelle zone in cui è
         presente molto dettaglio, come ad esempio lungo i bordi di un oggetto.
-        
         \item \textbf{Band Offset}: I pixel sono classificati in bande in base ai loro valori di intensità.
         Ogni banda corrisponde a un intervallo specifico di valori di pixel. Questa modalità viene applicata
         nelle zone uniformi, prive di dettaglio, come ad esempio il cielo.
@@ -677,38 +730,151 @@ In particolare:
     \item \textbf{Calcolo degli Offset}: Per ciascuna modalità, viene calcolato un offset che rappresenta la
     correzione da applicare. Questi offset sono determinati durante la fase di codifica e trasmessi insieme
     ai dati video compressi.
-    
     \item \textbf{Applicazione degli Offset}: Durante la decodifica, gli offset calcolati vengono applicati
     ai pixel classificati. Questo passaggio corregge gli errori di quantizzazione, migliorando la qualità
     visiva dell'immagine.
 \end{enumerate}
 
----
--35.4\% di compressione a parità di resa grafica rispetto al H.264
----
+\section{Tecnologie Future \& Comparazione delle prestazioni}
+L'evoluzione della compressione video non si ferma con gli standard descritti fin'ora. Con il continuo
+aumento della domanda di contenuti video ad alta risoluzione e la necessità di trasmissioni più efficienti,
+sono emersi nuovi codec progettati per offrire prestazioni superiori in termini di qualità e compressione.
+In questo capitolo, esamineremo in breve alcune delle tecnologie più promettenti che stanno prendendo piede
+in questo periodo: VP9, H.266 e AV1.
+
+\subsection{VP9}
+Sviluppato da Google, il codec VP9 è stato introdotto come successore di VP8 e rappresenta una valida
+alternativa ai codec H.264 e H.265. Progettato principalmente per lo streaming video su piattaforme come
+YouTube, VP9 offre una compressione più efficiente rispetto a H.264, con una riduzione del bitrate fino al
+50\% per la stessa qualità visiva. VP9 supporta risoluzioni fino a 8K.
+
+\subsection{H.266/VVC}
+L'H.266, noto anche come Versatile Video Coding (VVC), è stato sviluppato dall'ITU-T e dal Moving Picture
+Experts Group (MPEG) come successore di H.265. L'obiettivo di H.266 è fornire una compressione
+significativamente migliorata, riducendo il bitrate del 50\% rispetto a H.265 per la stessa qualità visiva.
 
 \subsection{AV1}
-TODO: accennare la VP9
-TODO: il codec AV1 è molto lento nel codificare/decodificare video, ma con un acceleratore apposito è nettamente più veloce del H.265
-TODO: blocchi da 128x128 invece dei 64x64 del H.265
-TODO: i chroma possono arrivare a 2x2 per una massima precisione
-TODO: immagine a destra 14:36
-TODO: differenze a min 15:03
+Il codec AV1, sviluppato dall'Alliance for Open Media, è un codec open source progettato per essere una
+soluzione di compressione video di nuova generazione. AV1 offre una compressione più efficiente rispetto
+a VP9 e H.265, riducendo il bitrate del 30\% rispetto a H.265 per la stessa qualità visiva.
 
 \subsection{Comparazione delle prestazioni}
+TODO
+https://www.google.it/search?q=vp9+vs+h265&rlz=1C2ONGR_itIT1057IT1102&sca_esv=8870e14de2d74e2a&udm=2&biw=2560&bih=1271&sxsrf=ADLYWIJYgaDjJgsbFa7IIDLjXKQN9jfd4w%3A1716813522406&ei=0n5UZvWoGNiC9u8PobS3-AE&oq=vp9+vs+h&gs_lp=Egxnd3Mtd2l6LXNlcnAiCHZwOSB2cyBoKgIIADIHEAAYgAQYEzIHEAAYgAQYEzIHEAAYgAQYEzIIEAAYExgIGB4yCBAAGBMYCBgeMggQABgTGAgYHjIIEAAYExgIGB4yCBAAGBMYCBgeMggQABgTGAgYHjIIEAAYExgIGB5I2yNQAFiVG3AAeACQAQCYAZkBoAHXBaoBAzcuMbgBA8gBAPgBAZgCB6ACjQXCAgQQIxgnwgIFEAAYgATCAggQABiABBixA8ICDhAAGIAEGLEDGIMBGIoFwgIKEAAYgAQYQxiKBcICBBAAGB6YAwCSBwM2LjGgB78j&sclient=gws-wiz-serp#vhid=CMFdEzOn3JK75M&vssid=mosaic
+https://www.red5.net/blog/6-points-of-comparison-for-vp9-or-h265/
+https://www.macxdvd.com/mac-dvd-video-converter-how-to/vp9-vs-h265.htm
 
 \section{Vantaggi per le aziende}
+L'adozione di algoritmi di compressione video sempre più efficienti offre numerosi vantaggi alle aziende,
+in particolare a quelle che operano nel campo dei media, dello streaming e dei servizi Cloud. Questi
+vantaggi si traducono in risparmi significativi in termini di costi operativi e miglioramenti delle
+prestazioni, contribuendo a una gestione più efficace delle risorse. In questo capitolo, esploreremo due
+dei principali benefici derivanti dall'adozione di codec di nuova generazione: la riduzione dell'utilizzo
+di spazio di archiviazione e l'ottimizzazione della larghezza di banda.
+
+\subsection{Riduzione dell'Utilizzo di Spazio di Archiviazione}
+Uno dei vantaggi più immediati dell'adozione di codec di compressione video più efficienti è la riduzione
+della quantità di spazio di archiviazione necessario per memorizzare i video. Nei data center moderni, i
+video sono tipicamente memorizzati su array di dischi rigidi (HDD) o unità a stato solido (SSD). Anche se
+le SSD stanno diventando sempre più comuni grazie alla loro maggiore velocità e affidabilità, gli HDD
+sono ancora ampiamente utilizzati per la loro convenienza economica quando si tratta di archiviazione
+su larga scala.
+
+L'adozione di codec più efficienti, permette di ridurre significativamente la dimensione dei file video.
+Questo significa che le aziende possono archiviare più contenuti video utilizzando meno unità di archiviazione,
+riducendo così i costi associati all'acquisto e alla manutenzione dell'hardware di archiviazione.
+
+Per esempio, ogni minuto vengono caricate 500 ore di video su YouTube\footnote{Fonte: \href{https://www.statista.com/statistics/259477/hours-of-video-uploaded-to-youtube-every-minute/}{Statista}}.
+Considerando un bitrate di 10 MB/s\footnote{Fonte: \href{https://support.google.com/youtube/answer/2853702?hl=it}{Google}},
+ciò richiederebbe una capacità di archiviazione di 432 TB al giorno. Tenendo conto di un costo medio di
+0,0144\$ per GB\footnote{Fonte: \href{https://www.backblaze.com/blog/hard-drive-cost-per-gigabyte/}{Backblaze}},
+questa esigenza si tradurrebbe in una spesa giornaliera di 6.220\$, ovvero 2.270.300\$ all'anno. Pertanto,
+l'adozione di codec più efficienti potrebbe aiutare le aziende a risparmiare notevolmente.
+
+\subsection{Ottimizzazione della Larghezza di Banda}
+Un altro vantaggio cruciale dei codec di compressione video avanzati è la riduzione della larghezza di
+banda necessaria per la trasmissione dei video. Questo è particolarmente importante per le aziende che
+offrono servizi di streaming video, come YouTube, Netflix, Twitch e altre piattaforme di intrattenimento online.
+
+Utilizzando codec più efficienti, è possibile trasmettere video di alta qualità con un bitrate inferiore
+Questo non solo riduce i costi di larghezza di banda per le aziende, ma migliora anche l'esperienza degli
+utenti finali, che possono godere di video di alta qualità anche con connessioni internet meno performanti.
+Inoltre, la riduzione della larghezza di banda necessaria per la trasmissione significa che le aziende possono
+servire un numero maggiore di utenti simultaneamente senza sovraccaricare la rete.
+
+Ad esempio, Twitch, una piattaforma di streaming di contenuti in tempo reale, può arrivare a spendere più di
+1000\$ al giorno per ogni utente che trasmette in diretta \footnote{Fonte: \href{https://ivs.rocks/calculator}{AWS}}.
+Anche in questo caso, si potrebbero ottenere significativi risparmi riducendo il bitrate dei video.
+
+\subsection{Implicazioni per i Servizi Cloud e il Content Delivery Network (CDN)}
+Le aziende che operano servizi Cloud e utilizzano reti di distribuzione dei contenuti (CDN) traggono
+enormi benefici dall'adozione di codec più efficienti. Riducendo le dimensioni dei file video, è
+possibile diminuire i tempi di caricamento e di buffering, migliorando l'accessibilità e la reattività
+dei contenuti video. Questo è essenziale per mantenere alta la soddisfazione degli utenti e ridurre i
+tassi di abbandono.
+
+\subsection{Risparmio Energetico e Impatto Ambientale}
+Infine, l'adozione di codec di compressione video più efficienti contribuisce anche alla riduzione del
+consumo energetico nei data center. Archiviare e trasmettere dati più compatti significa che meno
+risorse hardware sono necessarie, il che porta a un minore consumo di energia. Questo non solo riduce
+i costi operativi per le aziende, ma contribuisce anche a un minore impatto ambientale, sostenendo
+pratiche aziendali più sostenibili.
 
 \section{Sfide e considerazioni}
-Non dimenticare di discutere anche delle sfide e delle considerazioni pratiche legate all'adozione di nuovi codec, come il supporto hardware/software, la compatibilità con dispositivi esistenti e la gestione dei diritti d'autore.
+Mentre l'adozione di codec di compressione video sempre più efficienti offre numerosi vantaggi,
+esistono anche diverse sfide e considerazioni che le aziende devono affrontare. Questi ostacoli
+possono influenzare le decisioni strategiche riguardanti l'implementazione di nuovi codec e
+richiedono una valutazione attenta per bilanciare i benefici e i costi. In questo capitolo,
+esploreremo alcune delle principali sfide legate all'adozione dei nuovi codec, incluse le
+questioni legate alle \textbf{royalties}, i costi di ricodifica e la compatibilità hardware.
+
+\subsection{Royalties e Costi dei Codec}
+I codec sviluppati dalla ITU, come gli standard H.264 e H.265, sono soggetti a royalty e
+licenze. Questo significa che le aziende che desiderano utilizzare questi codec devono pagare
+delle tariffe per i diritti di utilizzo. Questi costi possono rappresentare un ostacolo
+significativo, soprattutto per le startup e le piccole imprese con budget limitati.
+
+Per affrontare questo problema, sono stati sviluppati codec open-source come VP9 e AV1. Questi
+codec non richiedono il pagamento di royalties, rendendoli una scelta più economica per molte
+aziende. Tuttavia, l'adozione di codec open-source comporta anche delle considerazioni riguardanti
+il supporto e la maturità del software, poiché possono richiedere ulteriori investimenti in termini
+di sviluppo e integrazione.
+
+\subsection{Costi di Ricodifica dei Video}
+Un'altra sfida significativa è rappresentata dai costi associati alla ricodifica dei contenuti
+video esistenti. La migrazione a un nuovo codec richiede che tutti i video precedentemente
+codificati vengano ricodificati nel nuovo formato. Questo processo può essere costoso e richiedere
+molto tempo, poiché comporta l'elaborazione di grandi quantità di dati video.
+
+Le aziende devono considerare attentamente il costo della ricodifica rispetto ai benefici attesi
+in termini di efficienza di compressione e risparmio di larghezza di banda. Inoltre, la ricodifica
+dei video può comportare una perdita di qualità, anche se minima, che deve essere presa in considerazione,
+soprattutto per contenuti sensibili alla qualità visiva.
+
+\subsection{Compatibilità Hardware}
+Un'altra sfida cruciale riguarda la compatibilità hardware. I nuovi codec, come AV1, richiedono
+hardware specifico per la decodifica efficiente. Mentre molti dispositivi moderni stanno iniziando a
+integrare il supporto per i nuovi codec, esistono ancora molti dispositivi in uso che non dispongono
+di acceleratori hardware adeguati.
+
+Questo problema può influire negativamente sull'esperienza utente, poiché la decodifica software dei
+video può risultare in prestazioni inferiori, come tempi di buffering più lunghi e un consumo energetico
+maggiore. Le aziende devono quindi valutare attentamente la penetrazione del mercato dei dispositivi
+compatibili e considerare strategie di transizione per garantire che i loro contenuti siano accessibili
+a un pubblico ampio.
+
+\subsection{Adozione dei Codec}
+TODO: grafico di utilizzo dei vari codec + grafico preso da chatgpt e fonte: https://www.businessresearchinsights.com/market-reports/video-codecs-market-112079
 
 \section{Conclusioni}
 TODO: si potrebbe parlare dell'approccio di NVIDIA per le video chat.
+parlare del fatto che yt usa un approccio ibrido vp9/av1
 
 \section{Bibliografia}
 \\+sito che parla della storia degli encorder https://api.video/blog/video-trends/the-history-of-video-compression-starts-in-1929/
 \\+parla dei tecnicismi del h.261 https://users.ece.utexas.edu/~ryerraballi/MSB/pdfs/M4L2.pdf
 \\+bitrate https://it.wikipedia.org/wiki/Velocit%C3%A0_di_trasmissione
+\\ycbcr https://en.wikipedia.org/wiki/YCbCr
 \\+utile! parla dei tecnicismi del h.264 nella sezione di Implementing h.264 https://www.embedded.com/implementing-h-264-video-compression-\\algorithms-on-a-software-configurable-processor/
 \\+utile! intra prediction https://www.sciencedirect.com/topics/computer-science/intra-prediction
 \\+utile! sito di International Telecommunication Union che parla dello standard h.264 https://www.itu.int/rec/T-REC-H.264-202108-I/en
@@ -721,9 +887,13 @@ TODO: si potrebbe parlare dell'approccio di NVIDIA per le video chat.
 \\+pdf di h.265 dal sito ufficiale https://www.itu.int/rec/T-REC-H.265-202309-I/en
 \\+CTU per H.265 https://codesequoia.wordpress.com/2012/10/28/hevc-ctu-cu-ctb-cb-pb-and-tb/
 \\+utile! parla dei tecnicismi del h.265 https://zhuanlan.zhihu.com/p/519752821
-\\-utile! parla dei tecnicismi del h.265 https://iphome.hhi.de/wiegand/assets/pdfs/2012_12_IEEE-HEVC-Overview.pdf
+\\+utile! parla dei tecnicismi del h.265 https://iphome.hhi.de/wiegand/assets/pdfs/2012_12_IEEE-HEVC-Overview.pdf
 \\-utile! paragona AV1 (togliere la parte dopo l'hashtag) a h.265 https://subclassy.github.io/compression#:~:text=265%20takes%202.83s%20on,so%20much%20time%20to%20process.
 \\-utile! paragona performance di h264, h265 e vp9 https://www.red5.net/blog/6-points-of-comparison-for-vp9-or-h265/
+\\+ uploads su youtube https://www.statista.com/statistics/259477/hours-of-video-uploaded-to-youtube-every-minute/
+\\+info youtube https://support.google.com/youtube/answer/2853702?hl=it
+\\+costo hdd https://www.backblaze.com/blog/hard-drive-cost-per-gigabyte/
+\\+ AWS Twitch stream cost estimator https://ivs.rocks/calculator
 \\-utile! paragona le performance dei vari codec su hw nvidia https://developer.nvidia.com/video-codec-sdk
 \\-utile! https://support.google.com/youtube/answer/2853702?hl=it
 
