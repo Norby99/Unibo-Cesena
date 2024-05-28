@@ -16,14 +16,10 @@
     filecolor=magenta,      
     urlcolor=cyan,
 }   % serve per i link
-\usepackage[table,xcdraw]{xcolor}
-\usepackage{tabularx}
-\usepackage{ragged2e}               % migliora la formattazione del testo all'interno delle celle
-\renewcommand{\arraystretch}{1.5}   % aggiunge margine alle celle
 \graphicspath{{images/}}
 
-\definecolor{darkBlue}{RGB}{21, 69, 179}
-\definecolor{lightPink}{RGB}{242, 10, 172}
+\usepackage{multicol}   % permette di creare liste su più colonne
+\usepackage{enumitem}   % permette di "poter" togliere il bullet all'inizio di un itemize
 
 \begin{document}
 
@@ -179,13 +175,13 @@ raggiunto un notevole 91\% di adozione tra gli sviluppatori nel settore video, c
 un pilastro fondamentale della tecnologia di compressione video. Inoltre, alcune delle tecnologie
 adottate da questo codec saranno cruciali per comprendere meglio il funzionamento dei codec successivi.
 
-\paragraph{Slices}\hphantom{A}\\
+\subsubsection{Slices}
 Una slice è una porzione sequenziale di dati all'interno di un frame video. Questa porzione è suddivisa
 in unità più piccole chiamate macroblock. La divisione del frame in slice viene fatta per organizzare e
 processare i dati video in modo efficiente durante la codifica e la decodifica. Un esempio di come
 questo approccio potrebbe aumentare l'efficienza è quello di processare ogni slice con un thread diverso.
 
-\paragraph{Macroblock}\hphantom{A}\\
+\subsubsection{Macroblock}
 Un'immagine viene divisa in dei blocchi quadrati di pixel chiamati macroblock e possono avere una
 dimensione variabile in base allo codec utilizzato, nel caso del H.264 è sempre 16x16 pixel. Il
 macroblock non raggruppa al suo interno l'immagine originale, bensì 3 matrici più semplici, la
@@ -215,9 +211,7 @@ zone.
     \label{fig:macroblocks_sub_division}
 \end{figure}
 
-TODO: volendo si possono inserire delle immagini per le slice e i macroblock
-
-\paragraph{Intraframe/intra prediction}\hphantom{A}\\
+\subsubsection{Intraframe/intra prediction}
 \begin{figure}[h]
     \centering
     \includegraphics[width=1\textwidth]{images/intraframe-algo.png}
@@ -244,7 +238,7 @@ un singolo fotogramma. Questo metodo si divide in più passaggi:
 L'algoritmo sceglie la suddivisione migliore provando tutti i tipi di divisioni dei
 blocchi fino a trovare quello con la residua migliore.
 
-\paragraph{Interframe/Motion compensation}\hphantom{A}\\
+\subsubsection{Interframe/Motion compensation}
 Quando si parla di compressione, l'obiettivo è ridurre al minimo le ridondanze. Nel contesto dei video,
 si nota subito che frame adiacenti temporalmente condividono una considerevole quantità di pixel.
 L'algoritmo di interframe si occupa proprio di questo aspetto. Invece di analizzare i singoli frame uno
@@ -307,7 +301,7 @@ Figura~\ref{fig:interframe}. Ci sono due modi per popolare un macroblock grazie 
     \label{fig:interframe}
 \end{figure}
 
-\paragraph{Transformation}\hphantom{A}\\
+\subsubsection{Transformation}
 Ora che tutti i macroblocks sono stati codificati secondo il metodo più conveniente, si prendono solo quelli che contengono
 la matrice dei residui, ovvero quelli codificati mediante interframe, e vengono divisi in blocchi quadrati 8x8
 e viene applicata la trasformata discreta del coseno (\textbf{DCT} - Discrete Cosine Transform).
@@ -348,7 +342,7 @@ Per applicare la trasformata discreta del coseno bisogna:
     \label{fig:DCT_example}
 \end{figure}
 
-\paragraph{Quantization}\hphantom{A}\\
+\subsubsection{Quantization}
 La quantizzazione implica la creazione di tre matrici, chiamate tabelle di quantizzazione, per
 suddividere i valori delle matrici ottenute tramite la trasformazione. Queste tre matrici, una
 per le Luma e due per le Chroma, sono identiche per l'intera immagine e sono strutturate in
@@ -369,7 +363,7 @@ frequenza, impercettibili per l'occhio umano.
     \label{fig:quantization_example}
 \end{figure}
 
-\paragraph{Entropy Coding}\hphantom{A}\\
+\subsubsection{Entropy Coding}
 Nella fase di Entropy Coding, si mira a comprimere ulteriormente i dati, facendo riferimento non
 all'immagine come tale, ma interpretandola come una stringa di bit o simboli. Esistono diversi tipi di
 algoritmi di Entropy Coding che possono variare in base al codec e all'implementazione.
@@ -440,7 +434,7 @@ rami differenti all'interno dell'albero di Huffman, ma grazie alla normalizzazio
 30, che occuperanno solo un ramo in quanto il simbolo '-' sarà quasi sicuramente utilizzato per altri
 numeri.
 
-\paragraph{Loop filtering}\hphantom{A}\\
+\subsubsection{Loop filtering}
 Il \textbf{Loop filtering} è una tecnica che viene utilizzata solo nella ricostruzione delle immagini,
 non nella codifica, e consiste nell'applicare un o più filtri all'immagine apportando i seguenti benefici:
 
@@ -470,7 +464,7 @@ non nella codifica, e consiste nell'applicare un o più filtri all'immagine appo
     \label{fig:deblocking_filter}
 \end{figure}
 
-\paragraph{Ricapitolando}\hphantom{A}\\
+\subsubsection{Ricapitolando}
 \begin{figure}[h]
     \centering
     \includegraphics[width=1\textwidth]{images/h264-coding-loop.png}
@@ -519,7 +513,7 @@ prendendo sempre più piede in questo periodo) ottenendo una compressione miglio
 riesce a codificare filmati 3D, in HDR e anche video girati in 360°. Nei paragrafi successivi si vedremo quali
 cambiamenti sono stati apportati al predecessore H.264 per creare questo nuovo codec.
 
-\paragraph{Coding Tree Unit (CTU)}\hphantom{A}\\
+\subsubsection{Coding Tree Unit (CTU)}
 La prima differenza con il formato H.264 è la gestione dei blocchi. Il codec H.265 non utilizza
 i classici macroblocks che sono stati usati fino a questo periodo dalla maggioranza dei codec, ma
 utilizza il sistema \textbf{Coding Tree Unit} (d'ora in poi verrà abbreviato con CTU). A differenza
@@ -571,7 +565,7 @@ in quanto anche i CTU vengono gestiti e processati in gruppi chiamati \textbf{sl
 Una dettaglio molto importante è che all'interno di un Coding Block, ogni Prediction Block utilizza la
 stessa modalità di predizione (intra o inter).
 
-\paragraph{Intraframe/intra prediction}\hphantom{A}\\
+\subsubsection{Intraframe/intra prediction}
 A cambiare nell'applicazione della intra prediction sono i blocchi, che possono avere molte più
 dimensioni rispetto all'H.264, con lati da 8, 16, 32, 64 e tutte le combinazioni di quadrati o rettangoli
 possibili, garantendo una compressione migliore.
@@ -596,7 +590,7 @@ importante dei Chroma perché si risparmia sulla potenza computazionale.
 Infine, la DCT non è più limitata a una dimensione di 8x8, ma può arrivare anche a dimensioni di 32x32,
 aumentando ulteriormente la compressione.
 
-\paragraph{Interframe/Motion compensation}\hphantom{A}\\
+\subsubsection{Interframe/Motion compensation}
 Anche il codec H.265 utilizza la Interframe, esattamente come il suo predecessore, ma i motion vector che
 utilizza non sono più limitati a spostare un blocco sulla posizione esatta di un altro blocco di un frame,
 ma possono traslare un Coding Block (CB) in qualsiasi posizione del frame desiderata.
@@ -622,9 +616,7 @@ Nella Interframe, vengono aggiunte altre tre tecnologie per aumentare la compres
     Luma.
 \end{itemize}
 
-TODO: valutare se inserire immagine (perche sfuocata) min 43:02
-
-\paragraph{Transformation e Quantization}\hphantom{A}\\
+\subsubsection{Transformation e Quantization}
 Nella trasformazione, il codec H.265 introduce la tecnologia Residual Quad-tree Transform (RQT), utilizzata
 all'interno delle TB, che possono avere dimensioni variabili. Questa innovazione consente l'applicazione di
 trasformate diverse a blocchi di grandi dimensioni rispetto a quelli piccoli, permettendo così di mantenere
@@ -662,7 +654,7 @@ l'alto-destra 4×4 a sotto-blocchi di coefficienti di trasformazione.
     \label{fig:HEVC_ACS}
 \end{figure}
 
-\paragraph{Entropy Coding}\hphantom{A}\\
+\subsubsection{Entropy Coding}
 La Entropy Coding del codec H.265 è rimasta invariata rispetto al suo predecessore per quanto riguarda
 la codifica delle matrici residue, continuando a utilizzare la codifica di Huffman. Tuttavia, è stato
 introdotto un nuovo metodo per la codifica dei Syntax Element di ogni blocco e dei vettori di movimento.
@@ -696,7 +688,7 @@ in diverse fasi:
     della compressione.
 \end{enumerate}
 
-\paragraph{Loop filtering}\hphantom{A}\\
+\subsubsection{Loop filtering}
 Come il codec H.264, anche questo applica molti filtri per migliorare la qualità dell'immagine, ma i principali
 sono due, ovvero il \textbf{Deblocking Filter} e il \textbf{Sample Adaptive Offset (SAO)}.
 
@@ -735,7 +727,7 @@ In particolare:
     visiva dell'immagine.
 \end{enumerate}
 
-\section{Tecnologie Future \& Comparazione delle prestazioni}
+\section{Tecnologie Future}
 L'evoluzione della compressione video non si ferma con gli standard descritti fin'ora. Con il continuo
 aumento della domanda di contenuti video ad alta risoluzione e la necessità di trasmissioni più efficienti,
 sono emersi nuovi codec progettati per offrire prestazioni superiori in termini di qualità e compressione.
@@ -746,7 +738,7 @@ in questo periodo: VP9, H.266 e AV1.
 Sviluppato da Google, il codec VP9 è stato introdotto come successore di VP8 e rappresenta una valida
 alternativa ai codec H.264 e H.265. Progettato principalmente per lo streaming video su piattaforme come
 YouTube, VP9 offre una compressione più efficiente rispetto a H.264, con una riduzione del bitrate fino al
-50\% per la stessa qualità visiva. VP9 supporta risoluzioni fino a 8K.
+50\% per la stessa qualità visiva avvicinandosi alle prestazioni dell'H.265.
 
 \subsection{H.266/VVC}
 L'H.266, noto anche come Versatile Video Coding (VVC), è stato sviluppato dall'ITU-T e dal Moving Picture
@@ -756,13 +748,11 @@ significativamente migliorata, riducendo il bitrate del 50\% rispetto a H.265 pe
 \subsection{AV1}
 Il codec AV1, sviluppato dall'Alliance for Open Media, è un codec open source progettato per essere una
 soluzione di compressione video di nuova generazione. AV1 offre una compressione più efficiente rispetto
-a VP9 e H.265, riducendo il bitrate del 30\% rispetto a H.265 per la stessa qualità visiva.
-
-\subsection{Comparazione delle prestazioni}
-TODO
-https://www.google.it/search?q=vp9+vs+h265&rlz=1C2ONGR_itIT1057IT1102&sca_esv=8870e14de2d74e2a&udm=2&biw=2560&bih=1271&sxsrf=ADLYWIJYgaDjJgsbFa7IIDLjXKQN9jfd4w%3A1716813522406&ei=0n5UZvWoGNiC9u8PobS3-AE&oq=vp9+vs+h&gs_lp=Egxnd3Mtd2l6LXNlcnAiCHZwOSB2cyBoKgIIADIHEAAYgAQYEzIHEAAYgAQYEzIHEAAYgAQYEzIIEAAYExgIGB4yCBAAGBMYCBgeMggQABgTGAgYHjIIEAAYExgIGB4yCBAAGBMYCBgeMggQABgTGAgYHjIIEAAYExgIGB5I2yNQAFiVG3AAeACQAQCYAZkBoAHXBaoBAzcuMbgBA8gBAPgBAZgCB6ACjQXCAgQQIxgnwgIFEAAYgATCAggQABiABBixA8ICDhAAGIAEGLEDGIMBGIoFwgIKEAAYgAQYQxiKBcICBBAAGB6YAwCSBwM2LjGgB78j&sclient=gws-wiz-serp#vhid=CMFdEzOn3JK75M&vssid=mosaic
-https://www.red5.net/blog/6-points-of-comparison-for-vp9-or-h265/
-https://www.macxdvd.com/mac-dvd-video-converter-how-to/vp9-vs-h265.htm
+a VP9 e H.265. Ad alte risoluzioni, come nel 4K, riesce ad ottenere una riduzione del 30\% del bitrate
+rispetto all'H.265. Invece pecca molto nelle risoluzioni basse, dove ha una compressione quasi identica
+alla controparte. Questo codec ha l'enorme svantaggio di richiedere un acceleratore hardware apposito
+molto potente per poter decodificare i video in tempo reale, il che lo rende inferiore ai suoi rivali VP9
+e H.265 a risoluzioni basse.
 
 \section{Vantaggi per le aziende}
 L'adozione di algoritmi di compressione video sempre più efficienti offre numerosi vantaggi alle aziende,
@@ -785,7 +775,7 @@ Questo significa che le aziende possono archiviare più contenuti video utilizza
 riducendo così i costi associati all'acquisto e alla manutenzione dell'hardware di archiviazione.
 
 Per esempio, ogni minuto vengono caricate 500 ore di video su YouTube\footnote{Fonte: \href{https://www.statista.com/statistics/259477/hours-of-video-uploaded-to-youtube-every-minute/}{Statista}}.
-Considerando un bitrate di 10 MB/s\footnote{Fonte: \href{https://support.google.com/youtube/answer/2853702?hl=it}{Google}},
+Considerando un bitrate di 10 MB/s \footnote{Fonte: \href{https://support.google.com/youtube/answer/2853702?hl=it}{Google}},
 ciò richiederebbe una capacità di archiviazione di 432 TB al giorno. Tenendo conto di un costo medio di
 0,0144\$ per GB\footnote{Fonte: \href{https://www.backblaze.com/blog/hard-drive-cost-per-gigabyte/}{Backblaze}},
 questa esigenza si tradurrebbe in una spesa giornaliera di 6.220\$, ovvero 2.270.300\$ all'anno. Pertanto,
@@ -864,6 +854,7 @@ compatibili e considerare strategie di transizione per garantire che i loro cont
 a un pubblico ampio.
 
 \subsection{Adozione dei Codec}
+Non so se metterlo, perche mancano le fonti
 TODO: grafico di utilizzo dei vari codec + grafico preso da chatgpt e fonte: https://www.businessresearchinsights.com/market-reports/video-codecs-market-112079
 
 \section{Conclusioni}
@@ -871,30 +862,36 @@ TODO: si potrebbe parlare dell'approccio di NVIDIA per le video chat.
 parlare del fatto che yt usa un approccio ibrido vp9/av1
 
 \section{Bibliografia}
-\\+sito che parla della storia degli encorder https://api.video/blog/video-trends/the-history-of-video-compression-starts-in-1929/
-\\+parla dei tecnicismi del h.261 https://users.ece.utexas.edu/~ryerraballi/MSB/pdfs/M4L2.pdf
-\\+bitrate https://it.wikipedia.org/wiki/Velocit%C3%A0_di_trasmissione
-\\ycbcr https://en.wikipedia.org/wiki/YCbCr
-\\+utile! parla dei tecnicismi del h.264 nella sezione di Implementing h.264 https://www.embedded.com/implementing-h-264-video-compression-\\algorithms-on-a-software-configurable-processor/
-\\+utile! intra prediction https://www.sciencedirect.com/topics/computer-science/intra-prediction
-\\+utile! sito di International Telecommunication Union che parla dello standard h.264 https://www.itu.int/rec/T-REC-H.264-202108-I/en
-\\+repository di un'implementazione dell'h.264 https://github.com/cisco/openh264
-\\+parla di molte cose... vechi codec, tranformation, quantizzazione https://www.researchgate.net/publication/334546287_Data_Reduction_in_MMBD_Computing#pf17
-\\+codifica di huffman https://en.wikipedia.org/wiki/Huffman_coding
-\\+sito utilizzato per costruire l'albero di huffman https://suhaan-bhandary.github.io/Huffman-Coding/
-\\+h.264 loop filtering https://www.vcodex.com/h264avc-loop-filter
-\\+repository di h.265 https://vcgit.hhi.fraunhofer.de/jvet/HM
-\\+pdf di h.265 dal sito ufficiale https://www.itu.int/rec/T-REC-H.265-202309-I/en
-\\+CTU per H.265 https://codesequoia.wordpress.com/2012/10/28/hevc-ctu-cu-ctb-cb-pb-and-tb/
-\\+utile! parla dei tecnicismi del h.265 https://zhuanlan.zhihu.com/p/519752821
-\\+utile! parla dei tecnicismi del h.265 https://iphome.hhi.de/wiegand/assets/pdfs/2012_12_IEEE-HEVC-Overview.pdf
-\\-utile! paragona AV1 (togliere la parte dopo l'hashtag) a h.265 https://subclassy.github.io/compression#:~:text=265%20takes%202.83s%20on,so%20much%20time%20to%20process.
-\\-utile! paragona performance di h264, h265 e vp9 https://www.red5.net/blog/6-points-of-comparison-for-vp9-or-h265/
-\\+ uploads su youtube https://www.statista.com/statistics/259477/hours-of-video-uploaded-to-youtube-every-minute/
-\\+info youtube https://support.google.com/youtube/answer/2853702?hl=it
-\\+costo hdd https://www.backblaze.com/blog/hard-drive-cost-per-gigabyte/
-\\+ AWS Twitch stream cost estimator https://ivs.rocks/calculator
-\\-utile! paragona le performance dei vari codec su hw nvidia https://developer.nvidia.com/video-codec-sdk
-\\-utile! https://support.google.com/youtube/answer/2853702?hl=it
+
+\begin{multicols}{2}
+\begin{itemize}[label={}]
+    \item The history of video compression standards, from 1929 until now (\href{https://api.video/blog/video-trends/the-history-of-video-compression-starts-in-1929/}{LINK})
+    \item Video Compression 1: H 261 (\href{https://users.ece.utexas.edu/~ryerraballi/MSB/pdfs/M4L2.pdf}{LINK})
+    \item Velocità di trasmissione "Bitrate" (\href{https://it.wikipedia.org/wiki/Velocit%C3%A0_di_trasmissione}{LINK})
+    \item YCbCr Colorspace (\href{https://en.wikipedia.org/wiki/YCbCr}{LINK})
+    \item Intra Prediction H.264 (\href{https://www.sciencedirect.com/topics/computer-science/intra-prediction}{LINK})
+
+    \item H.264 - SERIES H: AUDIOVISUAL AND MULTIMEDIA SYSTEMS 
+        Infrastructure of audiovisual services – Coding of moving 
+        video (\href{https://www.itu.int/rec/T-REC-H.264-202108-I/en}{LINK})
+    \item OpenH264 - H.264 Open Source implementation (\href{https://github.com/cisco/openh264}{LINK})
+    \item Data Reduction in MMBD Computing  (\href{https://www.researchgate.net/publication/334546287_Data_Reduction_in_MMBD_Computing#pf17}{LINK})
+    \item Huffman coding (\href{https://en.wikipedia.org/wiki/Huffman_coding}{LINK})
+    \item Huffman tree generator (\href{https://suhaan-bhandary.github.io/Huffman-Coding/}{LINK})
+
+    \item H.264/AVC Loop Filter (\href{https://www.vcodex.com/h264avc-loop-filter}{LINK})
+    \item HM reference software for HEVC - H.265 Open Source implementation (\href{https://vcgit.hhi.fraunhofer.de/jvet/HM}{LINK})
+    \item ITU-T H.265 (V9) (\href{https://www.itu.int/rec/T-REC-H.265-202309-I/en}{LINK})
+    \item HEVC – What are CTU, CU, CTB, CB, PB, and TB? (\href{https://codesequoia.wordpress.com/2012/10/28/hevc-ctu-cu-ctb-cb-pb-and-tb/}{LINK})
+    \item Confronto tra vantaggi e svantaggi di H.265 e H.264 (\href{https://zhuanlan.zhihu.com/p/519752821}{LINK})
+
+    \item Overview of the High Efficiency Video Coding
+        (HEVC) Standard (\href{https://iphome.hhi.de/wiegand/assets/pdfs/2012_12_IEEE-HEVC-Overview.pdf}{LINK})
+    \item H.265 vs AV1: The Battle for Efficient Video Compression! (\href{https://subclassy.github.io/compression}{LINK})
+    \item 6 Points of Comparison for VP9, H.265, or H.264 (\href{https://www.red5.net/blog/6-points-of-comparison-for-vp9-or-h265/}{LINK})
+    \item Hardware Based Decoder and Encoder (\href{https://developer.nvidia.com/video-codec-sdk}{LINK})
+    \item The State of Video Codecs 2024 (\href{https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=163422}{LINK})
+\end{itemize}
+\end{multicols}
 
 \end{document}
