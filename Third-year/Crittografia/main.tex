@@ -193,6 +193,13 @@ Di solito il livello di campionamento delle matrici Chroma è inferiore a quella
 l'occhio umano è più attente ad osservare la luminosità e i bordi degli oggetti rispetto al colore.
 Solo con questa piccola ottimizzazione si può risparmiare fino al 50\% sullo spazio occupato su disco.
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/macroblocks_sub-division.png}
+    \caption{Suddivisione di un'immagine in macroblocks e prediction-blocks.}
+    \label{fig:macroblocks_sub_division}
+\end{figure}
+
 Infine, i macroblock possono essere suddivisi in blocchi più piccoli, chiamati
 \textbf{prediction-blocks}, di vari dimensioni e forme, ad esempio il codec H.264 può suddividerli in
 4 prediction-blocks da 8x8, oppure 16 da 1x1, ma esistono altri codec che possono suddividere i
@@ -200,17 +207,10 @@ macroblock in matrici rettangolari, oppure triangolari. Questa suddivisione in p
 viene fatta in quanto un prediction-block più è piccolo e meglio riuscirà a rappresentare frammenti
 di immagine che contengono molto dettaglio a discapito della potenza di calcolo necessaria a
 decodificare l'immagine durante la fase di Intraframe. Si noti come nella
-Figura~\ref{fig:macroblocks_sub_division}le regioni del cielo e della montagna, caratterizzate da
+Figura~\ref{fig:macroblocks_sub_division} le regioni del cielo e della montagna, caratterizzate da
 pixel simili, generino macroblocks più ampi. Al contrario, in zone in cui coesistono sia la montagna
 che il cielo, i macroblocks sono più piccoli per gestire le variazioni nei dettagli di entrambe le
 zone.
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=1\textwidth]{images/macroblocks_sub-division.png}
-    \caption{Suddivisione di un'immagine in macroblocks e prediction-blocks.}
-    \label{fig:macroblocks_sub_division}
-\end{figure}
 
 \subsubsection{Intraframe/intra prediction}
 \begin{figure}[h]
@@ -253,7 +253,18 @@ che di interframe, e si comparano i due risultati. Se il costo\footnote{con cost
 in termini di memoria calcolato attraverso un processo di comparazione tra i due metodi intraframe e interframe}
 dell'intraframe è inferiore, questo
 significa che il frame che si sta analizzando non ha elementi in comune con i frame precedenti,
-suggerendo così un cambio di scena. Ci sono in totale 3 tipi di frame (vedi Figura~\ref{fig:frame_type}):
+suggerendo così un cambio di scena.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/frame-type.png}
+    \caption{Classificazione del tipo di frame.
+    I macroblock viola indicano che quel frame è stato ricostruito da un frame precedente,
+    mentre quello verde che è stato codificato grazie ai pixel interni al frame.}
+    \label{fig:frame_type}
+\end{figure}
+
+\noindent Ci sono in totale 3 tipi di frame (vedi Figura~\ref{fig:frame_type}):
 
 \begin{itemize}
   \item Il tipo \textbf{I frame} di solito indica un cambio di scena, pertanto si applica l'algoritmo
@@ -267,20 +278,21 @@ suggerendo così un cambio di scena. Ci sono in totale 3 tipi di frame (vedi Fig
   efficiente in quanto occupa il 25\% dello spazio rispetto al tipo I.
 \end{itemize}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=1\textwidth]{images/frame-type.png}
-    \caption{Classificazione del tipo di frame.
-    I macroblock viola indicano che quel frame è stato ricostruito da un frame precedente,
-    mentre quello verde che è stato codificato grazie ai pixel interni al frame.}
-    \label{fig:frame_type}
-\end{figure}
-
 Nel dettaglio, per comprendere quali elementi di un frame vengono ripetuti all'interno di altri frame,
 vengono nuovamente sfruttati i macroblock. Inoltre, i frame non vengono codificati in ordine cronologico,
 ma in modo sparso, in modo che quando si analizza un frame che utilizza l'algoritmo di interframe, possa
 attingere informazioni sia dai frame precedenti che da quelli successivi, come mostrato nella
-Figura~\ref{fig:interframe}. Ci sono due modi per popolare un macroblock grazie al intraframe:
+Figura~\ref{fig:interframe}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/interframe.png}
+    \caption{Nella figura viene mostrato un esempio di come l'algoritmo di interframe
+    attinge a frame diversi per ricostruire il macroblock interessato.}
+    \label{fig:interframe}
+\end{figure}
+
+\noindent Ci sono due modi per popolare un macroblock grazie al intraframe:
 
 \begin{itemize}
   \item La \textbf{Uni-directional Motion Compensation} consiste nell'individuare il macroblock identico
@@ -294,14 +306,6 @@ Figura~\ref{fig:interframe}. Ci sono due modi per popolare un macroblock grazie 
   macroblocks identici tra frame, ma anche di poter tracciare quelli che vengono ruotati, stirati o inclinati.
 \end{itemize}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=1\textwidth]{images/interframe.png}
-    \caption{Nella figura viene mostrato un esempio di come l'algoritmo di interframe
-    attinge a frame diversi per ricostruire il macroblock interessato.}
-    \label{fig:interframe}
-\end{figure}
-
 \subsubsection{Transformation}
 Ora che tutti i macroblocks sono stati codificati secondo il metodo più conveniente, si prendono solo quelli che contengono
 la matrice dei residui, ovvero quelli codificati mediante interframe, e vengono divisi in blocchi quadrati 8x8
@@ -312,16 +316,16 @@ i blocchi Chroma o la luminosità per i blocchi Luma) trasformando i valori dei 
 spaziale al dominio delle frequenze e individuando così i blocchi con più dettagli, ovvero i blocchi
 con frequenza maggiore.
 
-Per applicare la trasformata discreta del coseno bisogna:
-
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/DCT-table.png}
+    \includegraphics[width=0.5\textwidth]{images/DCT-table.png}
     \caption{Tabella DCT. In particolare si noti come partendo dall'angolo in alto a sinistra,
     più si va verso destra e più la frequenza della matrice aumenta in orizzontale e più si va
     verso il basso e più la frequenza della matrice aumenta in verticale.}
     \label{fig:DCT_table}
 \end{figure}
+
+\noindent Per applicare la trasformata discreta del coseno bisogna:
 
 \begin{enumerate}
     \item Dividere l'immagine (ovvero le 3 matrici dei residui) in piccoli blocchi quadrati 8x8
@@ -416,7 +420,7 @@ di illustrazioni}. L'algoritmo è diviso in diversi passaggi:
     \label{fig:huffman_tree}
 \end{figure}
 
-A questo punto, si dispone di un vasto albero che contiene tutti i numeri della lista insieme alle
+\noindent A questo punto, si dispone di un vasto albero che contiene tutti i numeri della lista insieme alle
 rispettive frequenze (consultare la Figura~\ref{fig:huffman_tree}). Ora, per codificare ciascun numero,
 che ricordiamo variare da -127 a 128, non è più necessario utilizzare 8 bit, ma in molti casi molto
 meno. Abbiamo trasformato il processo di codifica da una rappresentazione binaria diretta di ciascun
@@ -526,7 +530,7 @@ stato codificato, ad esempio la Syntax Element di una Coding Unit contiene le in
  
  \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/coding-unit.png}
+    \includegraphics[width=0.6\textwidth]{images/coding-unit.png}
     \caption{Rappresentazione di come viene suddivisa una Coding Unit.}
     \label{fig:coding_unit}
 \end{figure}
