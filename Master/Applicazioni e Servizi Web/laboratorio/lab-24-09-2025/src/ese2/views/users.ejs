@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>User List</title>
+</head>
+<body>
+  <h1>User List</h1>
+
+  <ul>
+    <% if (users.length > 0) { %>
+      <% users.forEach(user => { %>
+        <li><%= user.name %> (Age: <%= user.age %>)</li>
+      <% }); %>
+    <% } else { %>
+      <li>No users found.</li>
+    <% } %>
+  </ul>
+
+  <a href="/">Back to home</a>
+</body>
+</html>

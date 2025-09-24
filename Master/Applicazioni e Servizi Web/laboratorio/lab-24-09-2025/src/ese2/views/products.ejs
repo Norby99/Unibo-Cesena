@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Catalogo Prodotti</title>
+  <style>
+    .red { color: red; }
+    .green { color: green; }
+  </style>
+</head>
+<body>
+  <h1>Catalogo Prodotti</h1>
+
+  <% if (products.length > 0) { %>
+    <table border="1" cellpadding="5" cellspacing="0">
+      <tr>
+        <th>Nome</th>
+        <th>Prezzo</th>
+        <th>Disponibilità</th>
+      </tr>
+      <% products.forEach(product => { %>
+        <tr>
+          <td><%= product.name %></td>
+          <td>€<%= product.price.toFixed(2) %></td>
+          <td class="<%= product.available ? 'green' : 'red' %>">
+            <%= product.available ? 'In Stock' : 'Out of Stock' %>
+          </td>
+        </tr>
+      <% }); %>
+    </table>
+  <% } else { %>
+    <p>Nessun prodotto disponibile</p>
+  <% } %>
+
+  <p><a href="/">Torna alla Home</a></p>
+</body>
+</html>
