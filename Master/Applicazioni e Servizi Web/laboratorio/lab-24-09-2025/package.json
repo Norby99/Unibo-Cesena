@@ -1,0 +1,22 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "nodemon --legacy-watch src/ese2/index.js",
+    "watch": "browser-sync start --proxy 'localhost:8080' --files 'src/**/*.js, public/**/*.html' --no-ui --no-notify"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "browser-sync": "^3.0.4",
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "lodash": "^4.17.21"
+  }
+}
