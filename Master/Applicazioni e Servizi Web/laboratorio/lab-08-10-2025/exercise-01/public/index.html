@@ -27,9 +27,13 @@
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
         const socket = io();
-        let nickname = prompt("Inserisci il tuo nickname:");
-        if (!nickname) nickname = "Anonimo";
-        socket.emit("set nickname", nickname);
+        let nickname = null;
+        // Wait for connect before asking nickname so server handler is ready
+        socket.on('connect', () => {
+          nickname = prompt("Inserisci il tuo nickname:");
+          if (!nickname) nickname = "Anonimo";
+          socket.emit("set nickname", nickname);
+        });
 
         // Invia messaggio
         $('form').submit((e)=>{
@@ -39,7 +43,29 @@
           return false;
         });
 
-// IMPLEMENTATION HERE
+        socket.on('chat message', function(msg){
+          $('#messages').append($('<li>').text(msg));
+          $('#typing').text('');
+        });
+
+        socket.on('history', function(messages){
+          messages.forEach(msg => {
+            $('#messages').append($('<li>').text(msg));
+          });
+        });
+
+        $('#textInput').on('input', function() {
+          socket.emit('typing');
+        });
+
+        socket.on('typing', function(user) {
+          $('#typing').text(user + ' sta scrivendo...');
+          setTimeout(() => { $('#typing').text(''); }, 2000);
+        });
+
+        socket.on('users', function(users){
+          $('#userList').text(users.join(', '));
+        });
     </script>
   </body>
 </html>
