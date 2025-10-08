@@ -1,0 +1,41 @@
+openapi: 3.0.0
+info:
+  title: Filmoteca API
+  description: API per gestire una collezione di film
+  version: 1.0.0
+
+servers:
+  - url: https://api.films/v1
+
+paths:
+  /films:
+    get:
+      summary: Gets all the films
+      tags: [Films]
+      responses:
+        "200":
+          description: List of all movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Film"
+
+components:
+  schemas:
+    Film:
+      type: object
+      properties:
+        id:
+          type: integer
+        tile:
+          type: string
+        director:
+          type: string
+        year:
+          type: integer
+        genres:
+          type: array
+          items:
+            type: string
