@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 14px Helvetica, Arial; }
+      form { background: #7088b2; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 0.5%; width: 80%; margin-right: 1%; }
+      form button { width: 10%; background: #dadada; border-radius: 5px; padding: 0.5%; }
+      #messages { list-style-type: none; margin: 0; padding: 0; margin-bottom: 50px; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #dadada; }
+      #typing { font-style: italic; margin: 5px 10px; color: gray; }
+      #users { background: #f0f0f0; padding: 10px; margin-bottom: 5px; }
+    </style>
+  </head>
+  <body>
+    <div id="users"><strong>Utenti online:</strong> <span id="userList"></span></div>
+    <ul id="messages"></ul>
+    <p id="typing"></p>
+    <form>
+      <input id="textInput" type="text" autocomplete="off" /><button>Send</button>
+    </form>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        const socket = io();
+        let nickname = prompt("Inserisci il tuo nickname:");
+        if (!nickname) nickname = "Anonimo";
+        socket.emit("set nickname", nickname);
+
+        // Invia messaggio
+        $('form').submit((e)=>{
+          e.preventDefault();
+          socket.emit('chat message', $('#textInput').val());
+          $('#textInput').val('');
+          return false;
+        });
+
+// IMPLEMENTATION HERE
+    </script>
+  </body>
+</html>
