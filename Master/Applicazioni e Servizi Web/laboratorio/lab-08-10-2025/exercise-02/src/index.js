@@ -7,5 +7,9 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// IMPLEMENTATION HERE
-// IMPLEMENTATION HERE
+const movieRoutes = require("./routes/movie-routes");
+app.use("/movies", movieRoutes);
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT} (year constraint: ${MIN_YEAR}-${CURRENT_YEAR})`);
+});
