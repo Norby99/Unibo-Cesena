@@ -1,0 +1,11 @@
+services:
+  argos3:
+    image: tjferrara/argos3:latest
+    container_name: IRS_container
+    ports:
+      - "6080:80"
+      - "5900:5900"
+    volumes:
+      - /dev/shm:/dev/shm
+      - ./workspace:/root/Desktop
+    restart: unless-stopped
