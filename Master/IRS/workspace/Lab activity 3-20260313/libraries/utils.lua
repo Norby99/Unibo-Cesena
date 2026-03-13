@@ -9,4 +9,12 @@ function utils.normalize_sensors(sensors, max_perceived)
     return norm_sensors
 end
 
+function utils.avg_sensor_value(sensors)
+    local sum = 0
+    for _, sensor in ipairs(sensors) do
+        sum = sum + sensor.value
+    end
+    return sum / #sensors
+end
+
 return utils

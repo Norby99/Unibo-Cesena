@@ -3,11 +3,11 @@ local utils = require("libraries.utils")
 local Fear = {}
 Fear.__index = Fear
 
-function Fear.new(max_velocity, weight, sensors, max_perceived)
+function Fear.new(max_velocity, sensors, max_perceived)
     local self = setmetatable({}, Fear)
 
     self.name = "fear"
-    self.weight = weight or 1.0
+    self.weight = 1.0
     self.max_velocity = max_velocity
     self.sensors = sensors
     self.max_perceived = max_perceived
@@ -18,20 +18,16 @@ end
 function Fear:action()
     local K = 40.0  -- factor of rotational speed
 
+    self:calculate_weight()
+
     -- remove the sensors from the second quarter to the third quarter
     local n = #self.sensors
-    local q1 = math.floor(n * 0.25)
-    local q3 = math.floor(n * 0.75) + 1
+    local q1 = math.floor(n * 0.23)
+    local q3 = math.floor(n * 0.77)
 
     local norm_sensors = utils.normalize_sensors(self.sensors, self.max_perceived)
 
-    local obs_norm_sensors = {}
-    for i = 1, q1 do
-        table.insert(obs_norm_sensors, norm_sensors[i])
-    end
-    for i = q3, n do
-        table.insert(obs_norm_sensors, norm_sensors[i])
-    end
+    local obs_norm_sensors = self:_get_observable_sensors(norm_sensors, q1, q3)
 
     local left_sum = 0
     local right_sum = 0
@@ -61,6 +57,23 @@ function Fear:action()
     end
 
     return left_vel, right_vel
+end
+
+function Fear:calculate_weight()
+    local normalize_sensors = utils.normalize_sensors(self.sensors, self.max_perceived)
+    local avg_value = utils.avg_sensor_value(normalize_sensors)
+    self.weight = avg_value
+end
+
+function Fear:_get_observable_sensors(sensors, first_quarter, third_quarter)
+    local obs_sensors = {}
+    for i = 1, first_quarter do
+        table.insert(obs_sensors, sensors[i])
+    end
+    for i = third_quarter, #sensors do
+        table.insert(obs_sensors, sensors[i])
+    end
+    return obs_sensors
 end
 
 return Fear

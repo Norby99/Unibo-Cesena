@@ -3,11 +3,11 @@ local utils = require("libraries.utils")
 local Follow = {}
 Follow.__index = Follow
 
-function Follow.new(max_velocity, weight, sensors, max_perceived)
+function Follow.new(max_velocity, sensors, max_perceived)
     local self = setmetatable({}, Follow)
 
     self.name = "follow"
-    self.weight = weight or 1.0
+    self.weight = 1.0
     self.max_velocity = max_velocity
     self.sensors = sensors
     self.max_perceived = max_perceived
@@ -17,6 +17,8 @@ end
 
 function Follow:action()
     local K = 40.0  -- factor of rotational speed
+
+    self:calculate_weight()
 
     local left_sum = 0
     local right_sum = 0
@@ -48,6 +50,12 @@ function Follow:action()
     end
 
     return left_vel, right_vel
+end
+
+function Follow:calculate_weight()
+    local normalize_sensors = utils.normalize_sensors(self.sensors, self.max_perceived)
+    local avg_value = utils.avg_sensor_value(normalize_sensors)
+    self.weight = avg_value
 end
 
 return Follow
