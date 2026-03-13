@@ -1,4 +1,4 @@
-local utils = require "utils"
+local utils = require("libraries.utils")
 
 local Fear = {}
 Fear.__index = Fear

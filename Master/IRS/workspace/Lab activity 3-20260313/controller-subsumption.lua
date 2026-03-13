@@ -10,11 +10,11 @@ TODO:
 ]]
 
 -- Imports
-local Behavior = require("behavior")
-local Follow = require("follow")
-local Fear = require("fear")
+local Behavior = require("libraries.behaviors.behavior")
+local Follow = require("libraries.behaviors.follow")
+local Fear = require("libraries.behaviors.fear")
 
-local db = require "roboto_debug"
+local db = require("libraries.roboto_debug")
 
 n_steps = 0
 
