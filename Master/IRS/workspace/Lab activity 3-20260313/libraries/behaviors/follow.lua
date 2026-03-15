@@ -3,20 +3,27 @@ local utils = require("libraries.utils")
 local Follow = {}
 Follow.__index = Follow
 
-function Follow.new(max_velocity, sensors, max_perceived)
+-- This behavior makes the robot follow the light.
+function Follow.new(max_velocity, sensors, max_perceived, activation_threshold)
     local self = setmetatable({}, Follow)
 
     self.name = "follow"
-    self.weight = 1.0
+    self._factor_of_rotation = 40.0
     self.max_velocity = max_velocity
     self.sensors = sensors
     self.max_perceived = max_perceived
-
+    self.activation_threshold = activation_threshold
     return self
 end
 
+--[[ Performs the action of following the light
+    The robot will turn towards the side with more light, and move forward.
+    If the relative difference between the two sides is less than the threshold, it will not activate the behavior.
+
+    returns: left and right velocities, or nil if the behavior is not activated.
+    ]]
 function Follow:action()
-    local K = 40.0  -- factor of rotational speed
+    local K = self._factor_of_rotation
 
     local left_sum = 0
     local right_sum = 0
@@ -47,7 +54,7 @@ function Follow:action()
         right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity + K * diff * self.max_velocity))
     end
     
-    if relative_diff <  0.3 then
+    if relative_diff < self.activation_threshold then
         return nil
     end
 

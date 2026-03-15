@@ -3,12 +3,13 @@ local utils = require("libraries.utils")
 local Fear = {}
 Fear.__index = Fear
 
-function Fear.new(max_velocity, sensors, max_perceived)
+function Fear.new(max_velocity, sensors, max_perceived, activation_threshold)
     local self = setmetatable({}, Fear)
 
     self.name = "fear"
-    self.weight = 1.0
+    self._factor_of_rotation = 40.0
     self.max_velocity = max_velocity
+    self.activation_threshold = activation_threshold
     self.sensors = sensors
     self.max_perceived = max_perceived
 
@@ -16,7 +17,7 @@ function Fear.new(max_velocity, sensors, max_perceived)
 end
 
 function Fear:action()
-    local K = 40.0  -- factor of rotational speed
+    local K = self._factor_of_rotation
 
     -- remove the sensors from the second quarter to the third quarter
     local n = #self.sensors
@@ -54,7 +55,7 @@ function Fear:action()
         right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity - K * diff * self.max_velocity))
     end
     
-    if relative_diff <  0.5 then
+    if relative_diff < self.activation_threshold then
         return nil
     end
 

@@ -4,11 +4,11 @@ MAX_LIGHT_PERCIVED = 0.3
 MAX_PROXIMITY_PERCIVED = 1.0
 MIN_MOTOR_GROUND_PERCIVED = 0.01
 
+FEAR_ACTIVATION_THRESHOLD = 0.03
+FOLLOW_ACTIVATION_THRESHOLD = 0.03
+
 --[[
 TODO:
-- IMPORTANT: here i use the fusion, but the professors want to see the subsumption,
-	So when i higher priority behavior is sure, it has the full controll
-- clear up the code
 - set some variables to global constants
 ]]
 
@@ -29,8 +29,8 @@ function init()
 
 	controller = Behavior.new(MAX_VELOCITY)
 	controller:add(StopAtDarkSpot.new(MAX_VELOCITY, robot.motor_ground, MIN_MOTOR_GROUND_PERCIVED))
-	controller:add(Fear.new(MAX_VELOCITY, robot.proximity, MAX_PROXIMITY_PERCIVED))
-	controller:add(Follow.new(MAX_VELOCITY, robot.light, MAX_LIGHT_PERCIVED))
+	controller:add(Fear.new(MAX_VELOCITY, robot.proximity, MAX_PROXIMITY_PERCIVED, FEAR_ACTIVATION_THRESHOLD))
+	controller:add(Follow.new(MAX_VELOCITY, robot.light, MAX_LIGHT_PERCIVED, FOLLOW_ACTIVATION_THRESHOLD))
 end
 
 function step()
