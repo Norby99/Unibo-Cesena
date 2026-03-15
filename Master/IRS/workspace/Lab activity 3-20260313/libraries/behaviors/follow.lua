@@ -18,8 +18,6 @@ end
 function Follow:action()
     local K = 40.0  -- factor of rotational speed
 
-    self:calculate_weight()
-
     local left_sum = 0
     local right_sum = 0
 
@@ -48,14 +46,12 @@ function Follow:action()
         left_vel  = math.max(0, math.min(self.max_velocity, self.max_velocity - K * diff * self.max_velocity))
         right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity + K * diff * self.max_velocity))
     end
+    
+    if relative_diff <  0.3 then
+        return nil
+    end
 
     return left_vel, right_vel
-end
-
-function Follow:calculate_weight()
-    local normalize_sensors = utils.normalize_sensors(self.sensors, self.max_perceived)
-    local avg_value = utils.avg_sensor_value(normalize_sensors)
-    self.weight = avg_value
 end
 
 return Follow

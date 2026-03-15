@@ -22,17 +22,15 @@ local db = require("libraries.roboto_debug")
 
 n_steps = 0
 
---[[ This function is executed every time you press the 'execute'
-     button ]]
 function init()
 	robot.wheels.set_velocity(0, 0)
 	n_steps = 0
 	robot.leds.set_all_colors("black")
 
-	controller = Behavior.new()
+	controller = Behavior.new(MAX_VELOCITY)
 	controller:add(StopAtDarkSpot.new(MAX_VELOCITY, robot.motor_ground, MIN_MOTOR_GROUND_PERCIVED))
-	controller:add(Follow.new(MAX_VELOCITY, robot.light, MAX_LIGHT_PERCIVED))
 	controller:add(Fear.new(MAX_VELOCITY, robot.proximity, MAX_PROXIMITY_PERCIVED))
+	controller:add(Follow.new(MAX_VELOCITY, robot.light, MAX_LIGHT_PERCIVED))
 end
 
 function step()

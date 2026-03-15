@@ -18,8 +18,6 @@ end
 function Fear:action()
     local K = 40.0  -- factor of rotational speed
 
-    self:calculate_weight()
-
     -- remove the sensors from the second quarter to the third quarter
     local n = #self.sensors
     local q1 = math.floor(n * 0.23)
@@ -55,14 +53,12 @@ function Fear:action()
         left_vel  = math.max(0, math.min(self.max_velocity, self.max_velocity + K * diff * self.max_velocity))
         right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity - K * diff * self.max_velocity))
     end
+    
+    if relative_diff <  0.5 then
+        return nil
+    end
 
     return left_vel, right_vel
-end
-
-function Fear:calculate_weight()
-    local normalize_sensors = utils.normalize_sensors(self.sensors, self.max_perceived)
-    local avg_value = utils.avg_sensor_value(normalize_sensors)
-    self.weight = avg_value
 end
 
 function Fear:_get_observable_sensors(sensors, first_quarter, third_quarter)

@@ -16,8 +16,6 @@ function StopAtDarkSpot.new(max_velocity, sensors, min_threshold)
 end
 
 function StopAtDarkSpot:action()
-    self:calculate_weight()
-
     local avg_value = utils.avg_sensor_value(self.sensors)
 
     log("[behaviors:stop_at_dark_spot] Average motor ground value: " .. avg_value)
@@ -25,15 +23,7 @@ function StopAtDarkSpot:action()
     if avg_value < self.min_threshold then
         return 0, 0
     else
-        return self.max_velocity, self.max_velocity
-    end
-end
-
-function StopAtDarkSpot:calculate_weight()
-    if utils.avg_sensor_value(self.sensors) < self.min_threshold then
-        self.weight = 1.0
-    else
-        self.weight = 0.0
+        return nil
     end
 end
 
