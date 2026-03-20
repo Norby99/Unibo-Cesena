@@ -10,6 +10,8 @@ FOLLOW_ACTIVATION_THRESHOLD = 0.02
 --[[
 TODO:
 - set some variables to global constants
+- implement the behaviors from an interface
+- look for eventual non documented functions
 ]]
 
 -- Imports
