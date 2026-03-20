@@ -1,18 +1,18 @@
-local Behavior = {}
-Behavior.__index = Behavior
+local SubsumptionController = {}
+SubsumptionController.__index = SubsumptionController
 
-function Behavior.new(max_velocity)
-    local self = setmetatable({}, Behavior)
+function SubsumptionController.new(max_velocity)
+    local self = setmetatable({}, SubsumptionController)
     self.behaviors = {}
     self.max_velocity = max_velocity
     return self
 end
 
-function Behavior:add(behavior)
+function SubsumptionController:add(behavior)
     table.insert(self.behaviors, behavior)
 end
 
-function Behavior:run()
+function SubsumptionController:run()
     local n = #self.behaviors
     local left_speed = self.max_velocity
     local right_speed = self.max_velocity
@@ -34,4 +34,4 @@ function Behavior:run()
     return left_speed, right_speed
 end
 
-return Behavior
+return SubsumptionController

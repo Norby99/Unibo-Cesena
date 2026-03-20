@@ -13,7 +13,7 @@ TODO:
 ]]
 
 -- Imports
-local Behavior = require("libraries.behaviors.behavior")
+local SubsumptionController = require("libraries.subsumption_controller")
 local Follow = require("libraries.behaviors.follow")
 local Fear = require("libraries.behaviors.fear")
 local StopAtDarkSpot = require("libraries.behaviors.stop_at_dark_spot")
@@ -27,7 +27,7 @@ function init()
 	n_steps = 0
 	robot.leds.set_all_colors("black")
 
-	controller = Behavior.new(MAX_VELOCITY)
+	controller = SubsumptionController.new(MAX_VELOCITY)
 	controller:add(StopAtDarkSpot.new(MAX_VELOCITY, robot.motor_ground, MIN_MOTOR_GROUND_PERCIVED))
 	controller:add(Fear.new(MAX_VELOCITY, robot.proximity, MAX_PROXIMITY_PERCIVED, FEAR_ACTIVATION_THRESHOLD))
 	controller:add(Follow.new(MAX_VELOCITY, robot.light, MAX_LIGHT_PERCIVED, FOLLOW_ACTIVATION_THRESHOLD))

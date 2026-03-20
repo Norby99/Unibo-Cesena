@@ -11,7 +11,7 @@ In this project, we adopted a slightly different, more efficient approach. While
 The following snippet from the controller's main loop demonstrates this early-exit logic:
 
 ```lua
-function Behavior:run()
+function SubsumptionController:run()
     local left_speed = self.max_velocity
     local right_speed = self.max_velocity
 
@@ -44,14 +44,14 @@ The controller is composed of the following layers, ordered from highest to lowe
 The architecture's implementation is handled within the main Lua script. One of the primary advantages of this design is how intuitively simple it is to add a new layer. Because the controller abstracts the execution loop entirely, extending the robot's capabilities merely requires instantiating a new behavior and passing it to the central `controller` object via the `add()` method. As long as behaviors are appended in decreasing order of priority, no structural modifications to the core controller logic are needed.
 
 ```lua
-local Behavior = require("libraries.behaviors.behavior")
+local SubsumptionController = require("libraries.subsumption_controller")
 local Follow = require("libraries.behaviors.follow")
 local Fear = require("libraries.behaviors.fear")
 local StopAtDarkSpot = require("libraries.behaviors.stop_at_dark_spot")
 
 function init()
 -- Initialize the controller and define the hierarchy bounds
-controller = Behavior.new(MAX_VELOCITY)
+controller = SubsumptionController.new(MAX_VELOCITY)
 
 -- Level 1: Highest priority - Safety stop
 controller:add(StopAtDarkSpot.new(MAX_VELOCITY, robot.motor_ground, MIN_MOTOR_GROUND_PERCIVED))

@@ -39,8 +39,8 @@ function Fear:action()
         right_sum = right_sum + obs_norm_sensors[i].value
     end
 
-    local left_avg = left_sum / (#obs_norm_sensors / 2)
-    local right_avg = right_sum / (#obs_norm_sensors / 2)
+    local left_avg = (left_sum / (#obs_norm_sensors / 2))
+    local right_avg = (right_sum / (#obs_norm_sensors / 2))
 
     local diff = left_avg - right_avg
     local avg = (left_avg + right_avg) * 0.5
@@ -55,7 +55,8 @@ function Fear:action()
         right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity - K * diff * self.max_velocity))
     end
     
-    if relative_diff < self.activation_threshold then
+    local percived = (left_avg + right_avg) * 0.5
+    if percived < self.activation_threshold then
         return nil
     end
 

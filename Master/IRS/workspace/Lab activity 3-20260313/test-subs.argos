@@ -27,7 +27,7 @@
         <footbot_motor_ground implementation="rot_z_only" noise_level="0.01" />
 				<positioning implementation="default" noise_level="0.0" />
       </sensors>
-     <params script="controller-subsumption.lua" />
+     <params script="main.lua" />
    </lua_controller>
 
     
