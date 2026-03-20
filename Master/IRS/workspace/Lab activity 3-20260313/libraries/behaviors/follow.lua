@@ -54,7 +54,8 @@ function Follow:action()
         right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity + K * diff * self.max_velocity))
     end
     
-    if relative_diff < self.activation_threshold then
+    local perceived = (left_avg + right_avg) * 0.5
+    if perceived < self.activation_threshold then
         return nil
     end
 
