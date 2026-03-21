@@ -1,5 +1,6 @@
 local utils = {}
 
+-- Normalizes sensor values to the range [0, 1] based on a maximum perceived value
 function utils.normalize_sensors(sensors, max_perceived)
     local norm_sensors = {}
     for _, sensor in ipairs(sensors) do
@@ -9,6 +10,7 @@ function utils.normalize_sensors(sensors, max_perceived)
     return norm_sensors
 end
 
+-- Averages the values of a list of sensors.
 function utils.avg_sensor_value(sensors)
     local sum = 0
     for _, sensor in ipairs(sensors) do

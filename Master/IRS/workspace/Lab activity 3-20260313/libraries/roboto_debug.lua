@@ -2,6 +2,7 @@
 local roboto_debug = {}
 roboto_debug.__index = roboto_debug
 
+-- print the values of the light sensors.
 function roboto_debug.print_light_sensors(rob)
     local debug_values = {}
     for i = 1, #rob.light do
@@ -10,6 +11,7 @@ function roboto_debug.print_light_sensors(rob)
     log("[debug] Light sensors: " .. table.concat(debug_values, ", "))
 end
 
+-- print the values of the motor ground sensors.
 function roboto_debug.print_motor_ground(rob)
     local debug_values = {}
     for i = 1, #rob.motor_ground do

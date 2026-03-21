@@ -3,6 +3,7 @@ local utils = require("libraries.utils")
 local Fear = {}
 Fear.__index = Fear
 
+-- This behavior makes the robot avoid obstacles by turning away from them.
 function Fear.new(max_velocity, sensors, max_perceived, activation_threshold)
     local self = setmetatable({}, Fear)
 
@@ -16,6 +17,12 @@ function Fear.new(max_velocity, sensors, max_perceived, activation_threshold)
     return self
 end
 
+--[[ Performs the action of avoiding obstacles by turning away from them.
+    The robot will turn away from the side with more obstacles, and move forward.
+    If the relative difference between the two sides is less than the threshold, it will not activate the behavior.
+
+    returns: left and right velocities, or nil if the behavior is not activated.
+    ]]
 function Fear:action()
     local K = self._factor_of_rotation
 
