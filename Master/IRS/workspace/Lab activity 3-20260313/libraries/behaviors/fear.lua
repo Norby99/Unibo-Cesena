@@ -4,11 +4,13 @@ local Fear = {}
 Fear.__index = Fear
 
 -- This behavior makes the robot avoid obstacles by turning away from them.
-function Fear.new(max_velocity, sensors, max_perceived, activation_threshold)
+function Fear.new(max_velocity, sensors, max_perceived, activation_threshold, factor_of_rotation, min_relative_diff, blind_spot_percentage)
     local self = setmetatable({}, Fear)
 
     self.name = "fear"
-    self._factor_of_rotation = 40.0
+    self.factor_of_rotation = factor_of_rotation or 40.0
+    self.min_relative_diff = min_relative_diff or 0.05
+    self.blind_spot_percentage = blind_spot_percentage or 0.23
     self.max_velocity = max_velocity
     self.activation_threshold = activation_threshold
     self.sensors = sensors
@@ -24,12 +26,12 @@ end
     returns: left and right velocities, or nil if the behavior is not activated.
     ]]
 function Fear:action()
-    local K = self._factor_of_rotation
+    local K = self.factor_of_rotation
 
     -- remove the sensors from the second quarter to the third quarter
     local n = #self.sensors
-    local q1 = math.floor(n * 0.23)
-    local q3 = math.floor(n * 0.77)
+    local q1 = math.floor(n * self.blind_spot_percentage)
+    local q3 = math.floor(n * (1.0 - self.blind_spot_percentage))
 
     local norm_sensors = utils.normalize_sensors(self.sensors, self.max_perceived)
 
@@ -57,7 +59,7 @@ function Fear:action()
     local left_vel = self.max_velocity
     local right_vel = self.max_velocity
 
-    if relative_diff > 0.05 then  -- more than 5% relative difference
+    if relative_diff > self.min_relative_diff then  -- more than relative difference threshold
         left_vel  = math.max(0, math.min(self.max_velocity, self.max_velocity + K * diff * self.max_velocity))
         right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity - K * diff * self.max_velocity))
     end

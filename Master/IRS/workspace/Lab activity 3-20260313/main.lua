@@ -7,11 +7,13 @@ MIN_MOTOR_GROUND_PERCIVED = 0.01
 FEAR_ACTIVATION_THRESHOLD = 0.03
 FOLLOW_ACTIVATION_THRESHOLD = 0.02
 
+ROTATION_FACTOR = 40.0
+MIN_RELATIVE_DIFF = 0.05
+FEAR_BLIND_SPOT_PERCENTAGE = 0.23
+
 --[[
 TODO:
-- set some variables to global constants
 - implement the behaviors from an interface
-- look for eventual non documented functions
 ]]
 
 -- Imports
@@ -31,8 +33,8 @@ function init()
 
 	controller = SubsumptionController.new(MAX_VELOCITY)
 	controller:add(StopAtDarkSpot.new(MAX_VELOCITY, robot.motor_ground, MIN_MOTOR_GROUND_PERCIVED))
-	controller:add(Fear.new(MAX_VELOCITY, robot.proximity, MAX_PROXIMITY_PERCIVED, FEAR_ACTIVATION_THRESHOLD))
-	controller:add(Follow.new(MAX_VELOCITY, robot.light, MAX_LIGHT_PERCIVED, FOLLOW_ACTIVATION_THRESHOLD))
+	controller:add(Fear.new(MAX_VELOCITY, robot.proximity, MAX_PROXIMITY_PERCIVED, FEAR_ACTIVATION_THRESHOLD, ROTATION_FACTOR, MIN_RELATIVE_DIFF, FEAR_BLIND_SPOT_PERCENTAGE))
+	controller:add(Follow.new(MAX_VELOCITY, robot.light, MAX_LIGHT_PERCIVED, FOLLOW_ACTIVATION_THRESHOLD, ROTATION_FACTOR, MIN_RELATIVE_DIFF))
 end
 
 function step()
