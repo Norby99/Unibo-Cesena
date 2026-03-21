@@ -1,17 +1,15 @@
 local utils = require("libraries.utils")
+local Behavior = require("libraries.behaviors.behavior")
 
-local Follow = {}
+local Follow = setmetatable({}, {__index = Behavior})
 Follow.__index = Follow
 
 -- This behavior makes the robot follow the light.
 function Follow.new(max_velocity, sensors, max_perceived, activation_threshold, factor_of_rotation, min_relative_diff)
-    local self = setmetatable({}, Follow)
+    local self = setmetatable(Behavior.new("follow", max_velocity, sensors), Follow)
 
-    self.name = "follow"
     self.factor_of_rotation = factor_of_rotation or 40.0
     self.min_relative_diff = min_relative_diff or 0.05
-    self.max_velocity = max_velocity
-    self.sensors = sensors
     self.max_perceived = max_perceived
     self.activation_threshold = activation_threshold
     return self

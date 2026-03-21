@@ -1,19 +1,17 @@
 local utils = require("libraries.utils")
+local Behavior = require("libraries.behaviors.behavior")
 
-local Fear = {}
+local Fear = setmetatable({}, {__index = Behavior})
 Fear.__index = Fear
 
 -- This behavior makes the robot avoid obstacles by turning away from them.
 function Fear.new(max_velocity, sensors, max_perceived, activation_threshold, factor_of_rotation, min_relative_diff, blind_spot_percentage)
-    local self = setmetatable({}, Fear)
+    local self = setmetatable(Behavior.new("fear", max_velocity, sensors), Fear)
 
-    self.name = "fear"
     self.factor_of_rotation = factor_of_rotation or 40.0
     self.min_relative_diff = min_relative_diff or 0.05
     self.blind_spot_percentage = blind_spot_percentage or 0.23
-    self.max_velocity = max_velocity
     self.activation_threshold = activation_threshold
-    self.sensors = sensors
     self.max_perceived = max_perceived
 
     return self

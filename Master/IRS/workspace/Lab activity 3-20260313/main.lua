@@ -11,11 +11,6 @@ ROTATION_FACTOR = 40.0
 MIN_RELATIVE_DIFF = 0.05
 FEAR_BLIND_SPOT_PERCENTAGE = 0.23
 
---[[
-TODO:
-- implement the behaviors from an interface
-]]
-
 -- Imports
 local SubsumptionController = require("libraries.subsumption_controller")
 local Follow = require("libraries.behaviors.follow")
