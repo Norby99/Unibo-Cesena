@@ -6,11 +6,9 @@ local Follow = setmetatable({}, {__index = Behavior})
 Follow.__index = Follow
 
 -- This behavior makes the robot follow the light.
-function Follow.new(max_velocity, sensors, max_perceived, factor_of_rotation, min_relative_diff)
+function Follow.new(max_velocity, sensors, max_perceived)
     local self = setmetatable(Behavior.new("follow", max_velocity, sensors), Follow)
 
-    self.factor_of_rotation = factor_of_rotation or 40.0
-    self.min_relative_diff = min_relative_diff or 0.05
     self.max_perceived = max_perceived
     return self
 end
@@ -22,8 +20,6 @@ end
     returns: left and right velocities, or nil if the behavior is not activated.
     ]]
 function Follow:action()
-    local K = self.factor_of_rotation
-
     local norm_sensors = utils.normalize_sensors(self.sensors, self.max_perceived)
     local max_sensor = utils.max_sensor_value(norm_sensors)
 
