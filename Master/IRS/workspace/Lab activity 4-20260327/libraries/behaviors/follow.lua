@@ -1,17 +1,17 @@
 local utils = require("libraries.utils")
+local vector = require("libraries.vector")
 local Behavior = require("libraries.behaviors.behavior")
 
 local Follow = setmetatable({}, {__index = Behavior})
 Follow.__index = Follow
 
 -- This behavior makes the robot follow the light.
-function Follow.new(max_velocity, sensors, max_perceived, activation_threshold, factor_of_rotation, min_relative_diff)
+function Follow.new(max_velocity, sensors, max_perceived, factor_of_rotation, min_relative_diff)
     local self = setmetatable(Behavior.new("follow", max_velocity, sensors), Follow)
 
     self.factor_of_rotation = factor_of_rotation or 40.0
     self.min_relative_diff = min_relative_diff or 0.05
     self.max_perceived = max_perceived
-    self.activation_threshold = activation_threshold
     return self
 end
 
@@ -24,41 +24,14 @@ end
 function Follow:action()
     local K = self.factor_of_rotation
 
-    local left_sum = 0
-    local right_sum = 0
-
     local norm_sensors = utils.normalize_sensors(self.sensors, self.max_perceived)
+    local max_sensor = utils.max_sensor_value(norm_sensors)
 
-    for i = 1, #norm_sensors / 2 do
-        left_sum = left_sum + norm_sensors[i].value
-    end
+    b_vec = {length = max_sensor.value, angle = max_sensor.angle}
 
-    for i = #norm_sensors / 2 + 1, #norm_sensors do
-        right_sum = right_sum + norm_sensors[i].value
-    end
+    log("[follow] intensity: " .. b_vec.length .. " | angle: " .. b_vec.angle)
 
-    local left_avg = left_sum / (#norm_sensors / 2)
-    local right_avg = right_sum / (#norm_sensors / 2)
-
-    local diff = left_avg - right_avg
-    local avg = (left_avg + right_avg) * 0.5
-    local relative_diff = (avg > 0) and (math.abs(diff) / avg) or 0  -- relative difference between the two groups
-    log("[behaviors:follow] Left avg: " .. left_avg .. " | Right avg: " .. right_avg .. " | Relative diff: " .. (relative_diff * 100) .. "%")
-
-    local left_vel = self.max_velocity
-    local right_vel = self.max_velocity
-
-    if relative_diff > self.min_relative_diff then  -- more than relative difference threshold
-        left_vel  = math.max(0, math.min(self.max_velocity, self.max_velocity - K * diff * self.max_velocity))
-        right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity + K * diff * self.max_velocity))
-    end
-    
-    local perceived = (left_avg + right_avg) * 0.5
-    if perceived < self.activation_threshold then
-        return nil
-    end
-
-    return left_vel, right_vel
+    return b_vec
 end
 
 return Follow

@@ -20,4 +20,14 @@ function roboto_debug.print_motor_ground(rob)
     log("[debug] Motor ground: " .. table.concat(debug_values, ", "))
 end
 
+-- print the value of a 2D vector.
+function roboto_debug.print_vec2(name, vec)
+    log("[debug] " .. name .. ": x: " .. vec.x .. " | y: " .. vec.y)
+end
+
+-- print the value of a polar vector.
+function roboto_debug.print_polar_vec(name, vec)
+     log("[debug] " .. name .. ": length: " .. vec.length .. " | angle: " .. vec.angle)
+end
+
 return roboto_debug
