@@ -31,4 +31,13 @@ function utils.max_sensor_value(sensors)
     return max_sensor
 end
 
+-- Returns the opposite angle in radians, normalized to the range [-pi, pi].
+function utils.opposite_angle(angle)
+    local opposite = angle + math.pi
+    if opposite > math.pi then
+        opposite = opposite - 2 * math.pi
+    end
+    return opposite
+end
+
 return utils

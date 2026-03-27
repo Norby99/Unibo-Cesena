@@ -9,11 +9,20 @@ MAX_LIGHT_PERCIVED = 0.3
 MAX_PROXIMITY_PERCIVED = 1.0
 MIN_MOTOR_GROUND_PERCIVED = 0.01
 
+RANDOM_WANDER_TICKS = 10
+
+--[[
+    TODO
+- fermarsi sul punto nero
+- riscrivere la documentazione di tutte le funzioni
+]]
+
 -- Imports
 local MotorSchemaController = require("libraries.motor_schema_controller")
 local Follow = require("libraries.behaviors.follow")
 local Fear = require("libraries.behaviors.fear")
 local StopAtDarkSpot = require("libraries.behaviors.stop_at_dark_spot")
+local RandomWander = require("libraries.behaviors.random_wander")
 
 local db = require("libraries.roboto_debug")
 
@@ -27,7 +36,8 @@ function init()
 	controller = MotorSchemaController.new(MAX_VELOCITY)
     --controller:add(StopAtDarkSpot.new(MAX_VELOCITY, robot.motor_ground, MIN_MOTOR_GROUND_PERCIVED))
 	controller:add(Fear.new(MAX_VELOCITY, robot.proximity, MAX_PROXIMITY_PERCIVED))
-	--controller:add(Follow.new(MAX_VELOCITY, robot.light, MAX_LIGHT_PERCIVED))
+	controller:add(Follow.new(MAX_VELOCITY, robot.light, MAX_LIGHT_PERCIVED))
+    --controller:add(RandomWander.new(MAX_VELOCITY, robot.proximity, RANDOM_WANDER_TICKS))
 end
 
 function step()

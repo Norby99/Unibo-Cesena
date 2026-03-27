@@ -13,19 +13,17 @@ function Follow.new(max_velocity, sensors, max_perceived)
     return self
 end
 
---[[ Performs the action of following the light
-    The robot will turn towards the side with more light, and move forward.
-    If the relative difference between the two sides is less than the threshold, it will not activate the behavior.
-
-    returns: left and right velocities, or nil if the behavior is not activated.
+--[[ 
+    TODO: attrattiva
     ]]
 function Follow:action()
     local norm_sensors = utils.normalize_sensors(self.sensors, self.max_perceived)
     local max_sensor = utils.max_sensor_value(norm_sensors)
 
+    -- TODO: sarebbe figo fare che la lenght è 1 - il value e un valore minimo, se no scende a 0
     b_vec = {length = max_sensor.value, angle = max_sensor.angle}
 
-    log("[follow] intensity: " .. b_vec.length .. " | angle: " .. b_vec.angle)
+    log("[follow] intensity: " .. 1-b_vec.length .. " | angle: " .. b_vec.angle)
 
     return b_vec
 end

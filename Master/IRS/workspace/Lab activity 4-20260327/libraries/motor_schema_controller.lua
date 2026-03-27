@@ -33,17 +33,25 @@ function MotorSchemaController:run()
 
     left_speed, right_speed = self:calculate_speed(sum_vector)
 
+    log("[Controller] left_speed: " .. left_speed .. " | right_speed: " .. right_speed)
+
     return left_speed, right_speed
 end
 
 function MotorSchemaController:calculate_speed(v)
-    local target_speed = self.max_velocity  -- = v.length * self.max_velocity
+    local target_speed = self.max_velocity
     
-    local forward_component = target_speed * math.cos(v.angle)
-    local turn_component = target_speed * math.sin(v.angle)
+    local left_speed = target_speed
+    local right_speed = target_speed
     
-    left_speed = forward_component - turn_component
-    right_speed = forward_component + turn_component
+    local angle = v.angle
+    
+    if angle > 0 then
+        left_speed = target_speed * (1 - (angle / math.pi))
+    else
+        right_speed = target_speed * (1 - (-angle / math.pi))
+    end
+
     return left_speed, right_speed
 end
 

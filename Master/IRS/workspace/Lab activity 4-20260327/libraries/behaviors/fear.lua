@@ -8,7 +8,6 @@ Fear.__index = Fear
 function Fear.new(max_velocity, sensors, max_perceived)
     local self = setmetatable(Behavior.new("fear", max_velocity, sensors), Fear)
 
-    self.activation_threshold = activation_threshold
     self.max_perceived = max_perceived
 
     return self
@@ -24,7 +23,11 @@ function Fear:action()
     local norm_sensors = utils.normalize_sensors(self.sensors, self.max_perceived)
     local max_sensor = utils.max_sensor_value(norm_sensors)
 
-    return left_vel, right_vel
+    b_vec = {length = max_sensor.value, angle = utils.opposite_angle(max_sensor.angle)}
+
+    log("[fear] intensity: " .. b_vec.length .. " | angle: " .. b_vec.angle)
+
+    return b_vec
 end
 
 return Fear
