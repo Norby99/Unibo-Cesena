@@ -31,6 +31,16 @@ function utils.max_sensor_value(sensors)
     return max_sensor
 end
 
+function utils.normalize_speeds(left_speed, right_speed, max_vel)
+    local max_speed = math.max(math.abs(left_speed), math.abs(right_speed))
+    if max_speed > max_vel then
+        local scale = max_vel / max_speed
+        left_speed = left_speed * scale
+        right_speed = right_speed * scale
+    end
+    return left_speed, right_speed
+end
+
 -- Returns the opposite angle in radians, normalized to the range [-pi, pi].
 function utils.opposite_angle(angle)
     local opposite = angle + math.pi
