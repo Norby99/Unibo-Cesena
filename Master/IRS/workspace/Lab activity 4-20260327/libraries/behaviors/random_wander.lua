@@ -4,8 +4,9 @@ local Behavior = require("libraries.behaviors.behavior")
 local RandomWander = setmetatable({}, {__index = Behavior})
 RandomWander.__index = RandomWander
 
-function RandomWander.new(max_velocity, sensors, num_ticks)
-    local self = setmetatable(Behavior.new("RandomWander", max_velocity, sensors), RandomWander)
+function RandomWander.new(max_velocity, sensors, num_ticks, halt_behaviors)
+    halt_behaviors = halt_behaviors or {}
+    local self = setmetatable(Behavior.new("RandomWander", max_velocity, sensors, halt_behaviors), RandomWander)
 
     self.num_ticks = num_ticks
     self.current_tick = num_ticks
@@ -16,6 +17,10 @@ function RandomWander.new(max_velocity, sensors, num_ticks)
 end
 
 function RandomWander:action()
+    if self:should_halt() then
+        return nil
+    end
+
     local max_value = 1
 
     if self.current_tick >= self.num_ticks then

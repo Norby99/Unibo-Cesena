@@ -30,8 +30,6 @@ function MotorSchemaController:run()
         sum_vector = vector.vec2_polar_sum(sum_vector, vec)
     end
 
-    sum_vector.length = math.max(sum_vector.length, 1)
-
     db.print_polar_vec("sum_vector", sum_vector)
 
     left_speed, right_speed = self:calculate_speed(sum_vector)
@@ -42,7 +40,6 @@ function MotorSchemaController:run()
 end
 
 function MotorSchemaController:calculate_speed(vec)
-    -- Recupera la distanza tra le ruote (come indicato nell'immagine)
     local L = robot.wheels.axis_length
 
     v = self.max_velocity * vec.length

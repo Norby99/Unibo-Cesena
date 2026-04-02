@@ -5,8 +5,9 @@ local Fear = setmetatable({}, {__index = Behavior})
 Fear.__index = Fear
 
 -- This behavior makes the robot avoid obstacles by turning away from them.
-function Fear.new(max_velocity, sensors, max_perceived)
-    local self = setmetatable(Behavior.new("fear", max_velocity, sensors), Fear)
+function Fear.new(max_velocity, sensors, max_perceived, halt_behaviors)
+    halt_behaviors = halt_behaviors or {}
+    local self = setmetatable(Behavior.new("fear", max_velocity, sensors, halt_behaviors), Fear)
 
     self.max_perceived = max_perceived
 
@@ -20,6 +21,10 @@ end
     returns: left and right velocities, or nil if the behavior is not activated.
     ]]
 function Fear:action()
+    if self:should_halt() then
+        return nil
+    end
+
     local norm_sensors = utils.normalize_sensors(self.sensors, self.max_perceived)
     local max_sensor = utils.max_sensor_value(norm_sensors)
 

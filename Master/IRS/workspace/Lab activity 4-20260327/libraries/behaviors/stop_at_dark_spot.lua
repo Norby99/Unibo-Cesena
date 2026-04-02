@@ -5,8 +5,9 @@ local StopAtDarkSpot = setmetatable({}, {__index = Behavior})
 StopAtDarkSpot.__index = StopAtDarkSpot
 
 -- This behavior stops the robot when it perceives a dark spot
-function StopAtDarkSpot.new(max_velocity, sensors, min_threshold)
-    local self = setmetatable(Behavior.new("stop_at_dark_spot", max_velocity, sensors), StopAtDarkSpot)
+function StopAtDarkSpot.new(max_velocity, sensors, min_threshold, halt_behaviors)
+    halt_behaviors = halt_behaviors or {}
+    local self = setmetatable(Behavior.new("stop_at_dark_spot", max_velocity, sensors, halt_behaviors), StopAtDarkSpot)
 
     self.weight = 1.0
     self.min_threshold = min_threshold
@@ -16,7 +17,8 @@ end
 
 --[[ Performs the action of stopping if the average value of the motor ground sensors is below the threshold
     Returns:
-        (left_speed, right_speed) if the behavior is activated, nil otherwise
+        - A vector with length 0 and angle 0 if the behavior is activated (i.e., the robot should stop)
+        - nil if the behavior is not activated (i.e., the robot should not stop)
 ]]
 function StopAtDarkSpot:action()
     local avg_value = utils.avg_sensor_value(self.sensors)
@@ -24,7 +26,7 @@ function StopAtDarkSpot:action()
     log("[behaviors:stop_at_dark_spot] Average motor ground value: " .. avg_value)
 
     if avg_value < self.min_threshold then
-        return 0, 0
+        return {length = 0, angle = 0}
     else
         return nil
     end

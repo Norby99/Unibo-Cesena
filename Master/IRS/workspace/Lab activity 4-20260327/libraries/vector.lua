@@ -43,6 +43,9 @@ end
 
 -- Summing two 2D vectors in polar coordinates
 function vector.vec2_polar_sum(v1, v2)
+	if v1 == nil then return v2 end
+	if v2 == nil then return v1 end
+
 	local w1 = vector.polar_to_cart(v1)
 	local w2 = vector.polar_to_cart(v2)
 	local w3 = vector.vec2_sum(w1,w2)
