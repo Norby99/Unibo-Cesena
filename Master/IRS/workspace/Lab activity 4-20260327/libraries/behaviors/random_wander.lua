@@ -6,7 +6,7 @@ RandomWander.__index = RandomWander
 
 function RandomWander.new(max_velocity, sensors, num_ticks, halt_behaviors)
     halt_behaviors = halt_behaviors or {}
-    local self = setmetatable(Behavior.new("RandomWander", max_velocity, sensors, halt_behaviors), RandomWander)
+    local self = setmetatable(Behavior.new("random_wander", max_velocity, sensors, halt_behaviors), RandomWander)
 
     self.num_ticks = num_ticks
     self.current_tick = num_ticks

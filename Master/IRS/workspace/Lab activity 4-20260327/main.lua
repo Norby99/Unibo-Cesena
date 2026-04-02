@@ -9,11 +9,22 @@ MAX_LIGHT_PERCIVED = 0.3
 MAX_PROXIMITY_PERCIVED = 1.0
 MIN_MOTOR_GROUND_PERCIVED = 0.01
 
-RANDOM_WANDER_TICKS = 10
+RANDOM_WANDER_TICKS = 50
+
+local WeightsManager = require("libraries.weights_manager")
+
+local weights_manager = WeightsManager.new({
+	follow = 0.4,
+	fear = 0.4,
+	random_wander = 0.2
+})
+
+DEFAULT_WEIGHT = 1.0
+
+WEIGHTS = weights_manager:get_weights()
 
 --[[
     TODO
-- fermarsi sul punto nero
 - riscrivere la documentazione di tutte le funzioni
 ]]
 
@@ -33,11 +44,16 @@ function init()
 	n_steps = 0
 	robot.leds.set_all_colors("black")
 
-	controller = MotorSchemaController.new(MAX_VELOCITY)
-    --controller:add(StopAtDarkSpot.new(MAX_VELOCITY, robot.motor_ground, MIN_MOTOR_GROUND_PERCIVED))
-	controller:add(Fear.new(MAX_VELOCITY, robot.proximity, MAX_PROXIMITY_PERCIVED))
-	controller:add(Follow.new(MAX_VELOCITY, robot.light, MAX_LIGHT_PERCIVED))
-    --controller:add(RandomWander.new(MAX_VELOCITY, robot.proximity, RANDOM_WANDER_TICKS))
+	controller = MotorSchemaController.new(MAX_VELOCITY, WEIGHTS)
+
+	local stopAtDarkSpot = StopAtDarkSpot.new(MAX_VELOCITY, robot.motor_ground, MIN_MOTOR_GROUND_PERCIVED)
+	local fear = Fear.new(MAX_VELOCITY, robot.proximity, MAX_PROXIMITY_PERCIVED, {stopAtDarkSpot})
+	local follow = Follow.new(MAX_VELOCITY, robot.light, MAX_LIGHT_PERCIVED, {stopAtDarkSpot})
+	local randomWander = RandomWander.new(MAX_VELOCITY, robot.proximity, RANDOM_WANDER_TICKS, {stopAtDarkSpot})
+
+	controller:add(fear)
+	controller:add(follow)
+    --controller:add(randomWander)
 end
 
 function step()
@@ -55,5 +71,5 @@ end
 --[[ This function is executed only once, when the robot is removed
      from the simulation ]]
 function destroy()
-   -- put your code here
+   robot.wheels.set_velocity(0, 0)
 end

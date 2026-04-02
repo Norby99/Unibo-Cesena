@@ -5,10 +5,11 @@ local vector = require("libraries.vector")
 local utils = require("libraries.utils")
 local db = require("libraries.roboto_debug")
 
-function MotorSchemaController.new(max_velocity)
+function MotorSchemaController.new(max_velocity, weights)
     local self = setmetatable({}, MotorSchemaController)
     self.behaviors = {}
     self.max_velocity = max_velocity
+    self.weights = weights or {}
     return self
 end
 
@@ -21,19 +22,24 @@ function MotorSchemaController:run()
     local n = #self.behaviors
     local left_speed = self.max_velocity
     local right_speed = self.max_velocity
-    local total_weight = 0
 
     local sum_vector = {length = 0, angle = 0}
 
     for _, b in ipairs(self.behaviors) do
         local vec = b:action()
+
+        if vec then
+            local weight = self.weights[b.name] or DEFAULT_WEIGHT
+            log("[Controller] behavior: " .. b.name .. " | weight: " .. weight)
+            vec.length = vec.length * weight
+        end
+
         sum_vector = vector.vec2_polar_sum(sum_vector, vec)
     end
 
-    db.print_polar_vec("sum_vector", sum_vector)
-
     left_speed, right_speed = self:calculate_speed(sum_vector)
 
+    db.print_polar_vec("sum_vector", sum_vector)
     log("[Controller] left_speed: " .. left_speed .. " | right_speed: " .. right_speed)
 
     return left_speed, right_speed
