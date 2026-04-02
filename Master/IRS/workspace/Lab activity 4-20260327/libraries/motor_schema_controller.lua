@@ -5,6 +5,7 @@ local vector = require("libraries.vector")
 local utils = require("libraries.utils")
 local db = require("libraries.roboto_debug")
 
+-- Manages the motor schemas, combining each behavior's vector output.
 function MotorSchemaController.new(max_velocity, weights)
     local self = setmetatable({}, MotorSchemaController)
     self.behaviors = {}
@@ -18,6 +19,11 @@ function MotorSchemaController:add(behavior)
     table.insert(self.behaviors, behavior)
 end
 
+--[[ Runs the controller, calculating the combined vector from all behaviors and converting it to wheel speeds.
+     Returns:
+     - left_speed: The speed for the left wheel.
+     - right_speed: The speed for the right wheel.
+]]
 function MotorSchemaController:run()
     local n = #self.behaviors
     local left_speed = self.max_velocity
@@ -45,6 +51,7 @@ function MotorSchemaController:run()
     return left_speed, right_speed
 end
 
+-- Converts a polar vector to left and right wheel speeds using a differential drive model.
 function MotorSchemaController:calculate_speed(vec)
     local L = robot.wheels.axis_length
 

@@ -19,6 +19,7 @@ function utils.avg_sensor_value(sensors)
     return sum / #sensors
 end
 
+-- Returns the sensor with the maximum value from a list of sensors.
 function utils.max_sensor_value(sensors)
     local max_value = -math.huge
     local max_sensor = nil

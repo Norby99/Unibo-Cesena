@@ -1,7 +1,12 @@
 local Behavior = {}
 Behavior.__index = Behavior
 
--- Base constructor for a behavior
+--[[ Base constructor for a behavior
+    name: string, the name of the behavior
+    max_velocity: number, the maximum velocity of the robot
+    sensors: table, the sensors of the robot
+    halt_behaviors: table, a list of behaviors that can halt this behavior (optional)
+]]
 function Behavior.new(name, max_velocity, sensors, halt_behaviors)
     local self = setmetatable({}, Behavior)
     self.name = name
@@ -11,6 +16,9 @@ function Behavior.new(name, max_velocity, sensors, halt_behaviors)
     return self
 end
 
+--[[ Checks if any of the halt behaviors is activated.
+    Returns true if at least one halt behavior is activated, false otherwise.
+]]
 function Behavior:should_halt()
     for _, halt_behavior in ipairs(self.halt_behaviors) do
         if halt_behavior:action() ~= nil then

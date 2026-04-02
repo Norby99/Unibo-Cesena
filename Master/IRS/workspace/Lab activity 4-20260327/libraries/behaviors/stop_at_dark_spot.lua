@@ -4,7 +4,12 @@ local Behavior = require("libraries.behaviors.behavior")
 local StopAtDarkSpot = setmetatable({}, {__index = Behavior})
 StopAtDarkSpot.__index = StopAtDarkSpot
 
--- This behavior stops the robot when it perceives a dark spot
+--[[ This behavior stops the robot when it perceives a dark spot
+    max_velocity: the maximum velocity of the robot
+    sensors: the sensors used by the behavior (not used in this behavior, but kept for consistency with the other behaviors and potential future use)
+    min_threshold: the minimum threshold for the average value of the motor ground sensors
+    halt_behaviors: a list of behaviors that can halt this behavior (i.e., if any of these behaviors is activated, this behavior will be halted)
+]]
 function StopAtDarkSpot.new(max_velocity, sensors, min_threshold, halt_behaviors)
     halt_behaviors = halt_behaviors or {}
     local self = setmetatable(Behavior.new("stop_at_dark_spot", max_velocity, sensors, halt_behaviors), StopAtDarkSpot)

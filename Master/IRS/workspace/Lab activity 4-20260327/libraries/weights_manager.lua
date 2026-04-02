@@ -1,6 +1,7 @@
 local WeightsManager = {}
 WeightsManager.__index = WeightsManager
 
+-- Manages the weights of the behaviors, ensuring they sum up to 1.0
 function WeightsManager.new(weights)
     local self = setmetatable({}, WeightsManager)
     self.weights = weights or {}
@@ -11,6 +12,7 @@ function WeightsManager.new(weights)
     return self
 end
 
+-- Returns the weights, ensuring they sum up to WEIGHT_SUM_GOAL within a margin.
 function WeightsManager:get_weights()
     local sum = 0
     for _, weight in pairs(self.weights) do

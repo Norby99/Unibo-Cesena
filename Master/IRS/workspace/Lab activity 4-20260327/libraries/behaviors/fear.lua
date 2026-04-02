@@ -4,7 +4,12 @@ local Behavior = require("libraries.behaviors.behavior")
 local Fear = setmetatable({}, {__index = Behavior})
 Fear.__index = Fear
 
--- This behavior makes the robot avoid obstacles by turning away from them.
+--[[ This behavior makes the robot avoid obstacles by turning away from them.
+    max_velocity: the maximum velocity of the robot
+    sensors: the proximity sensors of the robot
+    max_perceived: the maximum value that the sensors can perceive, used for normalization
+    halt_behaviors: a list of behaviors that can halt this behavior if they are activated
+]]
 function Fear.new(max_velocity, sensors, max_perceived, halt_behaviors)
     halt_behaviors = halt_behaviors or {}
     local self = setmetatable(Behavior.new("fear", max_velocity, sensors, halt_behaviors), Fear)
@@ -15,10 +20,9 @@ function Fear.new(max_velocity, sensors, max_perceived, halt_behaviors)
 end
 
 --[[ Performs the action of avoiding obstacles by turning away from them.
-    The robot will turn away from the side with more obstacles, and move forward.
-    If the relative difference between the two sides is less than the threshold, it will not activate the behavior.
-
-    returns: left and right velocities, or nil if the behavior is not activated.
+    Returns:
+        - A vector with length proportional to the intensity of the obstacle and angle opposite to the direction of the obstacle if the behavior is activated (i.e., there is an obstacle to avoid)
+        - nil if the behavior is not activated (i.e., there are no obstacles to avoid or a halt behavior is activated)
     ]]
 function Fear:action()
     if self:should_halt() then

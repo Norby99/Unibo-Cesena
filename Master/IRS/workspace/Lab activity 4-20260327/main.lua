@@ -9,6 +9,10 @@ MAX_LIGHT_PERCIVED = 0.3
 MAX_PROXIMITY_PERCIVED = 1.0
 MIN_MOTOR_GROUND_PERCIVED = 0.01
 
+-- TODO: Maybe it would be nice to have beside weight a gain value that
+-- TODO: indicates how a behavior's output should be amplified or attenuated,
+-- TODO: by how certain it is by it's coice.
+
 RANDOM_WANDER_TICKS = 50
 
 local WeightsManager = require("libraries.weights_manager")
@@ -18,15 +22,9 @@ local weights_manager = WeightsManager.new({
 	fear = 0.4,
 	random_wander = 0.2
 })
-
 DEFAULT_WEIGHT = 1.0
 
 WEIGHTS = weights_manager:get_weights()
-
---[[
-    TODO
-- riscrivere la documentazione di tutte le funzioni
-]]
 
 -- Imports
 local MotorSchemaController = require("libraries.motor_schema_controller")
@@ -39,6 +37,7 @@ local db = require("libraries.roboto_debug")
 
 n_steps = 0
 
+-- Setup function, called once at the beginning of the simulation
 function init()
 	robot.wheels.set_velocity(0, 0)
 	n_steps = 0
@@ -56,6 +55,7 @@ function init()
     --controller:add(randomWander)
 end
 
+-- Step function, called at each simulation step
 function step()
 	n_steps = n_steps + 1
 
