@@ -14,13 +14,17 @@ import subprocess
 #? Punto 7.
 # Fa schifo perche gira solo per 5 generazioni, inoltre con il fatto che la crossover viene applicata meno spesso la popolazione non evolve molto.
 # anche se il crossover è 0, i risultati dello stesso genoma possono variare, perche i robottini cambiano di posto quando vengono inizializzati.
+# forse l'ultima cosa che ho scritto è sbagliata
+
+#? Idee
+# - fare crossover solo quando si ha una fitness bassa (es. sotto 0.5)
 
 ###
 
 GENOME_LENGTH = 50
 POP_SIZE = 10
 ELITE_SIZE = 5
-GENERATIONS = 5
+GENERATIONS = 20
 MUTATION_RATE = 0.1 # prob of mutating each gene
 CX_RATE = 0.5 # prob of applying crossover
 MUTATION_INTENSITY = 1 # stddev of a Gaussian distribution with mean 0
@@ -95,9 +99,13 @@ def mutate(individual):
 def print_stats(pop,fv):
     idx = max(range(POP_SIZE), key=lambda i: fv[i])
     best = pop[idx]
-    print("Gen", gen, ": Best fitness =", round(fv[idx],4))
+    best_fit = fv[idx]
+
+    print("Gen", gen, ": Best fitness =", round(best_fit,4))
     print("Best solution:", best)
     print("\n")
+    return [round(best_fit,4), best]
+    
 
 # Main GA loop
 population = [create_individual() for _ in range(POP_SIZE)]
@@ -105,8 +113,10 @@ population = [create_individual() for _ in range(POP_SIZE)]
 #print("Random solution:", population[0])
 
 # REPLACEMENT
+best_model = {"fitness": 0, "genome": None}
 for gen in range(GENERATIONS):
     fitness_values = [fitness(i) for i in population]
+    res_best_fit, res_best_sol = print_stats(population,fitness_values)
     new_population = []
     for _ in range(POP_SIZE):
         #selection_alg = select_proportional
@@ -117,5 +127,11 @@ for gen in range(GENERATIONS):
         child = crossover(parent1, parent2)
         child = mutate(child)
         new_population.append(child)
+
     population = new_population
-    print_stats(population,fitness_values)
+
+    if res_best_fit > best_model["fitness"]:
+        best_model["fitness"] = res_best_fit
+        best_model["genome"] = res_best_sol
+
+print("Best model found:", best_model)

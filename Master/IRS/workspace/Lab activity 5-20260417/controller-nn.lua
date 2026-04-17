@@ -11,7 +11,6 @@ function init()
 	net = nn.createNetwork(24,2,genome)
 end
 
-
 function step()
 	local input = {}
 	for i=1,#robot.light do
@@ -22,8 +21,6 @@ function step()
 	right_v = output[2] * MAX_VELOCITY
 	robot.wheels.set_velocity(left_v,right_v)
 end
-
-
 
 function destroy()
   -- Output the Euclidean distance from the light
