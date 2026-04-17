@@ -19,6 +19,11 @@ import subprocess
 #? Idee
 # - fare crossover solo quando si ha una fitness bassa (es. sotto 0.5)
 
+# per la avoidance: bisogna raddioppiare il nuemro di parametri da 24 a 48, mentre i bias rimangono gli stessi.
+# inoltre bisogna aggiugnere i sensori ai parametri e dargli una penalità se collidono (dire che è difficile capire se c'è collisione
+# perche non posso fare un check ogni step.). Comunque è difficile da far fuznionare perche i robot tendono a girare su se stessi.
+# una soluzione funzionava, ma non benissimo.
+
 ###
 
 GENOME_LENGTH = 50
