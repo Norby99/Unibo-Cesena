@@ -24,6 +24,7 @@
 	<leds implementation="default" medium="leds" />
       </actuators>
       <sensors>
+        <differential_steering implementation="default" />
         <footbot_proximity implementation="default" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
@@ -37,7 +38,7 @@
   <!-- * Arena configuration * -->
   <!-- *********************** -->
   <arena size="5.2, 5.2, 1.2" center="0,0,0.5">
-    <floor id="f" source="image" path="no_spot.png" />
+    <floor id="f" source="image" path="floors/one_spot.png" />
 
     <box id="bn" size="0.1, 5, 0.2" movable="false">
       <body position="2.5,0,0"  orientation="0,0,0" />
