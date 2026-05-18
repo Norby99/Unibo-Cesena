@@ -57,7 +57,7 @@ function update_state()
 	end
 
 	if sense_light() > AT_LIGHT_THRESHOLD then
-		log("[controller] At the light source! Stopping.")
+		log("[controller] At the light source! Stopping. Light reached in " .. n_steps .. " steps. Switching to AT_LIGHT state.")
 		robot.wheels.set_velocity(0, 0)
 		current_state = STATE_AT_LIGHT
 	end
