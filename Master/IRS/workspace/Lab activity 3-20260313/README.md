@@ -79,3 +79,13 @@ Through the development and testing of this project, clear limitations of the Su
 Because the system strictly follows the logic of a single behavior at any given time, it is highly susceptible to behavior monopolization. If a scenario arises where a high-priority behavior is continuously triggered, the robot will entirely focus on that single task, ignoring everything else. 
 
 For example, if the robot finds itself trapped in a corridor or between two walls, the **Fear** (obstacle avoidance) behavior will activate continuously. Consequently, the robot will permanently dedicate its actions to avoiding the walls and will never execute the **Follow** behavior. Even if there is a light source explicitly guiding it out, the strict exclusive prioritization prevents the goal-seeking logic from contributing to the final motor output, effectively "getting the robot stuck" in its own safety mechanism.
+
+## Performance avaluation
+The Subsumption Architecture was subjected to 40 randomized trials under a fixed simulation window of 1,500 steps.
+
+The robot successfully reached the light source in 95% of the trials (38 out of 40 runs).
+
+Within the successful trials, the robot reached the target with a mean completion time of 710 steps, exhibiting a standard deviation of 88 steps. The narrow standard deviation demonstrates that the priority-driven layers of the Subsumption architecture provide highly predictable and stable trajectories despite randomized starting vectors.
+
+### Failure Analysis
+In the 2 trials where the simulation timed out, the final distance to the light source was recorded at 0.12 meters and 0.81 meters. Inspection of the simulations revealed that these timeouts were not caused by the robot getting lost, but rather by complex, concave obstacle alignments near the light source.
