@@ -2,6 +2,7 @@
 local states = {}
 states.__index = states
 
+--[[ Class that implements the behavior of the robot in different states. ]]
 function states.new(robot, max_velocity)
     local self = setmetatable({}, states)
     self.robot = robot
@@ -9,7 +10,8 @@ function states.new(robot, max_velocity)
     return self
 end
 
-function states:follow(sensors)
+--[[ Method to follow the light source based on light sensor readings. ]]
+function states:follow(sensors, rotation_factor)
     local left_sum = 0
     local right_sum = 0
 
@@ -26,20 +28,15 @@ function states:follow(sensors)
 
     local diff = left_avg - right_avg
     local avg = (left_avg + right_avg) * 0.5
-    local relative_diff = (avg > 0) and (math.abs(diff) / avg) or 0  -- relative difference between the two groups
-    log("[states:follow] Left avg: " .. left_avg .. " | Right avg: " .. right_avg .. " | Relative diff: " .. (relative_diff * 100) .. "%")
+    log("[states:follow] Left avg: " .. left_avg .. " | Right avg: " .. right_avg)
 
-    if relative_diff < 0.05 then  -- less than 5% relative difference
-        self.robot.wheels.set_velocity(self.max_velocity, self.max_velocity)
-    else
-        local K = 40.0  -- factor of rotational speed
-        local left_vel  = math.max(0, math.min(self.max_velocity, self.max_velocity - K * diff * self.max_velocity))
-        local right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity + K * diff * self.max_velocity))
-        self.robot.wheels.set_velocity(left_vel, right_vel)
-    end
+    local left_vel  = math.max(0, math.min(self.max_velocity, self.max_velocity - rotation_factor * diff * self.max_velocity))
+    local right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity + rotation_factor * diff * self.max_velocity))
+    self.robot.wheels.set_velocity(left_vel, right_vel)
 end
 
-function states:fear(sensors)
+--[[ Method to fear obstacles based on proximity sensor readings. ]]
+function states:fear(sensors, rotation_factor)
     -- remove the sensors from the second quarter to the third quarter
     local n = #sensors
     local q1 = math.floor(n * 0.25)
@@ -75,9 +72,8 @@ function states:fear(sensors)
     if relative_diff < 0.05 then  -- less than 5% relative difference
         self.robot.wheels.set_velocity(self.max_velocity, self.max_velocity)
     else
-        local K = 40.0  -- factor of rotational speed
-        local left_vel  = math.max(0, math.min(self.max_velocity, self.max_velocity + K * diff * self.max_velocity))
-        local right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity - K * diff * self.max_velocity))
+        local left_vel  = math.max(0, math.min(self.max_velocity, self.max_velocity + rotation_factor * diff * self.max_velocity))
+        local right_vel = math.max(0, math.min(self.max_velocity, self.max_velocity - rotation_factor * diff * self.max_velocity))
         self.robot.wheels.set_velocity(left_vel, right_vel)
     end
 end
