@@ -32,6 +32,7 @@ function utils.max_sensor_value(sensors)
     return max_sensor
 end
 
+-- Normalizes the left and right motor speeds to ensure they do not exceed the maximum velocity.
 function utils.normalize_speeds(left_speed, right_speed, max_vel)
     local max_speed = math.max(math.abs(left_speed), math.abs(right_speed))
     if max_speed > max_vel then

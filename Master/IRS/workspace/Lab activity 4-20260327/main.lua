@@ -9,11 +9,7 @@ MAX_LIGHT_PERCIVED = 0.3
 MAX_PROXIMITY_PERCIVED = 1.0
 MIN_MOTOR_GROUND_PERCIVED = 0.01
 
--- TODO: Maybe it would be nice to have beside weight a gain value that
--- TODO: indicates how a behavior's output should be amplified or attenuated,
--- TODO: by how certain it is by it's coice.
-
-RANDOM_WANDER_TICKS = 50
+RANDOM_WANDER_TICKS = 50	-- Number of ticks for which the random wander behavior will maintain its current random direction before choosing a new one.
 
 local WeightsManager = require("libraries.weights_manager")
 
@@ -52,7 +48,7 @@ function init()
 
 	controller:add(fear)
 	controller:add(follow)
-    --controller:add(randomWander)
+    controller:add(randomWander)
 end
 
 -- Step function, called at each simulation step
