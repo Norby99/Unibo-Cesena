@@ -37,6 +37,12 @@ import subprocess
 
 # and compare replacement with elitism (5 replicas each and compare medians and means).
 
+# Problema simile al punto 7, la popolazione evolve poco a causa di CX rate a 0, ma ho notato che usando la fitness mediana tende a convergere più velocemten.
+# Inoltre per gioco ho notato che usando una fitness di tipo min ottenevo risultato eccellenti, penso sia dovuto al fatto che cosi facendo si favoriscono i genomi che sono più stabili e meno soggetti a colpi di fortuna, magari dovuti al rumore.
+
+# 11 Compare tournament selection and roulette wheel selection operators—using the previous parameter and experimental setting.
+# Comparing the two operators on just 5 generations showed minor empirical differences, heavily masked by the high elitism rate (50% of the population). However, theoretically and observing the logs, Tournament selection exhibits a more consistent selection pressure when fitness variance is low (early generations), whereas Roulette Wheel selection risks premature convergence if an artificially high-fitness 'super-individual' emerges early on due to initial noise.
+
 #? Idee
 # - fare crossover solo quando si ha una fitness bassa (es. sotto 0.5)
 
@@ -164,8 +170,8 @@ for gen in range(GENERATIONS):
         offspring_count = POP_SIZE
     
     for _ in range(offspring_count):
-        #selection_alg = select_proportional
-        selection_alg = select_tournament
+        selection_alg = select_proportional
+        #selection_alg = select_tournament
 
         parent1 = selection_alg(population,fitness_values)
         parent2 = selection_alg(population,fitness_values)
