@@ -52,11 +52,11 @@ import subprocess
 # una soluzione funzionava, ma non benissimo.
 
 #? TL:DR:
-# Il problema non derivava da rimasugli dell'algoritmo di avoidance, ma da un subdolo bug in Python per via delle liste passate per riferimento (per indirizzo di memoria).
-# Visto che in ga.py la probabilità di crossover (CX_RATE) era impostata a 0.0, la funzione crossover(parent1, parent2) restituiva banalmente la lista originale del genitore (return parent1). Successivamente, il codice andava a fare la mutazione passando il bambino (child = mutate(child)).
-# Il problema è che modificando gli elementi della lista individual all'interno di mutate, si andava involontariamente ad alterare il genitore in-place!
-# Questo mandava subito alla deriva tutti i progressi passati, e anche l'utilizzo dell'elitismo perdeva efficacia poiché i migliori individui salvati venivano continuamente distrutti dalla mutazione subendone direttamente gli effetti. Questo faceva sì che la rete neurale fosse perennemente in stato di "rumore random", provocando il movimento rotatorio dei robot a prescindere da quante generazioni passassero.
-# Ho sistemato ga.py applicando vari .copy()/list(...) in crossover, in mutate e anche nel ciclo in cui conservavi i genomi usando l'elitismo. Ora il genitore rimane preservato come "modello", e la generazione potrà effettivamente evolvere la fitness e trovare la strada verso la luce!
+# C'è stato un piccolo bug in ga.py con CX_RATE=0, risolto da gemini.
+# In pratica crossover restituiva semplicemente una copia del genitore, e poi mutate modificava 
+# in-place il figlio, alterando involontariamente anche il genitore a causa del passaggio per
+# riferimento delle liste in Python. Questo faceva sì che la popolazione non evolvesse e i robot
+# girassero su se stessi senza migliorare.
 
 ###
 
