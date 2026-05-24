@@ -12,6 +12,10 @@ Implementing elitism ensures that the top-performing genomes are preserved, but 
 
 Finally, comparing the selection operators `Tournament selection` and `Roulette Wheel selection` revealed minor empirical differences over just 5 generations. This outcome was heavily masked by the aggressive elitism rate. Theoretically and through log observation, however, Tournament selection demonstrates a more consistent selection pressure when fitness variance is low in early generations. It effectively mitigates the risk of premature convergence inherent to Roulette Wheel selection, which is prone to over-selecting a single 'super-individual' that happens to score artificially high due to initial simulation noise.
 
+## Data evaluation
+
+TODO
+
 ## Food for though
 
 The naive comparisons conducted during this short experimentation highlight that small population sizes and limited generations make the evolutionary process highly susceptible to stochastic noise, underscoring the necessity of more replicas and statistical testing for any principled analysis. To further improve the algorithm, future setups should scale up the population size and generation count, alongside introducing adaptive mutation rates or rank-based selection. Additionally, convergence could be accelerated by applying crossover conditionally—for instance, only triggering the operator when a parent's fitness falls below a specific threshold (e.g., 0.5)—thereby dynamically shifting the balance toward exploration only when the current solutions are underperforming.
