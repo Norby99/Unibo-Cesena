@@ -3,11 +3,16 @@ local nn = require "nn"
 MAX_VELOCITY = 15
 
 function init()
-	genome_param = os.getenv("GENOME")
+	local genome_param = os.getenv("GENOME") or GENOME
+	if not genome_param then
+		error("GENOME not provided: set the environment variable GENOME or define a global GENOME string")
+	end
+
 	genome = {}
 	for num in genome_param:gmatch("[^,]+") do
-			table.insert(genome,tonumber(num))
+		table.insert(genome, tonumber(num))
 	end
+
 	net = nn.createNetwork(24,2,genome)
 end
 
