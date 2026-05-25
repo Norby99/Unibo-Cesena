@@ -69,7 +69,8 @@ CX_RATE = 0.0 # prob of applying crossover
 MUTATION_INTENSITY = 1 # stddev of a Gaussian distribution with mean 0
 N_EVAL = 3  #! quante volte viene valutato un genoma per calcolare la fitness (media)
 
-USE_ELITISM = True # whether to use elitism or standard replacement
+USE_ELITISM = False # whether to use elitism or standard replacement
+SELECT_PROPORTIONAL = False # whether to use roulette wheel selection (proportional) or tournament selection
 
 # Create random individual
 def create_individual():
@@ -90,9 +91,9 @@ def fitness(individual):
                 fitness = str(line.strip().split(":")[1])
                 fitness = float(fitness.replace(",", "."))
         fvalue.append(fitness)
-    #fitness = statistics.median(fvalue)
+    fitness = statistics.median(fvalue)
     #fitness = statistics.mean(fvalue)
-    fitness = min(fvalue)
+    #fitness = min(fvalue)
     return fitness
 
 # Selection: tournament
@@ -170,8 +171,11 @@ for gen in range(GENERATIONS):
         offspring_count = POP_SIZE
     
     for _ in range(offspring_count):
-        selection_alg = select_proportional
-        #selection_alg = select_tournament
+
+        if SELECT_PROPORTIONAL:
+            selection_alg = select_proportional
+        else:
+            selection_alg = select_tournament
 
         parent1 = selection_alg(population,fitness_values)
         parent2 = selection_alg(population,fitness_values)
