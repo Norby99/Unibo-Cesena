@@ -14,7 +14,32 @@ Finally, comparing the selection operators `Tournament selection` and `Roulette 
 
 ## Data evaluation
 
-TODO
+### Point 4
+| Gaussian eval=3 mean |
+| :---: |
+| ![Point 4](/images/point4.png) |
+
+### Point 6
+| Gaussian eval=3 min |
+| :---: |
+| ![Point 6](/images/point6.png) |
+
+### Point 7
+| CX_RATE=1 - mean | CX_RATE=1 - median | CX_RATE=0.5 - mean | CX_RATE=0.5 - median | CX_RATE=0 - mean | CX_RATE=0 - median |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| ![Point 7 - CX_RATE=1 - mean](/images/point7-1-mean.png) | ![Point 7 - CX_RATE=1 - median](/images/point7-1-median.png) | ![Point 7 - CX_RATE=0.5 - mean](/images/point7-05-mean.png) | ![Point 7 - CX_RATE=0.5 - median](/images/point7-05-median.png) | ![Point 7 - CX_RATE=0 - mean](/images/point7-0-mean.png) | ![Point 7 - CX_RATE=0 - median](/images/point7-0-median.png) |
+
+### Point 9
+| replacement - mean | replacement - median | elitism - mean | elitism - median |
+| :---: | :---: | :---: | :---: |
+| ![Point 9 - replacement - mean](/images/point7-0-mean.png) | ![Point 9 - replacement - median](/images/point7-0-median.png) |![Point 9 - elitism - mean](/images/point9-e-mean.png) | ![Point 9 - elitism - median](/images/point9-e-median.png)|
+
+### Point 11
+| tournament-selection - mean | tournament-selection - median | roulette_wheel-selection - mean | roulette_wheel-selection - median |
+| :---: | :---: | :---: | :---: |
+| ![Point 11 - tournament-selection - mean](/images/point7-0-mean.png) | ![Point 11 - tournament-selection - median](/images/point7-0-median.png) |![Point 11 - roulette_wheel-selection - mean](/images/point11-r-mean.png) | ![Point 11 - roulette_wheel-selection - median](/images/point11-r-median.png)|
+
+
 
 ## Food for though
 
