@@ -63,7 +63,6 @@ function MotorSchemaController:run()
 
         if vec then
             local weight = self.weights[b.name] or DEFAULT_WEIGHT
-            -- log("[Controller] behavior: " .. b.name .. " | weight: " .. weight)
             vec.length = vec.length * weight
         end
 
@@ -77,25 +76,15 @@ function MotorSchemaController:run()
     return left_speed, right_speed
 end
 
+-- Calculates the probabilities for switching between moving and stopping based on the number of nearby robots.
 function MotorSchemaController:calculate_prob()
     CountRAB()
 
-    -- for the first exercise set PARAMS.D to 0
-    self.PROB.Ps = math.min(PARAMS.Psmax, PARAMS.S + PARAMS.a * PARAMS.N + PARAMS.D)
-    self.PROB.Pw = math.max(PARAMS.Pwmin, PARAMS.W - PARAMS.b * PARAMS.N + PARAMS.D)
+    local current_Ds = is_on_black() and PARAMS.Ds or 0
+    local current_Dw = is_on_black() and PARAMS.Dw or 0
 
-    --log("[Controller] N: " .. PARAMS.N .. " | Ps: " .. self.PROB.Ps .. " | Pw: " .. self.PROB.Pw)
-end
-
-function CountRAB()
-    number_robot_sensed = 0
-    for i = 1, #robot.range_and_bearing do
-        -- for each robot seen, check if it is close enough.
-        if robot.range_and_bearing[i].range < PARAMS.MAXRANGE and robot.range_and_bearing[i].data[1]==1 then
-            number_robot_sensed = number_robot_sensed + 1
-        end
-    end
-    PARAMS.N = number_robot_sensed
+    self.PROB.Ps = math.min(PARAMS.Psmax, PARAMS.S + PARAMS.a * PARAMS.N + current_Ds)
+    self.PROB.Pw = math.max(PARAMS.Pwmin, PARAMS.W - PARAMS.b * PARAMS.N - current_Dw)
 end
 
 -- Converts a polar vector to left and right wheel speeds using a differential drive model.
@@ -109,6 +98,27 @@ function MotorSchemaController:calculate_speed(vec)
     right_speed = v + (L / 2) * w
 
     return utils.normalize_speeds(left_speed, right_speed, self.max_velocity)
+end
+
+-- Counts the number of stopped nearby robots.
+function CountRAB()
+    number_robot_sensed = 0
+    for i = 1, #robot.range_and_bearing do
+        -- for each robot seen, check if it is close enough.
+        if robot.range_and_bearing[i].range < PARAMS.MAXRANGE and robot.range_and_bearing[i].data[1]==1 then
+            number_robot_sensed = number_robot_sensed + 1
+        end
+    end
+    PARAMS.N = number_robot_sensed
+end
+
+-- Check if the robot is on a black spot.
+function is_on_black()
+    if robot.motor_ground then
+        local avg_ground = utils.avg_sensor_value(robot.motor_ground)
+        return avg_ground < (MIN_MOTOR_GROUND_PERCIVED or 0.1)
+    end
+    return false
 end
 
 return MotorSchemaController

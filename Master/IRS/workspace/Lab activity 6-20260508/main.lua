@@ -9,10 +9,6 @@ MAX_LIGHT_PERCIVED = 0.3
 MAX_PROXIMITY_PERCIVED = 1.0
 MIN_MOTOR_GROUND_PERCIVED = 0.01
 
--- TODO: Maybe it would be nice to have beside weight a gain value that
--- TODO: indicates how a behavior's output should be amplified or attenuated,
--- TODO: by how certain it is by it's coice.
-
 RANDOM_WANDER_TICKS = 2
 
 local WeightsManager = require("libraries.weights_manager")
@@ -36,7 +32,8 @@ PARAMS = {
 	N = 0,
 	MAXRANGE = 30.0,
 
-	D = 0
+	Dw = 0.1,
+	Ds = 0.01
 }
 
 -- Imports
