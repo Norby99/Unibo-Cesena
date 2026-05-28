@@ -17,34 +17,34 @@ Finally, comparing the selection operators `Tournament selection` and `Roulette 
 ### Point 4
 | Gaussian eval=3 mean |
 | :---: |
-| ![Point 4](/images/point4.png) |
+| ![Point 4](./images/point4.png) |
 
 ### Point 6
 | Gaussian eval=3 min |
 | :---: |
-| ![Point 6](/images/point6.png) |
+| ![Point 6](./images/point6.png) |
 
 ### Point 7
 | CX_RATE=1 - mean | CX_RATE=1 - median | CX_RATE=0.5 - mean | CX_RATE=0.5 - median | CX_RATE=0 - mean | CX_RATE=0 - median |
 | :---: | :---: | :---: | :---: | :---: | :---: |
-| ![Point 7 - CX_RATE=1 - mean](/images/point7-1-mean.png) | ![Point 7 - CX_RATE=1 - median](/images/point7-1-median.png) | ![Point 7 - CX_RATE=0.5 - mean](/images/point7-05-mean.png) | ![Point 7 - CX_RATE=0.5 - median](/images/point7-05-median.png) | ![Point 7 - CX_RATE=0 - mean](/images/point7-0-mean.png) | ![Point 7 - CX_RATE=0 - median](/images/point7-0-median.png) |
+| ![Point 7 - CX_RATE=1 - mean](./images/point7-1-mean.png) | ![Point 7 - CX_RATE=1 - median](./images/point7-1-median.png) | ![Point 7 - CX_RATE=0.5 - mean](./images/point7-05-mean.png) | ![Point 7 - CX_RATE=0.5 - median](./images/point7-05-median.png) | ![Point 7 - CX_RATE=0 - mean](./images/point7-0-mean.png) | ![Point 7 - CX_RATE=0 - median](./images/point7-0-median.png) |
 
 ### Point 9
 | replacement - mean | replacement - median | elitism - mean | elitism - median |
 | :---: | :---: | :---: | :---: |
-| ![Point 9 - replacement - mean](/images/point7-0-mean.png) | ![Point 9 - replacement - median](/images/point7-0-median.png) |![Point 9 - elitism - mean](/images/point9-e-mean.png) | ![Point 9 - elitism - median](/images/point9-e-median.png)|
+| ![Point 9 - replacement - mean](./images/point7-0-mean.png) | ![Point 9 - replacement - median](./images/point7-0-median.png) |![Point 9 - elitism - mean](./images/point9-e-mean.png) | ![Point 9 - elitism - median](./images/point9-e-median.png)|
 
 ### Point 11
 | tournament-selection - mean | tournament-selection - median | roulette_wheel-selection - mean | roulette_wheel-selection - median |
 | :---: | :---: | :---: | :---: |
-| ![Point 11 - tournament-selection - mean](/images/point7-0-mean.png) | ![Point 11 - tournament-selection - median](/images/point7-0-median.png) |![Point 11 - roulette_wheel-selection - mean](/images/point11-r-mean.png) | ![Point 11 - roulette_wheel-selection - median](/images/point11-r-median.png)|
+| ![Point 11 - tournament-selection - mean](./images/point7-0-mean.png) | ![Point 11 - tournament-selection - median](./images/point7-0-median.png) |![Point 11 - roulette_wheel-selection - mean](./images/point11-r-mean.png) | ![Point 11 - roulette_wheel-selection - median](./images/point11-r-median.png)|
 
 > Every chart and gathered data can be found in the DATA.md file.
 
 
 ## Food for thought
 
-The naive comparisons conducted during this short experimentation highlight that small population sizes and limited generations make the evolutionary process highly susceptible to stochastic noise, underscoring the necessity of more replicas and statistical testing for any principled analysis. To further improve the algorithm, future setups should scale up the population size and generation count, alongside introducing adaptive mutation rates or rank-based selection. Additionally, convergence could be accelerated by applying crossover conditionally—for instance, only triggering the operator when a parent's fitness falls below a specific threshold (e.g., 0.5)—thereby dynamically shifting the balance toward exploration only when the current solutions are underperforming.
+The naive comparisons conducted during this laboratory highlight that small population sizes and limited generations make the evolutionary process highly susceptible to stochastic noise, underscoring the necessity of more replicas and statistical testing for any principled analysis. To further improve the algorithm, future setups should scale up the population size and generation count, alongside introducing adaptive mutation rates or rank-based selection. Additionally, convergence could be accelerated by applying crossover conditionally—for instance, only triggering the operator when a parent's fitness falls below a specific threshold (e.g., 0.5)—thereby dynamically shifting the balance toward exploration only when the current solutions are underperforming.
 
 Transitioning the target behavior to pure collision avoidance requires replacing the 24 light sensors with 24 proximity sensors as the network inputs, while keeping the biases constant. The fitness function must also be modified to introduce a penalty for collisions. However, this behavior is notoriously difficult to evolve successfully in practice, as the genetic algorithm often gets trapped in local optima where the robots simply spin in circles to avoid moving forward into obstacles.
 
